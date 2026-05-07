@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cadastro de Fornecedor — Premix</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0A2E5C;--navy-l:#13447A;--amber:#E8842C;--amber-h:#D4741F;
+  --bg:#F0F2F7;--card:#FFFFFF;--text:#1B2A3D;--muted:#6B7A8D;
+  --border:#D4DAE3;--focus:#0A2E5C;--green:#0F9D58;--red:#D93025;
+  --radius:10px;
+}
+html{font-size:15px;scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.55}
+
+.wrap{max-width:800px;margin:0 auto;padding:20px 16px 80px}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,var(--navy) 0%,#1A4F8A 100%);border-radius:16px;padding:44px 28px 36px;text-align:center;margin-bottom:28px;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;width:260px;height:260px;border-radius:50%;background:rgba(232,132,44,.12);top:-80px;right:-60px}
+.hdr::after{content:'';position:absolute;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.03);bottom:-60px;left:-40px}
+.hdr h1{font-size:1.65rem;font-weight:800;color:#fff;position:relative;z-index:1;letter-spacing:-.4px}
+.hdr p{color:rgba(255,255,255,.7);font-size:.88rem;margin-top:6px;position:relative;z-index:1}
+
+/* PROGRESS */
+.prog{display:flex;justify-content:center;gap:6px;margin-bottom:24px;flex-wrap:wrap}
+.prog-s{display:flex;align-items:center;gap:5px;padding:7px 14px;background:var(--card);border:1.5px solid var(--border);border-radius:99px;font-size:.78rem;font-weight:500;color:var(--muted);cursor:pointer;transition:.25s}
+.prog-s.on{border-color:var(--navy);color:var(--navy);background:rgba(10,46,92,.04);font-weight:600}
+.prog-s.done{border-color:var(--green);color:var(--green);background:rgba(15,157,88,.04)}
+.sn{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;background:var(--border);color:var(--muted);transition:.25s}
+.prog-s.on .sn{background:var(--navy);color:#fff}
+.prog-s.done .sn{background:var(--green);color:#fff}
+
+/* SECTIONS */
+.sec{background:var(--card);border-radius:var(--radius);padding:28px 24px;margin-bottom:16px;box-shadow:0 1px 4px rgba(10,46,92,.05);border:1px solid rgba(212,218,227,.5);display:none;animation:fadeUp .3s ease}
+.sec.on{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.stitle{font-size:1.08rem;font-weight:700;display:flex;align-items:center;gap:10px;margin-bottom:3px}
+.stitle .ic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.95rem}
+.ssub{font-size:.8rem;color:var(--muted);margin-bottom:22px}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid .full{grid-column:1/-1}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+
+/* FIELDS */
+.fld{display:flex;flex-direction:column;gap:4px}
+.fld label{font-size:.78rem;font-weight:600;color:var(--text)}
+.fld label .req{color:var(--amber);margin-left:2px}
+.fld input,.fld select,.fld textarea{padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:.88rem;color:var(--text);background:#FAFBFD;outline:none;transition:.2s;width:100%}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--focus);box-shadow:0 0 0 3px rgba(10,46,92,.07);background:#fff}
+.fld input.err,.fld select.err{border-color:var(--red);box-shadow:0 0 0 3px rgba(217,48,37,.07)}
+.fld textarea{resize:vertical;min-height:72px}
+.fld .hint{font-size:.72rem;color:var(--muted)}
+.fld .emsg{font-size:.72rem;color:var(--red);display:none}
+.fld .emsg.show{display:block}
+
+/* FILE UPLOAD */
+.fup{border:2px dashed var(--border);border-radius:10px;padding:22px 14px;text-align:center;cursor:pointer;transition:.25s;background:#FAFBFD;position:relative}
+.fup:hover{border-color:var(--navy);background:rgba(10,46,92,.015)}
+.fup.ok{border-color:var(--green);background:rgba(15,157,88,.025)}
+.fup input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.fup .ui{font-size:1.6rem;margin-bottom:4px}
+.fup .ut{font-size:.82rem;color:var(--muted)}
+.fup .ut strong{color:var(--navy)}
+.fup .fn{font-size:.8rem;color:var(--green);font-weight:600;margin-top:4px}
+
+/* RADIO */
+.rg{display:flex;gap:10px}
+.ro{flex:1;position:relative}
+.ro input[type=radio]{position:absolute;opacity:0}
+.ro label{display:block;padding:9px 14px;border:1.5px solid var(--border);border-radius:8px;text-align:center;cursor:pointer;font-size:.82rem;font-weight:500;transition:.2s;background:#FAFBFD}
+.ro input:checked+label{border-color:var(--navy);background:rgba(10,46,92,.04);color:var(--navy);font-weight:600}
+
+/* BUTTONS */
+.btns{display:flex;justify-content:space-between;gap:10px;margin-top:22px}
+.btn{padding:11px 26px;border-radius:10px;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;transition:.2s;border:none;display:flex;align-items:center;gap:6px}
+.btn2{background:var(--bg);color:var(--muted);border:1.5px solid var(--border)}
+.btn2:hover{background:#E4E8F0}
+.btn1{background:var(--navy);color:#fff;box-shadow:0 2px 8px rgba(10,46,92,.22)}
+.btn1:hover{background:var(--navy-l);transform:translateY(-1px)}
+.btns3{background:var(--amber);color:#fff;box-shadow:0 2px 8px rgba(232,132,44,.28)}
+.btns3:hover{background:var(--amber-h);transform:translateY(-1px)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+
+/* SUCCESS */
+.sov{display:none;position:fixed;inset:0;background:rgba(10,46,92,.82);backdrop-filter:blur(5px);z-index:1000;justify-content:center;align-items:center}
+.sov.show{display:flex}
+.scard{background:#fff;border-radius:20px;padding:48px 36px;text-align:center;max-width:420px;width:90%;animation:pop .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+.scard .chk{width:60px;height:60px;background:linear-gradient(135deg,#0F9D58,#34D399);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:1.6rem;color:#fff}
+.scard h2{font-size:1.2rem;font-weight:700;margin-bottom:8px}
+.scard p{font-size:.88rem;color:var(--muted);line-height:1.5}
+
+.spinner{display:inline-block;width:16px;height:16px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr">
+    <h1>Cadastro de Fornecedor</h1>
+    <p>Preencha os dados abaixo para se cadastrar como fornecedor Premix</p>
+  </div>
+
+  <div class="prog">
+    <div class="prog-s on" onclick="go(1)"><span class="sn">1</span>Empresa</div>
+    <div class="prog-s" onclick="go(2)"><span class="sn">2</span>Contato</div>
+    <div class="prog-s" onclick="go(3)"><span class="sn">3</span>Endereço</div>
+    <div class="prog-s" onclick="go(4)"><span class="sn">4</span>Banco</div>
+    <div class="prog-s" onclick="go(5)"><span class="sn">5</span>Documentos</div>
+  </div>
+
+  <form id="frm" novalidate>
+    <!-- STEP 1 -->
+    <div class="sec on" id="s1">
+      <div class="stitle"><span class="ic" style="background:#EBF0FA">🏢</span>Dados da Empresa</div>
+      <p class="ssub">Informações básicas do fornecedor</p>
+      <div class="grid">
+        <div class="fld full"><label>Razão Social <span class="req">*</span></label><input name="razao_social" required placeholder="Ex: Empresa Ltda"><span class="emsg">Campo obrigatório</span></div>
+        <div class="fld"><label>Nome Fantasia</label><input name="nome_fantasia" placeholder="Nome comercial"></div>
+        <div class="fld"><label>CNPJ <span class="req">*</span></label><input name="cnpj" required placeholder="00.000.000/0000-00" maxlength="18"><span class="emsg">CNPJ inválido</span></div>
+        <div class="fld"><label>Inscrição Estadual</label><input name="inscricao_estadual" placeholder="Inscrição Estadual"></div>
+        <div class="fld"><label>Inscrição Municipal</label><input name="inscricao_municipal" placeholder="Inscrição Municipal"></div>
+        <div class="fld full"><label>Ramo de Atividade</label><input name="ramo_atividade" placeholder="Ex: Alimentos, Embalagens, Logística..."></div>
+        <div class="fld full"><label>Produtos / Serviços Oferecidos</label><textarea name="produtos_servicos" placeholder="Descreva os principais produtos ou serviços..."></textarea></div>
+      </div>
+      <div class="btns" style="justify-content:flex-end"><button type="button" class="btn btn1" onclick="next()">Próximo →</button></div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="sec" id="s2">
+      <div class="stitle"><span class="ic" style="background:#FEF3E2">📞</span>Dados de Contato</div>
+      <p class="ssub">Como podemos entrar em contato</p>
+      <div class="grid">
+        <div class="fld"><label>Nome do Responsável <span class="req">*</span></label><input name="responsavel_nome" required placeholder="Nome completo"><span class="emsg">Campo obrigatório</span></div>
+        <div class="fld"><label>Cargo</label><input name="responsavel_cargo" placeholder="Ex: Gerente Comercial"></div>
+        <div class="fld"><label>Telefone Fixo</label><input name="telefone" placeholder="(00) 0000-0000" maxlength="15"></div>
+        <div class="fld"><label>Celular / WhatsApp <span class="req">*</span></label><input name="celular" required placeholder="(00) 00000-0000" maxlength="16"><span class="emsg">Campo obrigatório</span></div>
+        <div class="fld"><label>E-mail <span class="req">*</span></label><input name="email" required placeholder="contato@empresa.com" type="email"><span class="emsg">E-mail inválido</span></div>
+        <div class="fld"><label>Website</label><input name="website" placeholder="https://www.empresa.com"></div>
+      </div>
+      <div class="btns"><button type="button" class="btn btn2" onclick="prev()">← Voltar</button><button type="button" class="btn btn1" onclick="next()">Próximo →</button></div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="sec" id="s3">
+      <div class="stitle"><span class="ic" style="background:#E8F5E9">📍</span>Endereço</div>
+      <p class="ssub">Localização da empresa</p>
+      <div class="grid">
+        <div class="fld"><label>CEP <span class="req">*</span></label><input name="cep" required placeholder="00000-000" maxlength="9"><span class="hint">Digite o CEP e clique em buscar</span><span class="emsg">CEP inválido</span></div>
+        <div class="fld" style="align-self:end"><button type="button" class="btn btn2" onclick="buscaCEP()" style="width:100%">🔍 Buscar CEP</button></div>
+        <div class="fld"><label>Logradouro <span class="req">*</span></label><input name="logradouro" required placeholder="Rua, Avenida..."><span class="emsg">Campo obrigatório</span></div>
+        <div class="fld"><label>Número <span class="req">*</span></label><input name="numero" required placeholder="Nº"><span class="emsg">Campo obrigatório</span></div>
+        <div class="fld"><label>Complemento</label><input name="complemento" placeholder="Sala, Andar, Bloco..."></div>
+        <div class="fld"><label>Bairro <span class="req">*</span></label><input name="bairro" required placeholder="Bairro"><span class="emsg">Campo obrigatório</span></div>
+        <div class="fld"><label>Cidade <span class="req">*</span></label><input name="cidade" required placeholder="Cidade"><span class="emsg">Campo obrigatório</span></div>
+        <div class="fld"><label>Estado <span class="req">*</span></label><select name="estado" required><option value="">Selecione</option><option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option></select><span class="emsg">Selecione o estado</span></div>
+      </div>
+      <div class="btns"><button type="button" class="btn btn2" onclick="prev()">← Voltar</button><button type="button" class="btn btn1" onclick="next()">Próximo →</button></div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="sec" id="s4">
+      <div class="stitle"><span class="ic" style="background:#F3E8FF">🏦</span>Dados Bancários</div>
+      <p class="ssub">Informações para pagamento</p>
+      <div class="grid">
+        <div class="fld"><label>Banco <span class="req">*</span></label><input name="banco" required placeholder="Ex: Bradesco, Itaú..."><span class="emsg">Campo obrigatório</span></div>
+        <div class="fld"><label>Tipo de Conta <span class="req">*</span></label><div class="rg"><div class="ro"><input type="radio" name="tipo_conta" id="tc1" value="corrente" checked><label for="tc1">Corrente</label></div><div class="ro"><input type="radio" name="tipo_conta" id="tc2" value="poupanca"><label for="tc2">Poupança</label></div></div></div>
+        <div class="fld"><label>Agência <span class="req">*</span></label><input name="agencia" required placeholder="0000"><span class="emsg">Campo obrigatório</span></div>
+        <div class="fld"><label>Conta <span class="req">*</span></label><input name="conta" required placeholder="00000-0"><span class="emsg">Campo obrigatório</span></div>
+        <div class="fld"><label>Titular da Conta</label><input name="titular_conta" placeholder="Nome do titular"></div>
+        <div class="fld"><label>CPF/CNPJ do Titular</label><input name="cpf_cnpj_titular" placeholder="CPF ou CNPJ"></div>
+        <div class="fld full"><label>Chave PIX</label><input name="pix" placeholder="CPF, CNPJ, e-mail, telefone ou chave aleatória"></div>
+      </div>
+      <div class="btns"><button type="button" class="btn btn2" onclick="prev()">← Voltar</button><button type="button" class="btn btn1" onclick="next()">Próximo →</button></div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="sec" id="s5">
+      <div class="stitle"><span class="ic" style="background:#FEE2E2">📄</span>Documentos e Finalização</div>
+      <p class="ssub">Anexe os comprovantes e finalize</p>
+      <div class="grid">
+        <div class="fld">
+          <label>Comprovante de CNPJ <span class="req">*</span></label>
+          <div class="fup" id="dc">
+            <div class="ui">📎</div>
+            <div class="ut">Clique ou arraste o <strong>Cartão CNPJ</strong></div>
+            <div class="fn" id="fcn"></div>
+            <input type="file" name="comprovante_cnpj" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fcn','dc')">
+          </div>
+          <span class="hint">PDF, JPG ou PNG (máx. 5MB)</span>
+        </div>
+        <div class="fld">
+          <label>Comprovante Bancário <span class="req">*</span></label>
+          <div class="fup" id="db">
+            <div class="ui">📎</div>
+            <div class="ut">Clique ou arraste o <strong>comprovante bancário</strong></div>
+            <div class="fn" id="fbn"></div>
+            <input type="file" name="comprovante_bancario" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fbn','db')">
+          </div>
+          <span class="hint">PDF, JPG ou PNG (máx. 5MB)</span>
+        </div>
+        <div class="fld full"><label>Condições de Pagamento</label><input name="condicoes_pagamento" placeholder="Ex: 30/60/90 dias, à vista..."></div>
+        <div class="fld full"><label>Prazo de Entrega</label><input name="prazo_entrega" placeholder="Ex: 15 dias úteis, pronta entrega..."></div>
+      </div>
+      <div class="btns"><button type="button" class="btn btn2" onclick="prev()">← Voltar</button><button type="submit" class="btn btns3" id="sbtn">Enviar Cadastro ✓</button></div>
+    </div>
+  </form>
+</div>
+
+<div class="sov" id="sov">
+  <div class="scard">
+    <div class="chk">✓</div>
+    <h2>Cadastro Enviado!</h2>
+    <p>Seus dados foram recebidos com sucesso.<br>Nossa equipe irá analisar e entrar em contato em breve.</p>
+  </div>
+</div>
+
+<script>
+// ======= CONFIGURAÇÃO SUPABASE =======
+const SB_URL='https://frudrwxdygfticgcwigv.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZydWRyd3hkeWdmdGljZ2N3aWd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxMDg4NzgsImV4cCI6MjA5MzY4NDg3OH0.2laDHYhQEiBu0K9iQCiYtf2T3_Q21rnJAAsNByUKJ10';
+// ======================================
+
+let cur=1;const tot=5;
+
+// Máscaras
+const mCNPJ=v=>v.replace(/\D/g,'').replace(/^(\d{2})(\d)/,'$1.$2').replace(/^(\d{2}\.\d{3})(\d)/,'$1.$2').replace(/\.(\d{3})(\d)/,'.$1/$2').replace(/(\d{4})(\d)/,'$1-$2').substring(0,18);
+const mTel=v=>{v=v.replace(/\D/g,'');return v.length<=10?v.replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{4})(\d)/,'$1-$2'):v.replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d)/,'$1-$2')};
+const mCEP=v=>v.replace(/\D/g,'').replace(/(\d{5})(\d)/,'$1-$2').substring(0,9);
+
+document.querySelector('[name=cnpj]').addEventListener('input',function(){this.value=mCNPJ(this.value)});
+document.querySelector('[name=telefone]').addEventListener('input',function(){this.value=mTel(this.value)});
+document.querySelector('[name=celular]').addEventListener('input',function(){this.value=mTel(this.value)});
+document.querySelector('[name=cep]').addEventListener('input',function(){this.value=mCEP(this.value)});
+
+// Navegação
+function go(s){
+  if(s<1||s>tot)return;
+  document.querySelectorAll('.sec').forEach(e=>e.classList.remove('on'));
+  document.getElementById('s'+s).classList.add('on');
+  document.querySelectorAll('.prog-s').forEach((e,i)=>{
+    e.classList.remove('on','done');
+    if(i+1<s)e.classList.add('done');
+    if(i+1===s)e.classList.add('on');
+  });
+  cur=s;window.scrollTo({top:0,behavior:'smooth'});
+}
+function next(){if(valStep(cur))go(cur+1)}
+function prev(){go(cur-1)}
+
+// Validação
+function valStep(s){
+  const sec=document.getElementById('s'+s);
+  const reqs=sec.querySelectorAll('[required]');
+  let ok=true;
+  reqs.forEach(f=>{
+    const em=f.closest('.fld')?.querySelector('.emsg');
+    if(!f.value.trim()){f.classList.add('err');if(em)em.classList.add('show');ok=false}
+    else{f.classList.remove('err');if(em)em.classList.remove('show')}
+  });
+  if(!ok)sec.querySelector('.err')?.focus();
+  return ok;
+}
+
+// File handler
+function hf(inp,fnId,dropId){
+  const f=inp.files[0];
+  if(!f)return;
+  if(f.size>5*1024*1024){alert('Arquivo muito grande. Máximo 5MB.');inp.value='';return}
+  document.getElementById(fnId).textContent='✓ '+f.name;
+  document.getElementById(dropId).classList.add('ok');
+}
+
+// Busca CEP
+async function buscaCEP(){
+  const cep=document.querySelector('[name=cep]').value.replace(/\D/g,'');
+  if(cep.length!==8){alert('Digite um CEP válido');return}
+  try{
+    const r=await fetch('https://viacep.com.br/ws/'+cep+'/json/');
+    const d=await r.json();
+    if(d.erro){alert('CEP não encontrado');return}
+    document.querySelector('[name=logradouro]').value=d.logradouro||'';
+    document.querySelector('[name=bairro]').value=d.bairro||'';
+    document.querySelector('[name=cidade]').value=d.localidade||'';
+    const sel=document.querySelector('[name=estado]');
+    for(let o of sel.options){if(o.value===d.uf){sel.value=d.uf;break}}
+  }catch(e){alert('Erro ao buscar CEP')}
+}
+
+// Upload arquivo para Supabase Storage
+async function uploadFile(file,folder){
+  const ts=Date.now();
+  const ext=file.name.split('.').pop();
+  const path=folder+'/'+ts+'_'+Math.random().toString(36).substr(2,6)+'.'+ext;
+  const res=await fetch(SB_URL+'/storage/v1/object/comprovantes/'+path,{
+    method:'POST',
+    headers:{'Authorization':'Bearer '+SB_KEY,'Content-Type':file.type,'x-upsert':'true'},
+    body:file
+  });
+  if(!res.ok)throw new Error('Upload falhou');
+  return SB_URL+'/storage/v1/object/public/comprovantes/'+path;
+}
+
+// Submit
+document.getElementById('frm').addEventListener('submit',async function(e){
+  e.preventDefault();
+  if(!valStep(cur))return;
+
+  const cnpjFile=document.querySelector('[name=comprovante_cnpj]').files[0];
+  const bancoFile=document.querySelector('[name=comprovante_bancario]').files[0];
+  if(!cnpjFile){alert('Anexe o comprovante de CNPJ');return}
+  if(!bancoFile){alert('Anexe o comprovante bancário');return}
+
+  const btn=document.getElementById('sbtn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Enviando...';
+
+  try{
+    // Upload arquivos
+    const [cnpjUrl,bancoUrl]=await Promise.all([
+      uploadFile(cnpjFile,'cnpj'),
+      uploadFile(bancoFile,'bancario')
+    ]);
+
+    // Montar dados
+    const fd=new FormData(this);
+    const data={};
+    for(const[k,v]of fd.entries()){
+      if(k!=='comprovante_cnpj'&&k!=='comprovante_bancario')data[k]=v;
+    }
+    data.comprovante_cnpj_url=cnpjUrl;
+    data.comprovante_bancario_url=bancoUrl;
+    data.status='pendente';
+
+    // Enviar para Supabase
+    const res=await fetch(SB_URL+'/rest/v1/fornecedores',{
+      method:'POST',
+      headers:{
+        'apikey':SB_KEY,
+        'Authorization':'Bearer '+SB_KEY,
+        'Content-Type':'application/json',
+        'Prefer':'return=minimal'
+      },
+      body:JSON.stringify(data)
+    });
+
+    if(!res.ok){const err=await res.text();throw new Error(err)}
+
+    document.getElementById('sov').classList.add('show');
+  }catch(err){
+    alert('Erro ao enviar: '+err.message);
+    btn.disabled=false;btn.textContent='Enviar Cadastro ✓';
+  }
+});
+</script>
+</body>
+</html>
