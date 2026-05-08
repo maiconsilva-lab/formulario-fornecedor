@@ -4,139 +4,222 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cadastro de Fornecedor — Premix</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --navy:#0A2E5C;--navy-l:#13447A;--amber:#E8842C;--amber-h:#D4741F;
-  --bg:#F0F2F7;--card:#FFFFFF;--text:#1B2A3D;--muted:#6B7A8D;
-  --border:#D4DAE3;--focus:#0A2E5C;--green:#0F9D58;--red:#D93025;
-  --radius:10px;
+  --premix-green:#00A650;--premix-green-d:#008C44;--premix-green-l:#33B96F;
+  --premix-dark:#1A1A1A;--premix-dark-2:#2D2D2D;
+  --premix-gold:#C8A951;--premix-gold-l:#D4BC6E;
+  --bg:#F5F6F0;--card:#FFFFFF;--text:#1A1A1A;--muted:#6B7265;
+  --border:#D8DDD2;--focus:#00A650;
+  --red:#D93025;--amber:#E8842C;
+  --radius:8px;
 }
 html{font-size:15px;scroll-behavior:smooth}
-body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.55}
+body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
 
-.wrap{max-width:800px;margin:0 auto;padding:20px 16px 80px}
+.wrap{max-width:820px;margin:0 auto;padding:0 16px 80px}
 
 /* HEADER */
-.hdr{background:linear-gradient(135deg,var(--navy) 0%,#1A4F8A 100%);border-radius:16px;padding:44px 28px 36px;text-align:center;margin-bottom:28px;position:relative;overflow:hidden}
-.hdr::before{content:'';position:absolute;width:260px;height:260px;border-radius:50%;background:rgba(232,132,44,.12);top:-80px;right:-60px}
-.hdr::after{content:'';position:absolute;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.03);bottom:-60px;left:-40px}
-.hdr h1{font-size:1.65rem;font-weight:800;color:#fff;position:relative;z-index:1;letter-spacing:-.4px}
-.hdr p{color:rgba(255,255,255,.7);font-size:.88rem;margin-top:6px;position:relative;z-index:1}
+.hdr{background:var(--premix-dark);padding:28px 28px 24px;text-align:center;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--premix-green),var(--premix-gold),var(--premix-green))}
+.hdr-logo{height:48px;margin-bottom:14px;filter:brightness(0) invert(1)}
+.hdr h1{font-family:'Montserrat',sans-serif;font-size:1.45rem;font-weight:800;color:#fff;letter-spacing:.5px;text-transform:uppercase}
+.hdr p{color:rgba(255,255,255,.55);font-size:.82rem;margin-top:4px;font-weight:400}
+.hdr-stripe{height:3px;background:var(--premix-green);margin:0}
+
+/* TYPE SELECTOR */
+.type-sel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin:24px 0;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.type-sel h2{font-family:'Montserrat',sans-serif;font-size:.95rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--premix-dark);margin-bottom:14px}
+.type-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:600px){.type-cards{grid-template-columns:1fr}}
+.type-card{border:2px solid var(--border);border-radius:var(--radius);padding:18px 14px;text-align:center;cursor:pointer;transition:.25s;position:relative}
+.type-card:hover{border-color:var(--premix-green);background:rgba(0,166,80,.03)}
+.type-card.on{border-color:var(--premix-green);background:rgba(0,166,80,.06)}
+.type-card.on::after{content:'✓';position:absolute;top:8px;right:10px;width:22px;height:22px;background:var(--premix-green);color:#fff;border-radius:50%;font-size:.7rem;display:flex;align-items:center;justify-content:center;font-weight:700}
+.type-card .tc-icon{font-size:1.6rem;margin-bottom:6px}
+.type-card .tc-title{font-family:'Montserrat',sans-serif;font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.type-card .tc-desc{font-size:.72rem;color:var(--muted);margin-top:3px}
 
 /* PROGRESS */
-.prog{display:flex;justify-content:center;gap:6px;margin-bottom:24px;flex-wrap:wrap}
-.prog-s{display:flex;align-items:center;gap:5px;padding:7px 14px;background:var(--card);border:1.5px solid var(--border);border-radius:99px;font-size:.78rem;font-weight:500;color:var(--muted);cursor:pointer;transition:.25s}
-.prog-s.on{border-color:var(--navy);color:var(--navy);background:rgba(10,46,92,.04);font-weight:600}
-.prog-s.done{border-color:var(--green);color:var(--green);background:rgba(15,157,88,.04)}
-.sn{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;background:var(--border);color:var(--muted);transition:.25s}
-.prog-s.on .sn{background:var(--navy);color:#fff}
-.prog-s.done .sn{background:var(--green);color:#fff}
+.prog{display:flex;justify-content:center;gap:4px;margin-bottom:20px;flex-wrap:wrap}
+.prog-s{display:flex;align-items:center;gap:4px;padding:6px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:99px;font-size:.75rem;font-weight:600;color:var(--muted);cursor:pointer;transition:.25s;font-family:'Montserrat',sans-serif;text-transform:uppercase;letter-spacing:.3px}
+.prog-s.on{border-color:var(--premix-green);color:var(--premix-green);background:rgba(0,166,80,.04)}
+.prog-s.done{border-color:var(--premix-green);color:#fff;background:var(--premix-green)}
+.sn{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800;background:var(--border);color:var(--muted);transition:.25s}
+.prog-s.on .sn{background:var(--premix-green);color:#fff}
+.prog-s.done .sn{background:rgba(255,255,255,.3);color:#fff}
 
 /* SECTIONS */
-.sec{background:var(--card);border-radius:var(--radius);padding:28px 24px;margin-bottom:16px;box-shadow:0 1px 4px rgba(10,46,92,.05);border:1px solid rgba(212,218,227,.5);display:none;animation:fadeUp .3s ease}
+.sec{background:var(--card);border-radius:var(--radius);padding:26px 22px;margin-bottom:14px;border:1px solid var(--border);display:none;animation:fadeUp .3s ease;box-shadow:0 1px 4px rgba(0,0,0,.03)}
 .sec.on{display:block}
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.stitle{font-family:'Montserrat',sans-serif;font-size:.95rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:10px;margin-bottom:2px}
+.stitle .ic{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.9rem}
+.ssub{font-size:.78rem;color:var(--muted);margin-bottom:20px}
 
-.stitle{font-size:1.08rem;font-weight:700;display:flex;align-items:center;gap:10px;margin-bottom:3px}
-.stitle .ic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.95rem}
-.ssub{font-size:.8rem;color:var(--muted);margin-bottom:22px}
+/* ALERT BOX */
+.alert-box{background:#FFF8E1;border:1px solid #FFD54F;border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;font-size:.8rem;line-height:1.5;color:#5D4037;display:flex;gap:10px;align-items:flex-start}
+.alert-box.red{background:#FEE2E2;border-color:#EF9A9A;color:#B71C1C}
+.alert-box .ab-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px}
 
 /* GRID */
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .grid .full{grid-column:1/-1}
 @media(max-width:600px){.grid{grid-template-columns:1fr}}
 
 /* FIELDS */
 .fld{display:flex;flex-direction:column;gap:4px}
-.fld label{font-size:.78rem;font-weight:600;color:var(--text)}
-.fld label .req{color:var(--amber);margin-left:2px}
-.fld input,.fld select,.fld textarea{padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:.88rem;color:var(--text);background:#FAFBFD;outline:none;transition:.2s;width:100%}
-.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--focus);box-shadow:0 0 0 3px rgba(10,46,92,.07);background:#fff}
+.fld label{font-size:.75rem;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.3px;font-family:'Montserrat',sans-serif}
+.fld label .req{color:var(--premix-green);margin-left:2px}
+.fld input,.fld select,.fld textarea{padding:10px 12px;border:1.5px solid var(--border);border-radius:6px;font-family:'Open Sans',sans-serif;font-size:.88rem;color:var(--text);background:#FAFBF8;outline:none;transition:.2s;width:100%}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--focus);box-shadow:0 0 0 3px rgba(0,166,80,.1);background:#fff}
 .fld input.err,.fld select.err{border-color:var(--red);box-shadow:0 0 0 3px rgba(217,48,37,.07)}
-.fld textarea{resize:vertical;min-height:72px}
-.fld .hint{font-size:.72rem;color:var(--muted)}
-.fld .emsg{font-size:.72rem;color:var(--red);display:none}
+.fld textarea{resize:vertical;min-height:70px}
+.fld .hint{font-size:.7rem;color:var(--muted)}
+.fld .emsg{font-size:.7rem;color:var(--red);display:none}
 .fld .emsg.show{display:block}
 
+/* CHECKBOX FIELD */
+.chk-field{display:flex;align-items:center;gap:8px;padding:8px 0}
+.chk-field input[type=checkbox]{width:18px;height:18px;accent-color:var(--premix-green);cursor:pointer}
+.chk-field label{font-size:.82rem;font-weight:500;cursor:pointer;text-transform:none;letter-spacing:0}
+
 /* FILE UPLOAD */
-.fup{border:2px dashed var(--border);border-radius:10px;padding:22px 14px;text-align:center;cursor:pointer;transition:.25s;background:#FAFBFD;position:relative}
-.fup:hover{border-color:var(--navy);background:rgba(10,46,92,.015)}
-.fup.ok{border-color:var(--green);background:rgba(15,157,88,.025)}
+.fup{border:2px dashed var(--border);border-radius:8px;padding:20px 14px;text-align:center;cursor:pointer;transition:.25s;background:#FAFBF8;position:relative}
+.fup:hover{border-color:var(--premix-green);background:rgba(0,166,80,.015)}
+.fup.ok{border-color:var(--premix-green);background:rgba(0,166,80,.03)}
 .fup input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
-.fup .ui{font-size:1.6rem;margin-bottom:4px}
-.fup .ut{font-size:.82rem;color:var(--muted)}
-.fup .ut strong{color:var(--navy)}
-.fup .fn{font-size:.8rem;color:var(--green);font-weight:600;margin-top:4px}
+.fup .ui{font-size:1.4rem;margin-bottom:4px}
+.fup .ut{font-size:.78rem;color:var(--muted)}
+.fup .ut strong{color:var(--premix-green)}
+.fup .fn{font-size:.75rem;color:var(--premix-green);font-weight:700;margin-top:4px}
 
 /* RADIO */
-.rg{display:flex;gap:10px}
+.rg{display:flex;gap:8px}
 .ro{flex:1;position:relative}
 .ro input[type=radio]{position:absolute;opacity:0}
-.ro label{display:block;padding:9px 14px;border:1.5px solid var(--border);border-radius:8px;text-align:center;cursor:pointer;font-size:.82rem;font-weight:500;transition:.2s;background:#FAFBFD}
-.ro input:checked+label{border-color:var(--navy);background:rgba(10,46,92,.04);color:var(--navy);font-weight:600}
+.ro label{display:block;padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;text-align:center;cursor:pointer;font-size:.82rem;font-weight:600;transition:.2s;background:#FAFBF8}
+.ro input:checked+label{border-color:var(--premix-green);background:rgba(0,166,80,.06);color:var(--premix-green)}
 
 /* BUTTONS */
 .btns{display:flex;justify-content:space-between;gap:10px;margin-top:22px}
-.btn{padding:11px 26px;border-radius:10px;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;transition:.2s;border:none;display:flex;align-items:center;gap:6px}
+.btn{padding:11px 26px;border-radius:6px;font-family:'Montserrat',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;transition:.2s;border:none;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.5px}
 .btn2{background:var(--bg);color:var(--muted);border:1.5px solid var(--border)}
-.btn2:hover{background:#E4E8F0}
-.btn1{background:var(--navy);color:#fff;box-shadow:0 2px 8px rgba(10,46,92,.22)}
-.btn1:hover{background:var(--navy-l);transform:translateY(-1px)}
-.btns3{background:var(--amber);color:#fff;box-shadow:0 2px 8px rgba(232,132,44,.28)}
-.btns3:hover{background:var(--amber-h);transform:translateY(-1px)}
+.btn2:hover{background:#E4E8DF}
+.btn1{background:var(--premix-green);color:#fff;box-shadow:0 2px 8px rgba(0,166,80,.25)}
+.btn1:hover{background:var(--premix-green-d);transform:translateY(-1px)}
+.btns3{background:var(--premix-dark);color:#fff;box-shadow:0 2px 8px rgba(26,26,26,.25)}
+.btns3:hover{background:var(--premix-dark-2);transform:translateY(-1px)}
 .btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
 
 /* SUCCESS */
-.sov{display:none;position:fixed;inset:0;background:rgba(10,46,92,.82);backdrop-filter:blur(5px);z-index:1000;justify-content:center;align-items:center}
+.sov{display:none;position:fixed;inset:0;background:rgba(26,26,26,.88);backdrop-filter:blur(5px);z-index:1000;justify-content:center;align-items:center}
 .sov.show{display:flex}
-.scard{background:#fff;border-radius:20px;padding:48px 36px;text-align:center;max-width:420px;width:90%;animation:pop .4s cubic-bezier(.34,1.56,.64,1)}
+.scard{background:#fff;border-radius:12px;padding:44px 36px;text-align:center;max-width:420px;width:90%;animation:pop .4s cubic-bezier(.34,1.56,.64,1);position:relative;overflow:hidden}
+.scard::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--premix-green),var(--premix-gold))}
 @keyframes pop{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
-.scard .chk{width:60px;height:60px;background:linear-gradient(135deg,#0F9D58,#34D399);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:1.6rem;color:#fff}
-.scard h2{font-size:1.2rem;font-weight:700;margin-bottom:8px}
-.scard p{font-size:.88rem;color:var(--muted);line-height:1.5}
-
+.scard .chk{width:56px;height:56px;background:var(--premix-green);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:1.5rem;color:#fff}
+.scard h2{font-family:'Montserrat',sans-serif;font-size:1.15rem;font-weight:800;text-transform:uppercase;letter-spacing:.3px;margin-bottom:8px}
+.scard p{font-size:.85rem;color:var(--muted);line-height:1.5}
 .spinner{display:inline-block;width:16px;height:16px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* HIDE SECTIONS BY TYPE */
+.hide{display:none!important}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="hdr">
+    <img src="https://premix.com.br/wp-content/uploads/2023/06/Logotipo_Premix_Positivo_Com-Bandeira.png" alt="Premix" class="hdr-logo">
     <h1>Cadastro de Fornecedor</h1>
-    <p>Preencha os dados abaixo para se cadastrar como fornecedor Premix</p>
+    <p>Núcleo Fiscal — Preencha os dados para cadastro</p>
+  </div>
+  <div class="hdr-stripe"></div>
+
+  <!-- TYPE SELECTOR -->
+  <div class="type-sel">
+    <h2>Tipo de Cadastro</h2>
+    <div class="type-cards">
+      <div class="type-card on" onclick="setType('pj')">
+        <div class="tc-icon">🏢</div>
+        <div class="tc-title">Pessoa Jurídica</div>
+        <div class="tc-desc">Fornecedor PJ / Empresa</div>
+      </div>
+      <div class="type-card" onclick="setType('pf')">
+        <div class="tc-icon">👤</div>
+        <div class="tc-title">Pessoa Física</div>
+        <div class="tc-desc">Fornecedor pessoa física</div>
+      </div>
+      <div class="type-card" onclick="setType('motorista')">
+        <div class="tc-icon">🚛</div>
+        <div class="tc-title">Motorista Premix</div>
+        <div class="tc-desc">Cadastro de motorista</div>
+      </div>
+    </div>
   </div>
 
-  <div class="prog">
-    <div class="prog-s on" onclick="go(1)"><span class="sn">1</span>Empresa</div>
-    <div class="prog-s" onclick="go(2)"><span class="sn">2</span>Contato</div>
-    <div class="prog-s" onclick="go(3)"><span class="sn">3</span>Endereço</div>
-    <div class="prog-s" onclick="go(4)"><span class="sn">4</span>Banco</div>
-    <div class="prog-s" onclick="go(5)"><span class="sn">5</span>Documentos</div>
+  <!-- PROGRESS -->
+  <div class="prog" id="progBar">
+    <div class="prog-s on" onclick="go(1)"><span class="sn">1</span><span class="prog-label">Dados</span></div>
+    <div class="prog-s" onclick="go(2)"><span class="sn">2</span><span class="prog-label">Contato</span></div>
+    <div class="prog-s" onclick="go(3)"><span class="sn">3</span><span class="prog-label">Endereço</span></div>
+    <div class="prog-s" onclick="go(4)"><span class="sn">4</span><span class="prog-label">Banco</span></div>
+    <div class="prog-s" onclick="go(5)"><span class="sn">5</span><span class="prog-label">Documentos</span></div>
   </div>
 
   <form id="frm" novalidate>
-    <!-- STEP 1 -->
+    <input type="hidden" name="tipo_cadastro" id="tipoCadastro" value="pj">
+
+    <!-- STEP 1: DADOS -->
     <div class="sec on" id="s1">
-      <div class="stitle"><span class="ic" style="background:#EBF0FA">🏢</span>Dados da Empresa</div>
-      <p class="ssub">Informações básicas do fornecedor</p>
-      <div class="grid">
-        <div class="fld full"><label>Razão Social <span class="req">*</span></label><input name="razao_social" required placeholder="Ex: Empresa Ltda"><span class="emsg">Campo obrigatório</span></div>
-        <div class="fld"><label>Nome Fantasia</label><input name="nome_fantasia" placeholder="Nome comercial"></div>
-        <div class="fld"><label>CNPJ <span class="req">*</span></label><input name="cnpj" required placeholder="00.000.000/0000-00" maxlength="18"><span class="emsg">CNPJ inválido</span></div>
-        <div class="fld"><label>Inscrição Estadual</label><input name="inscricao_estadual" placeholder="Inscrição Estadual"></div>
-        <div class="fld"><label>Inscrição Municipal</label><input name="inscricao_municipal" placeholder="Inscrição Municipal"></div>
-        <div class="fld full"><label>Ramo de Atividade</label><input name="ramo_atividade" placeholder="Ex: Alimentos, Embalagens, Logística..."></div>
-        <div class="fld full"><label>Produtos / Serviços Oferecidos</label><textarea name="produtos_servicos" placeholder="Descreva os principais produtos ou serviços..."></textarea></div>
+      <div class="stitle"><span class="ic" style="background:#E8F5E9">🏢</span><span id="s1title">Dados da Empresa</span></div>
+      <p class="ssub" id="s1sub">Informações básicas do fornecedor</p>
+
+      <!-- PJ FIELDS -->
+      <div id="fields-pj">
+        <div class="grid">
+          <div class="fld full"><label>Razão Social <span class="req">*</span></label><input name="razao_social" required placeholder="Razão Social completa"><span class="emsg">Campo obrigatório</span></div>
+          <div class="fld"><label>Nome Fantasia</label><input name="nome_fantasia" placeholder="Nome comercial"></div>
+          <div class="fld"><label>CNPJ <span class="req">*</span></label><input name="cnpj" required placeholder="00.000.000/0000-00" maxlength="18"><span class="emsg">CNPJ inválido</span></div>
+          <div class="fld"><label>Inscrição Estadual <span class="req">*</span></label>
+            <div class="chk-field"><input type="checkbox" id="ieIsento" onchange="toggleIE()"><label for="ieIsento">Isento</label></div>
+            <input name="inscricao_estadual" id="ieInput" required placeholder="Número da IE"><span class="emsg">Informe a IE ou marque Isento</span>
+          </div>
+          <div class="fld full"><label>Ramo de Atividade</label><input name="ramo_atividade" placeholder="Ex: Alimentos, Embalagens, Logística..."></div>
+          <div class="fld full"><label>Produtos / Serviços Oferecidos</label><textarea name="produtos_servicos" placeholder="Descreva os principais produtos ou serviços..."></textarea></div>
+        </div>
       </div>
+
+      <!-- PF FIELDS -->
+      <div id="fields-pf" class="hide">
+        <div class="grid">
+          <div class="fld full"><label>Nome Completo <span class="req">*</span></label><input name="nome_completo" placeholder="Nome completo"><span class="emsg">Campo obrigatório</span></div>
+          <div class="fld"><label>CPF <span class="req">*</span></label><input name="cpf" placeholder="000.000.000-00" maxlength="14"><span class="emsg">CPF inválido</span></div>
+          <div class="fld"><label>RG <span class="req">*</span></label><input name="rg" placeholder="Número do RG"><span class="emsg">Campo obrigatório</span></div>
+        </div>
+      </div>
+
+      <!-- MOTORISTA FIELDS -->
+      <div id="fields-mot" class="hide">
+        <div class="grid">
+          <div class="fld full"><label>Nome Completo <span class="req">*</span></label><input name="nome_completo_mot" placeholder="Nome completo do motorista"><span class="emsg">Campo obrigatório</span></div>
+          <div class="fld"><label>CPF <span class="req">*</span></label><input name="cpf_mot" placeholder="000.000.000-00" maxlength="14"><span class="emsg">CPF inválido</span></div>
+          <div class="fld"><label>RG <span class="req">*</span></label><input name="rg_mot" placeholder="Número do RG"><span class="emsg">Campo obrigatório</span></div>
+          <div class="fld"><label>CNH Categoria <span class="req">*</span></label><select name="cnh_categoria" required><option value="">Selecione</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>AB</option><option>AC</option><option>AD</option><option>AE</option></select><span class="emsg">Selecione a categoria</span></div>
+          <div class="fld"><label>ANTT / RNTRC</label><input name="antt" placeholder="Número ANTT"></div>
+        </div>
+      </div>
+
       <div class="btns" style="justify-content:flex-end"><button type="button" class="btn btn1" onclick="next()">Próximo →</button></div>
     </div>
 
-    <!-- STEP 2 -->
+    <!-- STEP 2: CONTATO -->
     <div class="sec" id="s2">
-      <div class="stitle"><span class="ic" style="background:#FEF3E2">📞</span>Dados de Contato</div>
-      <p class="ssub">Como podemos entrar em contato</p>
+      <div class="stitle"><span class="ic" style="background:#FFF3E0">📞</span>Contato</div>
+      <p class="ssub">Dados de contato</p>
       <div class="grid">
         <div class="fld"><label>Nome do Responsável <span class="req">*</span></label><input name="responsavel_nome" required placeholder="Nome completo"><span class="emsg">Campo obrigatório</span></div>
         <div class="fld"><label>Cargo</label><input name="responsavel_cargo" placeholder="Ex: Gerente Comercial"></div>
@@ -148,12 +231,12 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
       <div class="btns"><button type="button" class="btn btn2" onclick="prev()">← Voltar</button><button type="button" class="btn btn1" onclick="next()">Próximo →</button></div>
     </div>
 
-    <!-- STEP 3 -->
+    <!-- STEP 3: ENDEREÇO -->
     <div class="sec" id="s3">
       <div class="stitle"><span class="ic" style="background:#E8F5E9">📍</span>Endereço</div>
-      <p class="ssub">Localização da empresa</p>
+      <p class="ssub">Localização</p>
       <div class="grid">
-        <div class="fld"><label>CEP <span class="req">*</span></label><input name="cep" required placeholder="00000-000" maxlength="9"><span class="hint">Digite o CEP e clique em buscar</span><span class="emsg">CEP inválido</span></div>
+        <div class="fld"><label>CEP <span class="req">*</span></label><input name="cep" required placeholder="00000-000" maxlength="9"><span class="hint">Digite o CEP e clique buscar</span><span class="emsg">CEP inválido</span></div>
         <div class="fld" style="align-self:end"><button type="button" class="btn btn2" onclick="buscaCEP()" style="width:100%">🔍 Buscar CEP</button></div>
         <div class="fld"><label>Logradouro <span class="req">*</span></label><input name="logradouro" required placeholder="Rua, Avenida..."><span class="emsg">Campo obrigatório</span></div>
         <div class="fld"><label>Número <span class="req">*</span></label><input name="numero" required placeholder="Nº"><span class="emsg">Campo obrigatório</span></div>
@@ -165,102 +248,218 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
       <div class="btns"><button type="button" class="btn btn2" onclick="prev()">← Voltar</button><button type="button" class="btn btn1" onclick="next()">Próximo →</button></div>
     </div>
 
-    <!-- STEP 4 -->
+    <!-- STEP 4: BANCO -->
     <div class="sec" id="s4">
       <div class="stitle"><span class="ic" style="background:#F3E8FF">🏦</span>Dados Bancários</div>
       <p class="ssub">Informações para pagamento</p>
-      <div class="grid">
-        <div class="fld"><label>Banco <span class="req">*</span></label><input name="banco" required placeholder="Ex: Bradesco, Itaú..."><span class="emsg">Campo obrigatório</span></div>
-        <div class="fld"><label>Tipo de Conta <span class="req">*</span></label><div class="rg"><div class="ro"><input type="radio" name="tipo_conta" id="tc1" value="corrente" checked><label for="tc1">Corrente</label></div><div class="ro"><input type="radio" name="tipo_conta" id="tc2" value="poupanca"><label for="tc2">Poupança</label></div></div></div>
-        <div class="fld"><label>Agência <span class="req">*</span></label><input name="agencia" required placeholder="0000"><span class="emsg">Campo obrigatório</span></div>
-        <div class="fld"><label>Conta <span class="req">*</span></label><input name="conta" required placeholder="00000-0"><span class="emsg">Campo obrigatório</span></div>
-        <div class="fld"><label>Titular da Conta</label><input name="titular_conta" placeholder="Nome do titular"></div>
-        <div class="fld"><label>CPF/CNPJ do Titular</label><input name="cpf_cnpj_titular" placeholder="CPF ou CNPJ"></div>
-        <div class="fld full"><label>Chave PIX</label><input name="pix" placeholder="CPF, CNPJ, e-mail, telefone ou chave aleatória"></div>
+
+      <div class="alert-box red" id="alertBancoPJ">
+        <span class="ab-icon">⚠️</span>
+        <div><strong>ATENÇÃO — Regra Bancária Premix:</strong><br>A Premix <strong>NÃO</strong> realiza pagamentos para terceiros. Os dados bancários devem ser obrigatoriamente do <strong>CNPJ do fornecedor ou de sua matriz</strong>. Contas de sócios, funcionários ou outras pessoas físicas/jurídicas não serão aceitas.</div>
       </div>
+      <div class="alert-box red hide" id="alertBancoPF">
+        <span class="ab-icon">⚠️</span>
+        <div><strong>ATENÇÃO:</strong> Os dados bancários devem ser do <strong>mesmo CPF</strong> informado no cadastro.</div>
+      </div>
+
+      <div id="bancoFields">
+        <div class="grid">
+          <div class="fld"><label>Banco <span class="req">*</span></label><input name="banco" required placeholder="Ex: Bradesco, Itaú..."><span class="emsg">Campo obrigatório</span></div>
+          <div class="fld"><label>Tipo de Conta <span class="req">*</span></label><div class="rg"><div class="ro"><input type="radio" name="tipo_conta" id="tc1" value="corrente" checked><label for="tc1">Corrente</label></div><div class="ro"><input type="radio" name="tipo_conta" id="tc2" value="poupanca"><label for="tc2">Poupança</label></div></div></div>
+          <div class="fld"><label>Agência <span class="req">*</span></label><input name="agencia" required placeholder="0000"><span class="emsg">Campo obrigatório</span></div>
+          <div class="fld"><label>Conta <span class="req">*</span></label><input name="conta" required placeholder="00000-0"><span class="emsg">Campo obrigatório</span></div>
+          <div class="fld"><label>Titular da Conta <span class="req">*</span></label><input name="titular_conta" required placeholder="Deve ser o mesmo CNPJ/CPF do cadastro"><span class="emsg">Campo obrigatório</span></div>
+          <div class="fld"><label>CPF/CNPJ do Titular <span class="req">*</span></label><input name="cpf_cnpj_titular" required placeholder="Mesmo do cadastro"><span class="emsg">Campo obrigatório</span></div>
+          <div class="fld full"><label>Chave PIX</label><input name="pix" placeholder="CPF, CNPJ, e-mail, telefone ou chave aleatória"></div>
+        </div>
+      </div>
+
+      <div id="bancoMotorista" class="hide">
+        <div class="alert-box">
+          <span class="ab-icon">ℹ️</span>
+          <div>Para cadastro de <strong>Motorista Premix</strong>, os dados bancários não são obrigatórios nesta etapa.</div>
+        </div>
+      </div>
+
       <div class="btns"><button type="button" class="btn btn2" onclick="prev()">← Voltar</button><button type="button" class="btn btn1" onclick="next()">Próximo →</button></div>
     </div>
 
-    <!-- STEP 5 -->
+    <!-- STEP 5: DOCUMENTOS -->
     <div class="sec" id="s5">
-      <div class="stitle"><span class="ic" style="background:#FEE2E2">📄</span>Documentos e Finalização</div>
-      <p class="ssub">Anexe os comprovantes e finalize</p>
-      <div class="grid">
-        <div class="fld">
-          <label>Comprovante de CNPJ <span class="req">*</span></label>
-          <div class="fup" id="dc">
-            <div class="ui">📎</div>
-            <div class="ut">Clique ou arraste o <strong>Cartão CNPJ</strong></div>
-            <div class="fn" id="fcn"></div>
-            <input type="file" name="comprovante_cnpj" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fcn','dc')">
+      <div class="stitle"><span class="ic" style="background:#FEE2E2">📄</span>Documentos</div>
+      <p class="ssub">Anexe os comprovantes obrigatórios</p>
+
+      <!-- PJ DOCS -->
+      <div id="docs-pj">
+        <div class="grid">
+          <div class="fld">
+            <label>Cartão CNPJ <span class="req">*</span></label>
+            <div class="fup" id="dc"><div class="ui">📎</div><div class="ut">Clique para anexar <strong>Cartão CNPJ</strong></div><div class="fn" id="fcn"></div><input type="file" name="comprovante_cnpj" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fcn','dc')"></div>
+            <span class="hint">PDF, JPG ou PNG (máx. 5MB)</span>
           </div>
-          <span class="hint">PDF, JPG ou PNG (máx. 5MB)</span>
-        </div>
-        <div class="fld">
-          <label>Comprovante Bancário <span class="req">*</span></label>
-          <div class="fup" id="db">
-            <div class="ui">📎</div>
-            <div class="ut">Clique ou arraste o <strong>comprovante bancário</strong></div>
-            <div class="fn" id="fbn"></div>
-            <input type="file" name="comprovante_bancario" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fbn','db')">
+          <div class="fld">
+            <label>Contrato Social <span class="req">*</span></label>
+            <div class="fup" id="dcs"><div class="ui">📎</div><div class="ut">Clique para anexar <strong>Contrato Social</strong></div><div class="fn" id="fcsn"></div><input type="file" name="contrato_social" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fcsn','dcs')"></div>
+            <span class="hint">PDF, JPG ou PNG (máx. 5MB)</span>
           </div>
-          <span class="hint">PDF, JPG ou PNG (máx. 5MB)</span>
+          <div class="fld">
+            <label>Comprovante Bancário <span class="req">*</span></label>
+            <div class="fup" id="db"><div class="ui">📎</div><div class="ut">Clique para anexar <strong>comprovante bancário</strong></div><div class="fn" id="fbn"></div><input type="file" name="comprovante_bancario" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fbn','db')"></div>
+            <span class="hint">PDF, JPG ou PNG (máx. 5MB)</span>
+          </div>
+          <div class="fld">
+            <label>Comprovante IE</label>
+            <div class="fup" id="die"><div class="ui">📎</div><div class="ut">Clique para anexar <strong>comprovante de IE</strong></div><div class="fn" id="fien"></div><input type="file" name="comprovante_ie" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fien','die')"></div>
+            <span class="hint">Obrigatório se não for isento</span>
+          </div>
         </div>
-        <div class="fld full"><label>Condições de Pagamento</label><input name="condicoes_pagamento" placeholder="Ex: 30/60/90 dias, à vista..."></div>
-        <div class="fld full"><label>Prazo de Entrega</label><input name="prazo_entrega" placeholder="Ex: 15 dias úteis, pronta entrega..."></div>
       </div>
+
+      <!-- PF DOCS -->
+      <div id="docs-pf" class="hide">
+        <div class="grid">
+          <div class="fld">
+            <label>Documento com Foto <span class="req">*</span></label>
+            <div class="fup" id="dpf"><div class="ui">📎</div><div class="ut">Clique para anexar <strong>RG, CNH ou outro doc com foto</strong></div><div class="fn" id="fpfn"></div><input type="file" name="documento_identidade" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fpfn','dpf')"></div>
+          </div>
+          <div class="fld">
+            <label>Comprovante Bancário <span class="req">*</span></label>
+            <div class="fup" id="dbpf"><div class="ui">📎</div><div class="ut">Clique para anexar <strong>comprovante bancário</strong></div><div class="fn" id="fbpfn"></div><input type="file" name="comprovante_bancario_pf" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fbpfn','dbpf')"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MOTORISTA DOCS -->
+      <div id="docs-mot" class="hide">
+        <div class="grid">
+          <div class="fld">
+            <label>Documento com Foto (CNH) <span class="req">*</span></label>
+            <div class="fup" id="dmot"><div class="ui">📎</div><div class="ut">Clique para anexar <strong>CNH ou doc com foto</strong></div><div class="fn" id="fmotn"></div><input type="file" name="documento_identidade_mot" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fmotn','dmot')"></div>
+          </div>
+          <div class="fld">
+            <label>Comprovante de Endereço</label>
+            <div class="fup" id="dend"><div class="ui">📎</div><div class="ut">Clique para anexar <strong>comprovante de endereço</strong></div><div class="fn" id="fendn"></div><input type="file" name="comprovante_endereco_mot" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fendn','dend')"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid" style="margin-top:12px">
+        <div class="fld full"><label>Condições de Pagamento</label><input name="condicoes_pagamento" placeholder="Ex: 30/60/90 dias, à vista..."></div>
+      </div>
+
       <div class="btns"><button type="button" class="btn btn2" onclick="prev()">← Voltar</button><button type="submit" class="btn btns3" id="sbtn">Enviar Cadastro ✓</button></div>
     </div>
   </form>
 </div>
 
+<!-- SUCCESS -->
 <div class="sov" id="sov">
   <div class="scard">
     <div class="chk">✓</div>
     <h2>Cadastro Enviado!</h2>
-    <p>Seus dados foram recebidos com sucesso.<br>Nossa equipe irá analisar e entrar em contato em breve.</p>
+    <p>Seus dados foram recebidos com sucesso.<br>O Núcleo Fiscal Premix irá analisar e entrar em contato.</p>
   </div>
 </div>
 
 <script>
-// ======= CONFIGURAÇÃO SUPABASE =======
 const SB_URL='https://frudrwxdygfticgcwigv.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZydWRyd3hkeWdmdGljZ2N3aWd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxMDg4NzgsImV4cCI6MjA5MzY4NDg3OH0.2laDHYhQEiBu0K9iQCiYtf2T3_Q21rnJAAsNByUKJ10';
-// ======================================
 
-let cur=1;const tot=5;
+let cur=1,tot=5,tipo='pj';
 
-// Máscaras
+// Type selector
+function setType(t){
+  tipo=t;
+  document.getElementById('tipoCadastro').value=t;
+  document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('on'));
+  event.currentTarget.classList.add('on');
+
+  // Toggle field visibility
+  document.getElementById('fields-pj').classList.toggle('hide',t!=='pj');
+  document.getElementById('fields-pf').classList.toggle('hide',t!=='pf');
+  document.getElementById('fields-mot').classList.toggle('hide',t!=='motorista');
+  document.getElementById('docs-pj').classList.toggle('hide',t!=='pj');
+  document.getElementById('docs-pf').classList.toggle('hide',t!=='pf');
+  document.getElementById('docs-mot').classList.toggle('hide',t!=='motorista');
+  document.getElementById('bancoFields').classList.toggle('hide',t==='motorista');
+  document.getElementById('bancoMotorista').classList.toggle('hide',t!=='motorista');
+  document.getElementById('alertBancoPJ').classList.toggle('hide',t!=='pj');
+  document.getElementById('alertBancoPF').classList.toggle('hide',t!=='pf');
+
+  // Update titles
+  if(t==='pj'){
+    document.getElementById('s1title').textContent='Dados da Empresa';
+    document.getElementById('s1sub').textContent='Informações básicas do fornecedor PJ';
+  } else if(t==='pf'){
+    document.getElementById('s1title').textContent='Dados Pessoais';
+    document.getElementById('s1sub').textContent='Informações do fornecedor pessoa física';
+  } else {
+    document.getElementById('s1title').textContent='Dados do Motorista';
+    document.getElementById('s1sub').textContent='Informações para cadastro de motorista Premix';
+  }
+
+  // Toggle required fields
+  toggleRequired();
+}
+
+function toggleRequired(){
+  // Remove all dynamic required
+  document.querySelectorAll('[data-req]').forEach(f=>f.removeAttribute('required'));
+
+  const t=tipo;
+  if(t==='pj'){
+    setReq(['razao_social','cnpj']);
+  } else if(t==='pf'){
+    setReq(['nome_completo','cpf','rg']);
+  } else {
+    setReq(['nome_completo_mot','cpf_mot','rg_mot','cnh_categoria']);
+  }
+
+  // Banco required only if not motorista
+  if(t!=='motorista'){
+    setReq(['banco','agencia','conta','titular_conta','cpf_cnpj_titular']);
+  }
+}
+
+function setReq(names){
+  names.forEach(n=>{
+    const el=document.querySelector('[name="'+n+'"]');
+    if(el)el.setAttribute('required','');
+  });
+}
+
+function toggleIE(){
+  const isento=document.getElementById('ieIsento').checked;
+  const inp=document.getElementById('ieInput');
+  if(isento){inp.value='ISENTO';inp.readOnly=true;inp.classList.remove('err')}
+  else{inp.value='';inp.readOnly=false}
+}
+
+// Masks
 const mCNPJ=v=>v.replace(/\D/g,'').replace(/^(\d{2})(\d)/,'$1.$2').replace(/^(\d{2}\.\d{3})(\d)/,'$1.$2').replace(/\.(\d{3})(\d)/,'.$1/$2').replace(/(\d{4})(\d)/,'$1-$2').substring(0,18);
+const mCPF=v=>v.replace(/\D/g,'').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2').substring(0,14);
 const mTel=v=>{v=v.replace(/\D/g,'');return v.length<=10?v.replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{4})(\d)/,'$1-$2'):v.replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d)/,'$1-$2')};
 const mCEP=v=>v.replace(/\D/g,'').replace(/(\d{5})(\d)/,'$1-$2').substring(0,9);
 
 document.querySelector('[name=cnpj]').addEventListener('input',function(){this.value=mCNPJ(this.value)});
+document.querySelector('[name=cpf]').addEventListener('input',function(){this.value=mCPF(this.value)});
+document.querySelector('[name=cpf_mot]').addEventListener('input',function(){this.value=mCPF(this.value)});
 document.querySelector('[name=telefone]').addEventListener('input',function(){this.value=mTel(this.value)});
 document.querySelector('[name=celular]').addEventListener('input',function(){this.value=mTel(this.value)});
 document.querySelector('[name=cep]').addEventListener('input',function(){this.value=mCEP(this.value)});
 
-// Navegação
-function go(s){
-  if(s<1||s>tot)return;
-  document.querySelectorAll('.sec').forEach(e=>e.classList.remove('on'));
-  document.getElementById('s'+s).classList.add('on');
-  document.querySelectorAll('.prog-s').forEach((e,i)=>{
-    e.classList.remove('on','done');
-    if(i+1<s)e.classList.add('done');
-    if(i+1===s)e.classList.add('on');
-  });
-  cur=s;window.scrollTo({top:0,behavior:'smooth'});
-}
+// Navigation
+function go(s){if(s<1||s>tot)return;document.querySelectorAll('.sec').forEach(e=>e.classList.remove('on'));document.getElementById('s'+s).classList.add('on');document.querySelectorAll('.prog-s').forEach((e,i)=>{e.classList.remove('on','done');if(i+1<s)e.classList.add('done');if(i+1===s)e.classList.add('on')});cur=s;window.scrollTo({top:0,behavior:'smooth'})}
 function next(){if(valStep(cur))go(cur+1)}
 function prev(){go(cur-1)}
 
-// Validação
 function valStep(s){
   const sec=document.getElementById('s'+s);
-  const reqs=sec.querySelectorAll('[required]');
+  const visibleFields=sec.querySelectorAll('[required]');
   let ok=true;
-  reqs.forEach(f=>{
+  visibleFields.forEach(f=>{
+    // Skip if parent is hidden
+    if(f.closest('.hide'))return;
     const em=f.closest('.fld')?.querySelector('.emsg');
     if(!f.value.trim()){f.classList.add('err');if(em)em.classList.add('show');ok=false}
     else{f.classList.remove('err');if(em)em.classList.remove('show')}
@@ -269,95 +468,69 @@ function valStep(s){
   return ok;
 }
 
-// File handler
-function hf(inp,fnId,dropId){
-  const f=inp.files[0];
-  if(!f)return;
-  if(f.size>5*1024*1024){alert('Arquivo muito grande. Máximo 5MB.');inp.value='';return}
-  document.getElementById(fnId).textContent='✓ '+f.name;
-  document.getElementById(dropId).classList.add('ok');
-}
+function hf(inp,fnId,dropId){const f=inp.files[0];if(!f)return;if(f.size>5*1024*1024){alert('Arquivo muito grande. Máximo 5MB.');inp.value='';return}document.getElementById(fnId).textContent='✓ '+f.name;document.getElementById(dropId).classList.add('ok')}
 
-// Busca CEP
-async function buscaCEP(){
-  const cep=document.querySelector('[name=cep]').value.replace(/\D/g,'');
-  if(cep.length!==8){alert('Digite um CEP válido');return}
-  try{
-    const r=await fetch('https://viacep.com.br/ws/'+cep+'/json/');
-    const d=await r.json();
-    if(d.erro){alert('CEP não encontrado');return}
-    document.querySelector('[name=logradouro]').value=d.logradouro||'';
-    document.querySelector('[name=bairro]').value=d.bairro||'';
-    document.querySelector('[name=cidade]').value=d.localidade||'';
-    const sel=document.querySelector('[name=estado]');
-    for(let o of sel.options){if(o.value===d.uf){sel.value=d.uf;break}}
-  }catch(e){alert('Erro ao buscar CEP')}
-}
+async function buscaCEP(){const cep=document.querySelector('[name=cep]').value.replace(/\D/g,'');if(cep.length!==8){alert('Digite um CEP válido');return}try{const r=await fetch('https://viacep.com.br/ws/'+cep+'/json/');const d=await r.json();if(d.erro){alert('CEP não encontrado');return}document.querySelector('[name=logradouro]').value=d.logradouro||'';document.querySelector('[name=bairro]').value=d.bairro||'';document.querySelector('[name=cidade]').value=d.localidade||'';const sel=document.querySelector('[name=estado]');for(let o of sel.options){if(o.value===d.uf){sel.value=d.uf;break}}}catch(e){alert('Erro ao buscar CEP')}}
 
-// Upload arquivo para Supabase Storage
-async function uploadFile(file,folder){
-  const ts=Date.now();
-  const ext=file.name.split('.').pop();
-  const path=folder+'/'+ts+'_'+Math.random().toString(36).substr(2,6)+'.'+ext;
-  const res=await fetch(SB_URL+'/storage/v1/object/comprovantes/'+path,{
-    method:'POST',
-    headers:{'Authorization':'Bearer '+SB_KEY,'Content-Type':file.type,'x-upsert':'true'},
-    body:file
-  });
-  if(!res.ok)throw new Error('Upload falhou');
-  return SB_URL+'/storage/v1/object/public/comprovantes/'+path;
-}
+async function uploadFile(file,folder){const ts=Date.now();const ext=file.name.split('.').pop();const path=folder+'/'+ts+'_'+Math.random().toString(36).substr(2,6)+'.'+ext;const res=await fetch(SB_URL+'/storage/v1/object/comprovantes/'+path,{method:'POST',headers:{'Authorization':'Bearer '+SB_KEY,'Content-Type':file.type,'x-upsert':'true'},body:file});if(!res.ok)throw new Error('Upload falhou');return SB_URL+'/storage/v1/object/public/comprovantes/'+path}
 
-// Submit
 document.getElementById('frm').addEventListener('submit',async function(e){
   e.preventDefault();
   if(!valStep(cur))return;
-
-  const cnpjFile=document.querySelector('[name=comprovante_cnpj]').files[0];
-  const bancoFile=document.querySelector('[name=comprovante_bancario]').files[0];
-  if(!cnpjFile){alert('Anexe o comprovante de CNPJ');return}
-  if(!bancoFile){alert('Anexe o comprovante bancário');return}
 
   const btn=document.getElementById('sbtn');
   btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Enviando...';
 
   try{
-    // Upload arquivos
-    const [cnpjUrl,bancoUrl]=await Promise.all([
-      uploadFile(cnpjFile,'cnpj'),
-      uploadFile(bancoFile,'bancario')
-    ]);
+    const uploads={};
 
-    // Montar dados
+    if(tipo==='pj'){
+      const cnpjF=document.querySelector('[name=comprovante_cnpj]').files[0];
+      const csF=document.querySelector('[name=contrato_social]').files[0];
+      const bancF=document.querySelector('[name=comprovante_bancario]').files[0];
+      if(!cnpjF||!csF||!bancF){alert('Anexe todos os documentos obrigatórios');btn.disabled=false;btn.textContent='Enviar Cadastro ✓';return}
+      const [u1,u2,u3]=await Promise.all([uploadFile(cnpjF,'cnpj'),uploadFile(csF,'contrato'),uploadFile(bancF,'bancario')]);
+      uploads.comprovante_cnpj_url=u1;uploads.contrato_social_url=u2;uploads.comprovante_bancario_url=u3;
+      const ieF=document.querySelector('[name=comprovante_ie]')?.files[0];
+      if(ieF)uploads.comprovante_ie_url=await uploadFile(ieF,'ie');
+    } else if(tipo==='pf'){
+      const docF=document.querySelector('[name=documento_identidade]').files[0];
+      const bancF=document.querySelector('[name=comprovante_bancario_pf]').files[0];
+      if(!docF||!bancF){alert('Anexe todos os documentos obrigatórios');btn.disabled=false;btn.textContent='Enviar Cadastro ✓';return}
+      const [u1,u2]=await Promise.all([uploadFile(docF,'doc_identidade'),uploadFile(bancF,'bancario')]);
+      uploads.documento_identidade_url=u1;uploads.comprovante_bancario_url=u2;
+    } else {
+      const docF=document.querySelector('[name=documento_identidade_mot]').files[0];
+      if(!docF){alert('Anexe o documento com foto');btn.disabled=false;btn.textContent='Enviar Cadastro ✓';return}
+      uploads.documento_identidade_url=await uploadFile(docF,'doc_motorista');
+      const endF=document.querySelector('[name=comprovante_endereco_mot]')?.files[0];
+      if(endF)uploads.comprovante_endereco_url=await uploadFile(endF,'endereco');
+    }
+
     const fd=new FormData(this);
     const data={};
-    for(const[k,v]of fd.entries()){
-      if(k!=='comprovante_cnpj'&&k!=='comprovante_bancario')data[k]=v;
+    const skipFields=['comprovante_cnpj','contrato_social','comprovante_bancario','comprovante_ie','documento_identidade','comprovante_bancario_pf','documento_identidade_mot','comprovante_endereco_mot'];
+    for(const[k,v]of fd.entries()){if(!skipFields.includes(k)&&v)data[k]=v}
+
+    // Map motorista/pf fields
+    if(tipo==='motorista'){
+      data.nome_completo=data.nome_completo_mot;delete data.nome_completo_mot;
+      data.cpf=data.cpf_mot;delete data.cpf_mot;
+      data.rg=data.rg_mot;delete data.rg_mot;
     }
-    data.comprovante_cnpj_url=cnpjUrl;
-    data.comprovante_bancario_url=bancoUrl;
+
+    data.inscricao_estadual_isento=document.getElementById('ieIsento')?.checked||false;
+    Object.assign(data,uploads);
     data.status='pendente';
 
-    // Enviar para Supabase
-    const res=await fetch(SB_URL+'/rest/v1/fornecedores',{
-      method:'POST',
-      headers:{
-        'apikey':SB_KEY,
-        'Authorization':'Bearer '+SB_KEY,
-        'Content-Type':'application/json',
-        'Prefer':'return=minimal'
-      },
-      body:JSON.stringify(data)
-    });
-
+    const res=await fetch(SB_URL+'/rest/v1/fornecedores',{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(data)});
     if(!res.ok){const err=await res.text();throw new Error(err)}
-
     document.getElementById('sov').classList.add('show');
-  }catch(err){
-    alert('Erro ao enviar: '+err.message);
-    btn.disabled=false;btn.textContent='Enviar Cadastro ✓';
-  }
+  }catch(err){alert('Erro ao enviar: '+err.message);btn.disabled=false;btn.textContent='Enviar Cadastro ✓'}
 });
+
+// Init
+toggleRequired();
 </script>
 </body>
 </html>
