@@ -26,20 +26,26 @@ body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);m
 
 .type-sel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin:24px 0;box-shadow:0 1px 4px rgba(0,0,0,.04)}
 .type-sel h2{font-family:'Montserrat',sans-serif;font-size:.95rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
-.type-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.type-sel.locked h2::after{content:' (selecionado)';color:var(--green);font-size:.75rem;font-weight:600}
+.type-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;transition:.4s}
 @media(max-width:600px){.type-cards{grid-template-columns:1fr}}
+.type-cards.locked{grid-template-columns:1fr}
 .type-card{border:2px solid var(--border);border-radius:var(--radius);padding:18px 14px;text-align:center;cursor:pointer;transition:.25s;position:relative}
 .type-card:hover{border-color:var(--green);background:rgba(0,166,80,.03)}
 .type-card.on{border-color:var(--green);background:rgba(0,166,80,.06)}
 .type-card.on::after{content:'✓';position:absolute;top:8px;right:10px;width:22px;height:22px;background:var(--green);color:#fff;border-radius:50%;font-size:.7rem;display:flex;align-items:center;justify-content:center;font-weight:700}
+.type-card.hidden{display:none}
 .tc-icon{font-size:1.6rem;margin-bottom:6px}
 .tc-title{font-family:'Montserrat',sans-serif;font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
 .tc-desc{font-size:.72rem;color:var(--muted);margin-top:3px}
+.change-type{margin-top:10px;text-align:right}
+.change-type button{background:none;border:none;color:var(--green);font-size:.75rem;cursor:pointer;text-decoration:underline;font-family:'Montserrat',sans-serif;font-weight:600}
 
 .prog{display:flex;justify-content:center;gap:4px;margin-bottom:20px;flex-wrap:wrap}
 .prog-s{display:flex;align-items:center;gap:4px;padding:6px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:99px;font-size:.75rem;font-weight:600;color:var(--muted);cursor:pointer;transition:.25s;font-family:'Montserrat',sans-serif;text-transform:uppercase;letter-spacing:.3px}
 .prog-s.on{border-color:var(--green);color:var(--green);background:rgba(0,166,80,.04)}
 .prog-s.done{border-color:var(--green);color:#fff;background:var(--green)}
+.prog-s.locked{opacity:.5;cursor:not-allowed}
 .sn{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800;background:var(--border);color:var(--muted);transition:.25s}
 .prog-s.on .sn{background:var(--green);color:#fff}
 .prog-s.done .sn{background:rgba(255,255,255,.3);color:#fff}
@@ -107,9 +113,15 @@ body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);m
 .scard .chk{width:56px;height:56px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:1.5rem;color:#fff}
 .scard h2{font-family:'Montserrat',sans-serif;font-size:1.15rem;font-weight:800;text-transform:uppercase;margin-bottom:8px}
 .scard p{font-size:.85rem;color:var(--muted);line-height:1.5}
+
 .spinner{display:inline-block;width:16px;height:16px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .hide{display:none!important}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--red);color:#fff;padding:12px 20px;border-radius:8px;font-size:.85rem;font-weight:600;z-index:2000;display:none;box-shadow:0 4px 16px rgba(0,0,0,.2);max-width:90%}
+.toast.show{display:block;animation:slideUp .3s ease}
+@keyframes slideUp{from{opacity:0;transform:translate(-50%,20px)}to{opacity:1;transform:translate(-50%,0)}}
 </style>
 </head>
 <body>
@@ -121,33 +133,37 @@ body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);m
   </div>
   <div class="hdr-stripe"></div>
 
-  <div class="type-sel">
-    <h2>Tipo de Cadastro</h2>
-    <div class="type-cards">
-      <div class="type-card on" data-type="pj" onclick="setType('pj',this)">
+  <div class="type-sel" id="typeSel">
+    <h2 id="typeSelTitle">Tipo de Cadastro</h2>
+    <div class="type-cards" id="typeCards">
+      <div class="type-card on" data-type="pj" onclick="setType('pj')">
         <div class="tc-icon">🏢</div><div class="tc-title">Pessoa Jurídica</div><div class="tc-desc">Fornecedor PJ / Empresa</div>
       </div>
-      <div class="type-card" data-type="pf" onclick="setType('pf',this)">
+      <div class="type-card" data-type="pf" onclick="setType('pf')">
         <div class="tc-icon">👤</div><div class="tc-title">Pessoa Física</div><div class="tc-desc">Fornecedor pessoa física</div>
       </div>
-      <div class="type-card" data-type="motorista" onclick="setType('motorista',this)">
+      <div class="type-card" data-type="motorista" onclick="setType('motorista')">
         <div class="tc-icon">🚛</div><div class="tc-title">Motorista Premix</div><div class="tc-desc">Cadastro de motorista</div>
       </div>
     </div>
+    <div class="change-type hide" id="changeType">
+      <button type="button" onclick="unlockType()">Trocar tipo de cadastro</button>
+    </div>
   </div>
 
-  <div class="prog" id="progBar">
-    <div class="prog-s on" onclick="go(1)"><span class="sn">1</span>Dados</div>
-    <div class="prog-s" onclick="go(2)"><span class="sn">2</span>Contato</div>
-    <div class="prog-s" onclick="go(3)"><span class="sn">3</span>Endereço</div>
-    <div class="prog-s banco-step" onclick="go(4)"><span class="sn">4</span>Banco</div>
-    <div class="prog-s" onclick="go(5)"><span class="sn">5</span>Documentos</div>
+  <div class="prog hide" id="progBar">
+    <div class="prog-s on" data-step="1" onclick="tryGo(1)"><span class="sn">1</span>Dados</div>
+    <div class="prog-s" data-step="2" onclick="tryGo(2)"><span class="sn">2</span>Contato</div>
+    <div class="prog-s" data-step="3" onclick="tryGo(3)"><span class="sn">3</span>Endereço</div>
+    <div class="prog-s banco-step" data-step="4" onclick="tryGo(4)"><span class="sn">4</span>Banco</div>
+    <div class="prog-s" data-step="5" onclick="tryGo(5)"><span class="sn">5</span>Documentos</div>
   </div>
 
-  <form id="frm" novalidate>
+  <button id="startBtn" type="button" onclick="startForm()" style="background:var(--green);color:#fff;border:none;padding:14px 32px;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:.88rem;font-weight:800;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;width:100%;box-shadow:0 4px 14px rgba(0,166,80,.3)">Iniciar Cadastro →</button>
+
+  <form id="frm" novalidate class="hide">
     <input type="hidden" name="tipo_cadastro" id="tipoCadastro" value="pj">
 
-    <!-- STEP 1 -->
     <div class="sec on" id="s1">
       <div class="stitle"><span class="ic" style="background:#E8F5E9">🏢</span><span id="s1title">Dados da Empresa</span></div>
       <p class="ssub" id="s1sub">Informações básicas do fornecedor</p>
@@ -185,7 +201,6 @@ body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);m
       <div class="btns" style="justify-content:flex-end"><button type="button" class="btn btn1" onclick="next()">Próximo →</button></div>
     </div>
 
-    <!-- STEP 2 -->
     <div class="sec" id="s2">
       <div class="stitle"><span class="ic" style="background:#FFF3E0">📞</span>Contato</div>
       <p class="ssub">Dados de contato</p>
@@ -200,7 +215,6 @@ body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);m
       <div class="btns"><button type="button" class="btn btn2" onclick="prev()">← Voltar</button><button type="button" class="btn btn1" onclick="next()">Próximo →</button></div>
     </div>
 
-    <!-- STEP 3 -->
     <div class="sec" id="s3">
       <div class="stitle"><span class="ic" style="background:#E8F5E9">📍</span>Endereço</div>
       <p class="ssub">Localização</p>
@@ -217,7 +231,6 @@ body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);m
       <div class="btns"><button type="button" class="btn btn2" onclick="prev()">← Voltar</button><button type="button" class="btn btn1" onclick="next()">Próximo →</button></div>
     </div>
 
-    <!-- STEP 4 -->
     <div class="sec" id="s4">
       <div class="stitle"><span class="ic" style="background:#F3E8FF">🏦</span>Dados Bancários</div>
       <p class="ssub">Informações para pagamento</p>
@@ -229,24 +242,18 @@ body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);m
         <span class="ab-icon">⚠️</span>
         <div><strong>ATENÇÃO:</strong> Os dados bancários devem ser do <strong>mesmo CPF</strong> informado no cadastro.</div>
       </div>
-      <div id="bancoFields">
-        <div class="grid">
-          <div class="fld"><label>Banco <span class="req">*</span></label><input name="banco" placeholder="Ex: Bradesco, Itaú..."><span class="emsg">Campo obrigatório</span></div>
-          <div class="fld"><label>Tipo de Conta <span class="req">*</span></label><div class="rg"><div class="ro"><input type="radio" name="tipo_conta" id="tc1" value="corrente" checked><label for="tc1">Corrente</label></div><div class="ro"><input type="radio" name="tipo_conta" id="tc2" value="poupanca"><label for="tc2">Poupança</label></div></div></div>
-          <div class="fld"><label>Agência <span class="req">*</span></label><input name="agencia" placeholder="0000"><span class="emsg">Campo obrigatório</span></div>
-          <div class="fld"><label>Conta <span class="req">*</span></label><input name="conta" placeholder="00000-0"><span class="emsg">Campo obrigatório</span></div>
-          <div class="fld"><label>Titular da Conta <span class="req">*</span></label><input name="titular_conta" placeholder="Deve ser o mesmo CNPJ/CPF do cadastro"><span class="emsg">Campo obrigatório</span></div>
-          <div class="fld"><label>CPF/CNPJ do Titular <span class="req">*</span></label><input name="cpf_cnpj_titular" placeholder="Mesmo do cadastro"><span class="emsg">Campo obrigatório</span></div>
-          <div class="fld full"><label>Chave PIX</label><input name="pix" placeholder="CPF, CNPJ, e-mail, telefone ou chave aleatória"></div>
-        </div>
-      </div>
-      <div id="bancoMotorista" class="hide">
-        <div class="alert-box"><span class="ab-icon">ℹ️</span><div>Para cadastro de <strong>Motorista Premix</strong>, os dados bancários não são obrigatórios nesta etapa.</div></div>
+      <div class="grid">
+        <div class="fld"><label>Banco <span class="req">*</span></label><input name="banco" placeholder="Ex: Bradesco, Itaú..."><span class="emsg">Campo obrigatório</span></div>
+        <div class="fld"><label>Tipo de Conta <span class="req">*</span></label><div class="rg"><div class="ro"><input type="radio" name="tipo_conta" id="tc1" value="corrente" checked><label for="tc1">Corrente</label></div><div class="ro"><input type="radio" name="tipo_conta" id="tc2" value="poupanca"><label for="tc2">Poupança</label></div></div></div>
+        <div class="fld"><label>Agência <span class="req">*</span></label><input name="agencia" placeholder="0000"><span class="emsg">Campo obrigatório</span></div>
+        <div class="fld"><label>Conta <span class="req">*</span></label><input name="conta" placeholder="00000-0"><span class="emsg">Campo obrigatório</span></div>
+        <div class="fld"><label>Titular da Conta <span class="req">*</span></label><input name="titular_conta" placeholder="Deve ser o mesmo CNPJ/CPF do cadastro"><span class="emsg">Campo obrigatório</span></div>
+        <div class="fld"><label>CPF/CNPJ do Titular <span class="req">*</span></label><input name="cpf_cnpj_titular" placeholder="Mesmo do cadastro"><span class="emsg">Campo obrigatório</span></div>
+        <div class="fld full"><label>Chave PIX</label><input name="pix" placeholder="CPF, CNPJ, e-mail, telefone ou chave aleatória"></div>
       </div>
       <div class="btns"><button type="button" class="btn btn2" onclick="prev()">← Voltar</button><button type="button" class="btn btn1" onclick="next()">Próximo →</button></div>
     </div>
 
-    <!-- STEP 5 -->
     <div class="sec" id="s5">
       <div class="stitle"><span class="ic" style="background:#FEE2E2">📄</span>Documentos</div>
       <p class="ssub">Anexe os comprovantes obrigatórios</p>
@@ -273,10 +280,12 @@ body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);m
       <div class="grid" style="margin-top:12px">
         <div class="fld full"><label>Condições de Pagamento</label><input name="condicoes_pagamento" placeholder="Ex: 30/60/90 dias, à vista..."></div>
       </div>
-      <div class="btns"><button type="button" class="btn btn2" onclick="prev()">← Voltar</button><button type="submit" class="btn btns3" id="sbtn">Enviar Cadastro ✓</button></div>
+      <div class="btns"><button type="button" class="btn btn2" onclick="prev()">← Voltar</button><button type="button" class="btn btns3" id="sbtn" onclick="enviar()">Enviar Cadastro ✓</button></div>
     </div>
   </form>
 </div>
+
+<div class="toast" id="toast"></div>
 
 <div class="sov" id="sov">
   <div class="scard">
@@ -290,30 +299,68 @@ body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);m
 const SB_URL='https://frudrwxdygfticgcwigv.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZydWRyd3hkeWdmdGljZ2N3aWd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxMDg4NzgsImV4cCI6MjA5MzY4NDg3OH0.2laDHYhQEiBu0K9iQCiYtf2T3_Q21rnJAAsNByUKJ10';
 
-let cur=1,tot=5,tipo='pj';
+let cur=1, tipo='pj', typeLocked=false;
 
-function setType(t,el){
+function showToast(msg,duration=3500){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),duration);
+}
+
+function setType(t){
+  if(typeLocked)return;
   tipo=t;
   document.getElementById('tipoCadastro').value=t;
-  document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on');
-  document.getElementById('fields-pj').classList.toggle('hide',t!=='pj');
-  document.getElementById('fields-pf').classList.toggle('hide',t!=='pf');
-  document.getElementById('fields-mot').classList.toggle('hide',t!=='motorista');
-  document.getElementById('docs-pj').classList.toggle('hide',t!=='pj');
-  document.getElementById('docs-pf').classList.toggle('hide',t!=='pf');
-  document.getElementById('docs-mot').classList.toggle('hide',t!=='motorista');
-  document.getElementById('bancoFields').classList.toggle('hide',t==='motorista');
-  document.getElementById('bancoMotorista').classList.toggle('hide',t!=='motorista');
-  document.getElementById('alertBancoPJ').classList.toggle('hide',t!=='pj');
-  document.getElementById('alertBancoPF').classList.toggle('hide',t!=='pf');
+  document.querySelectorAll('.type-card').forEach(c=>c.classList.toggle('on',c.dataset.type===t));
+}
+
+function startForm(){
+  // Lock type
+  typeLocked=true;
+  document.querySelectorAll('.type-card').forEach(c=>{
+    if(c.dataset.type!==tipo)c.classList.add('hidden');
+  });
+  document.getElementById('typeCards').classList.add('locked');
+  document.getElementById('typeSel').classList.add('locked');
+  document.getElementById('changeType').classList.remove('hide');
+  document.getElementById('startBtn').classList.add('hide');
+  document.getElementById('progBar').classList.remove('hide');
+  document.getElementById('frm').classList.remove('hide');
+
+  // Apply type-specific visibility
+  document.getElementById('fields-pj').classList.toggle('hide',tipo!=='pj');
+  document.getElementById('fields-pf').classList.toggle('hide',tipo!=='pf');
+  document.getElementById('fields-mot').classList.toggle('hide',tipo!=='motorista');
+  document.getElementById('docs-pj').classList.toggle('hide',tipo!=='pj');
+  document.getElementById('docs-pf').classList.toggle('hide',tipo!=='pf');
+  document.getElementById('docs-mot').classList.toggle('hide',tipo!=='motorista');
+  document.getElementById('alertBancoPJ').classList.toggle('hide',tipo!=='pj');
+  document.getElementById('alertBancoPF').classList.toggle('hide',tipo!=='pf');
+
   // Hide banco step for motorista
-  document.querySelectorAll('.banco-step').forEach(s=>s.style.display=t==='motorista'?'none':'flex');
-  tot=t==='motorista'?4:5;
-  if(t==='pj'){document.getElementById('s1title').textContent='Dados da Empresa';document.getElementById('s1sub').textContent='Informações do fornecedor PJ'}
-  else if(t==='pf'){document.getElementById('s1title').textContent='Dados Pessoais';document.getElementById('s1sub').textContent='Informações do fornecedor pessoa física'}
+  document.querySelectorAll('.banco-step').forEach(s=>s.style.display=tipo==='motorista'?'none':'flex');
+
+  // Update titles
+  if(tipo==='pj'){document.getElementById('s1title').textContent='Dados da Empresa';document.getElementById('s1sub').textContent='Informações do fornecedor PJ'}
+  else if(tipo==='pf'){document.getElementById('s1title').textContent='Dados Pessoais';document.getElementById('s1sub').textContent='Informações do fornecedor pessoa física'}
   else{document.getElementById('s1title').textContent='Dados do Motorista';document.getElementById('s1sub').textContent='Informações para cadastro de motorista Premix'}
+
   go(1);
+}
+
+function unlockType(){
+  if(!confirm('Trocar o tipo de cadastro irá apagar os dados preenchidos. Continuar?'))return;
+  typeLocked=false;
+  document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('hidden'));
+  document.getElementById('typeCards').classList.remove('locked');
+  document.getElementById('typeSel').classList.remove('locked');
+  document.getElementById('changeType').classList.add('hide');
+  document.getElementById('startBtn').classList.remove('hide');
+  document.getElementById('progBar').classList.add('hide');
+  document.getElementById('frm').classList.add('hide');
+  document.getElementById('frm').reset();
+  cur=1;
 }
 
 function toggleIE(){
@@ -335,54 +382,9 @@ document.querySelector('[name=telefone]').addEventListener('input',function(){th
 document.querySelector('[name=celular]').addEventListener('input',function(){this.value=mTel(this.value)});
 document.querySelector('[name=cep]').addEventListener('input',function(){this.value=mCEP(this.value)});
 
-function go(s){
-  if(s<1)return;
-  // Para motorista, pula do step 3 direto pro 5 (docs)
-  if(tipo==='motorista'&&s===4)s=5;
-  if(s>5)return;
-  document.querySelectorAll('.sec').forEach(e=>e.classList.remove('on'));
-  document.getElementById('s'+s).classList.add('on');
-  document.querySelectorAll('.prog-s').forEach((e,i)=>{
-    e.classList.remove('on','done');
-    const stepNum=i+1;
-    if(tipo==='motorista'&&stepNum===4)return;
-    if(stepNum<s)e.classList.add('done');
-    if(stepNum===s)e.classList.add('on');
-  });
-  cur=s;
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-function next(){
-  if(!valStep(cur))return;
-  if(tipo==='motorista'&&cur===3)go(5);
-  else go(cur+1);
-}
-function prev(){
-  if(tipo==='motorista'&&cur===5)go(3);
-  else go(cur-1);
-}
-
-function valStep(s){
-  const sec=document.getElementById('s'+s);
-  let ok=true;
-  // Validate visible required-like fields based on type
-  const fields=getRequiredForStep(s);
-  fields.forEach(name=>{
-    const f=sec.querySelector('[name="'+name+'"]');
-    if(!f)return;
-    if(f.closest('.hide'))return;
-    const em=f.closest('.fld')?.querySelector('.emsg');
-    if(!f.value.trim()){f.classList.add('err');if(em)em.classList.add('show');ok=false}
-    else{f.classList.remove('err');if(em)em.classList.remove('show')}
-  });
-  if(!ok){const first=sec.querySelector('.err');if(first)first.focus()}
-  return ok;
-}
-
-function getRequiredForStep(s){
+function getRequired(s){
   if(s===1){
-    if(tipo==='pj')return['razao_social','cnpj'];
+    if(tipo==='pj')return['razao_social','cnpj','inscricao_estadual'];
     if(tipo==='pf')return['nome_completo','cpf','rg'];
     return['nome_completo_mot','cpf_mot','rg_mot','cnh_categoria'];
   }
@@ -392,71 +394,218 @@ function getRequiredForStep(s){
   return[];
 }
 
-function hf(inp,fnId,dropId){const f=inp.files[0];if(!f)return;if(f.size>5*1024*1024){alert('Arquivo muito grande. Máximo 5MB.');inp.value='';return}document.getElementById(fnId).textContent='✓ '+f.name;document.getElementById(dropId).classList.add('ok')}
+function validateStep(s){
+  const sec=document.getElementById('s'+s);
+  let ok=true;
+  let firstErr=null;
+  const fields=getRequired(s);
+  fields.forEach(name=>{
+    const f=sec.querySelector('[name="'+name+'"]');
+    if(!f)return;
+    if(f.closest('.hide'))return;
+    const em=f.closest('.fld')?.querySelector('.emsg');
+    if(!f.value.trim()){
+      f.classList.add('err');
+      if(em)em.classList.add('show');
+      if(!firstErr)firstErr=f;
+      ok=false;
+    }else{
+      f.classList.remove('err');
+      if(em)em.classList.remove('show');
+    }
+  });
+  if(!ok){
+    showToast('⚠️ Preencha todos os campos obrigatórios');
+    if(firstErr)firstErr.focus();
+  }
+  return ok;
+}
 
-async function buscaCEP(){const cep=document.querySelector('[name=cep]').value.replace(/\D/g,'');if(cep.length!==8){alert('Digite um CEP válido');return}try{const r=await fetch('https://viacep.com.br/ws/'+cep+'/json/');const d=await r.json();if(d.erro){alert('CEP não encontrado');return}document.querySelector('[name=logradouro]').value=d.logradouro||'';document.querySelector('[name=bairro]').value=d.bairro||'';document.querySelector('[name=cidade]').value=d.localidade||'';const sel=document.querySelector('[name=estado]');for(let o of sel.options){if(o.value===d.uf){sel.value=d.uf;break}}}catch(e){alert('Erro ao buscar CEP')}}
+function go(s){
+  if(s<1||s>5)return;
+  if(tipo==='motorista'&&s===4)s=5;
+  document.querySelectorAll('.sec').forEach(e=>e.classList.remove('on'));
+  document.getElementById('s'+s).classList.add('on');
+  document.querySelectorAll('.prog-s').forEach(e=>{
+    const stepNum=parseInt(e.dataset.step);
+    e.classList.remove('on','done');
+    if(tipo==='motorista'&&stepNum===4){e.style.display='none';return}
+    if(stepNum<s)e.classList.add('done');
+    if(stepNum===s)e.classList.add('on');
+  });
+  cur=s;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 
-async function uploadFile(file,folder){const ts=Date.now();const ext=file.name.split('.').pop();const path=folder+'/'+ts+'_'+Math.random().toString(36).substr(2,6)+'.'+ext;const res=await fetch(SB_URL+'/storage/v1/object/comprovantes/'+path,{method:'POST',headers:{'Authorization':'Bearer '+SB_KEY,'Content-Type':file.type,'x-upsert':'true'},body:file});if(!res.ok)throw new Error('Upload falhou');return SB_URL+'/storage/v1/object/public/comprovantes/'+path}
+function tryGo(s){
+  // Only allow going to a previous step or current
+  if(s>cur)return;
+  go(s);
+}
 
-document.getElementById('frm').addEventListener('submit',async function(e){
-  e.preventDefault();
-  if(!valStep(cur))return;
+function next(){
+  if(!validateStep(cur))return;
+  if(tipo==='motorista'&&cur===3)go(5);
+  else go(cur+1);
+}
+function prev(){
+  if(tipo==='motorista'&&cur===5)go(3);
+  else go(cur-1);
+}
+
+function hf(inp,fnId,dropId){
+  const f=inp.files[0];
+  if(!f)return;
+  if(f.size>5*1024*1024){showToast('Arquivo muito grande. Máximo 5MB.');inp.value='';return}
+  document.getElementById(fnId).textContent='✓ '+f.name;
+  document.getElementById(dropId).classList.add('ok');
+}
+
+async function buscaCEP(){
+  const cep=document.querySelector('[name=cep]').value.replace(/\D/g,'');
+  if(cep.length!==8){showToast('Digite um CEP válido');return}
+  try{
+    const r=await fetch('https://viacep.com.br/ws/'+cep+'/json/');
+    const d=await r.json();
+    if(d.erro){showToast('CEP não encontrado');return}
+    document.querySelector('[name=logradouro]').value=d.logradouro||'';
+    document.querySelector('[name=bairro]').value=d.bairro||'';
+    document.querySelector('[name=cidade]').value=d.localidade||'';
+    const sel=document.querySelector('[name=estado]');
+    for(let o of sel.options){if(o.value===d.uf){sel.value=d.uf;break}}
+  }catch(e){showToast('Erro ao buscar CEP')}
+}
+
+async function uploadFile(file,folder){
+  const ts=Date.now();
+  const ext=file.name.split('.').pop();
+  const path=folder+'/'+ts+'_'+Math.random().toString(36).substr(2,6)+'.'+ext;
+  const res=await fetch(SB_URL+'/storage/v1/object/comprovantes/'+path,{
+    method:'POST',
+    headers:{'Authorization':'Bearer '+SB_KEY,'Content-Type':file.type,'x-upsert':'true'},
+    body:file
+  });
+  if(!res.ok){
+    const errText=await res.text();
+    throw new Error('Upload falhou: '+errText);
+  }
+  return SB_URL+'/storage/v1/object/public/comprovantes/'+path;
+}
+
+async function enviar(){
+  if(!validateStep(cur))return;
+
   const btn=document.getElementById('sbtn');
-  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Enviando...';
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span> Enviando...';
+
   try{
     const uploads={};
+
     if(tipo==='pj'){
       const cnpjF=document.querySelector('[name=comprovante_cnpj]').files[0];
       const csF=document.querySelector('[name=contrato_social]').files[0];
       const bancF=document.querySelector('[name=comprovante_bancario]').files[0];
-      if(!cnpjF||!csF||!bancF){alert('Anexe todos os documentos obrigatórios (CNPJ, Contrato Social e Comprovante Bancário)');btn.disabled=false;btn.textContent='Enviar Cadastro ✓';return}
-      const [u1,u2,u3]=await Promise.all([uploadFile(cnpjF,'cnpj'),uploadFile(csF,'contrato'),uploadFile(bancF,'bancario')]);
-      uploads.comprovante_cnpj_url=u1;uploads.contrato_social_url=u2;uploads.comprovante_bancario_url=u3;
+      if(!cnpjF||!csF||!bancF){
+        showToast('Anexe Cartão CNPJ, Contrato Social e Comprovante Bancário');
+        btn.disabled=false;btn.textContent='Enviar Cadastro ✓';
+        return;
+      }
+      const [u1,u2,u3]=await Promise.all([
+        uploadFile(cnpjF,'cnpj'),
+        uploadFile(csF,'contrato'),
+        uploadFile(bancF,'bancario')
+      ]);
+      uploads.comprovante_cnpj_url=u1;
+      uploads.contrato_social_url=u2;
+      uploads.comprovante_bancario_url=u3;
       const ieF=document.querySelector('[name=comprovante_ie]')?.files[0];
       if(ieF)uploads.comprovante_ie_url=await uploadFile(ieF,'ie');
     } else if(tipo==='pf'){
       const docF=document.querySelector('[name=documento_identidade]').files[0];
       const bancF=document.querySelector('[name=comprovante_bancario_pf]').files[0];
-      if(!docF||!bancF){alert('Anexe o documento com foto e o comprovante bancário');btn.disabled=false;btn.textContent='Enviar Cadastro ✓';return}
-      const [u1,u2]=await Promise.all([uploadFile(docF,'doc_identidade'),uploadFile(bancF,'bancario')]);
-      uploads.documento_identidade_url=u1;uploads.comprovante_bancario_url=u2;
+      if(!docF||!bancF){
+        showToast('Anexe documento com foto e comprovante bancário');
+        btn.disabled=false;btn.textContent='Enviar Cadastro ✓';
+        return;
+      }
+      const [u1,u2]=await Promise.all([
+        uploadFile(docF,'doc_identidade'),
+        uploadFile(bancF,'bancario')
+      ]);
+      uploads.documento_identidade_url=u1;
+      uploads.comprovante_bancario_url=u2;
     } else {
       const docF=document.querySelector('[name=documento_identidade_mot]').files[0];
-      if(!docF){alert('Anexe o documento com foto (CNH)');btn.disabled=false;btn.textContent='Enviar Cadastro ✓';return}
+      if(!docF){
+        showToast('Anexe documento com foto (CNH)');
+        btn.disabled=false;btn.textContent='Enviar Cadastro ✓';
+        return;
+      }
       uploads.documento_identidade_url=await uploadFile(docF,'doc_motorista');
       const endF=document.querySelector('[name=comprovante_endereco_mot]')?.files[0];
       if(endF)uploads.comprovante_endereco_url=await uploadFile(endF,'endereco');
     }
 
-    const fd=new FormData(this);
+    // Build data object
+    const fd=new FormData(document.getElementById('frm'));
     const data={};
     const skip=['comprovante_cnpj','contrato_social','comprovante_bancario','comprovante_ie','documento_identidade','comprovante_bancario_pf','documento_identidade_mot','comprovante_endereco_mot'];
-    for(const[k,v]of fd.entries()){if(!skip.includes(k)&&v!==''&&v!==undefined)data[k]=v}
+
+    for(const[k,v]of fd.entries()){
+      if(skip.includes(k))continue;
+      if(v===''||v===undefined)continue;
+      data[k]=v;
+    }
+
+    // Map motorista fields
     if(tipo==='motorista'){
-      data.nome_completo=data.nome_completo_mot||'';delete data.nome_completo_mot;
-      data.cpf=data.cpf_mot||'';delete data.cpf_mot;
-      data.rg=data.rg_mot||'';delete data.rg_mot;
+      if(data.nome_completo_mot){data.nome_completo=data.nome_completo_mot;delete data.nome_completo_mot}
+      if(data.cpf_mot){data.cpf=data.cpf_mot;delete data.cpf_mot}
+      if(data.rg_mot){data.rg=data.rg_mot;delete data.rg_mot}
     }
-    if(tipo==='pf'){
-      // Use nome_completo as razao_social fallback for display
-      data.razao_social=data.nome_completo;
+
+    // Ensure razao_social has a value (DB requires it)
+    if(!data.razao_social){
+      data.razao_social=data.nome_completo||data.responsavel_nome||'Sem nome';
     }
-    if(tipo==='motorista'){
-      data.razao_social=data.nome_completo;
-    }
+
     data.inscricao_estadual_isento=document.getElementById('ieIsento')?.checked||false;
     Object.assign(data,uploads);
     data.status='pendente';
-    // Remove empty strings
-    Object.keys(data).forEach(k=>{if(data[k]==='')delete data[k]});
-    // Ensure razao_social is never null
-    if(!data.razao_social)data.razao_social=data.nome_completo||data.responsavel_nome||'Sem nome';
 
-    const res=await fetch(SB_URL+'/rest/v1/fornecedores',{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(data)});
-    if(!res.ok){const err=await res.text();throw new Error(err)}
+    // Final cleanup - remove empty strings
+    Object.keys(data).forEach(k=>{
+      if(data[k]==='')delete data[k];
+    });
+
+    console.log('Enviando dados:',data);
+
+    const res=await fetch(SB_URL+'/rest/v1/fornecedores',{
+      method:'POST',
+      headers:{
+        'apikey':SB_KEY,
+        'Authorization':'Bearer '+SB_KEY,
+        'Content-Type':'application/json',
+        'Prefer':'return=minimal'
+      },
+      body:JSON.stringify(data)
+    });
+
+    if(!res.ok){
+      const err=await res.text();
+      console.error('Erro Supabase:',err);
+      throw new Error(err);
+    }
+
     document.getElementById('sov').classList.add('show');
-  }catch(err){alert('Erro ao enviar: '+err.message);btn.disabled=false;btn.textContent='Enviar Cadastro ✓'}
-});
+  }catch(err){
+    console.error('Erro completo:',err);
+    showToast('Erro ao enviar: '+err.message,5000);
+    btn.disabled=false;
+    btn.textContent='Enviar Cadastro ✓';
+  }
+}
 </script>
 </body>
 </html>
