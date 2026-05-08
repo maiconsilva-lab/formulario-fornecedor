@@ -353,7 +353,7 @@ function startForm(){
   go(getStepsForType(tipo)[0]);
 }
 
-function unlockType(){if(!confirm('Trocar o tipo de cadastro irá apagar os dados preenchidos. Continuar?'))return;resetForm()}
+function unlockType(){resetForm()}
 
 function resetForm(){
   typeLocked=false;
