@@ -470,19 +470,53 @@ function prev(){const steps=getStepsForType(tipo);const idx=steps.indexOf(cur);i
 
 function hf(inp,fnId,dropId){const f=inp.files[0];if(!f)return;if(f.size>5*1024*1024){showToast('Arquivo muito grande. Máximo 5MB.');inp.value='';return}document.getElementById(fnId).textContent='✓ '+f.name;document.getElementById(dropId).classList.add('ok')}
 
-async function buscaCEP(){
-  const cep=document.querySelector('[name=cep]').value.replace(/\D/g,'');
-  if(cep.length!==8){showToast('Digite um CEP válido');return}
-  try{
-    const r=await fetch('https://viacep.com.br/ws/'+cep+'/json/');
-    const d=await r.json();
-    if(d.erro){showToast('CEP não encontrado');return}
-    document.querySelector('[name=logradouro]').value=d.logradouro||'';
-    document.querySelector('[name=bairro]').value=d.bairro||'';
-    document.querySelector('[name=cidade]').value=d.localidade||'';
-    const sel=document.querySelector('[name=estado]');
-    for(let o of sel.options){if(o.value===d.uf){sel.value=d.uf;break}}
-  }catch(e){showToast('Erro ao buscar CEP')}
+async function buscaCEP() {
+  const btn = document.querySelector('button[onclick="buscaCEP()"]');
+  const cepInput = document.querySelector('[name=cep]');
+  const cep = cepInput.value.replace(/\D/g, '');
+
+  if (cep.length !== 8) {
+    showToast('⚠️ Digite o CEP completo (8 números)');
+    cepInput.focus();
+    return;
+  }
+
+  // Trava o botão e avisa que está carregando
+  const btnOriginalText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Buscando...';
+
+  try {
+    const r = await fetch('https://viacep.com.br/ws/' + cep + '/json/');
+    
+    if (!r.ok) throw new Error('Erro na API dos Correios');
+    
+    const d = await r.json();
+
+    if (d.erro) {
+      showToast('❌ CEP não encontrado na base de dados');
+    } else {
+      document.querySelector('[name=logradouro]').value = d.logradouro || '';
+      document.querySelector('[name=bairro]').value = d.bairro || '';
+      document.querySelector('[name=cidade]').value = d.localidade || '';
+      
+      const sel = document.querySelector('[name=estado]');
+      for (let o of sel.options) {
+        if (o.value === d.uf) {
+          sel.value = d.uf;
+          break;
+        }
+      }
+      showToast('📍 Endereço preenchido com sucesso!', 2500);
+    }
+  } catch (e) {
+    console.error('Erro ViaCEP:', e);
+    showToast('⚠️ Falha ao buscar CEP. Verifique a internet ou digite manualmente.', 5000);
+  } finally {
+    // Destrava o botão para ele voltar ao normal
+    btn.disabled = false;
+    btn.innerHTML = btnOriginalText;
+  }
 }
 
 function buildReview(){
