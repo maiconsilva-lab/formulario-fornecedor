@@ -150,7 +150,7 @@ body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);m
         <div class="grid">
           <div class="fld full"><label>Razão Social <span class="req">*</span></label><input name="razao_social" placeholder="Razão Social completa"><span class="emsg">Campo obrigatório</span></div>
           <div class="fld"><label>Nome Fantasia</label><input name="nome_fantasia" placeholder="Nome comercial"></div>
-          <div class="fld"><label>CNPJ <span class="req">*</span></label><input name="cnpj" placeholder="00.000.000/0000-00" maxlength="18"><span class="emsg">CNPJ inválido</span></div>
+          <div class="fld"><label>CNPJ <span class="req">*</span></label><input name="cnpj" id="cnpjInput" placeholder="00.000.000/0000-00" maxlength="18"><span class="emsg">CNPJ inválido</span></div>
           <div class="fld full"><label>Inscrição Estadual <span class="req">*</span></label><div class="chk-field"><input type="checkbox" id="ieIsento" onchange="toggleIE()"><label for="ieIsento">Isento</label></div><input name="inscricao_estadual" id="ieInput" placeholder="Número da IE"><span class="emsg">Informe a IE ou marque Isento</span></div>
           <div class="fld full"><label>Ramo de Atividade</label><input name="ramo_atividade" placeholder="Ex: Alimentos, Embalagens, Logística..."></div>
           <div class="fld full"><label>Produtos / Serviços</label><textarea name="produtos_servicos" placeholder="Descreva os principais produtos ou serviços..."></textarea></div>
@@ -570,6 +570,17 @@ async function enviar(){
     const data={};
     const skip=['comprovante_cnpj','contrato_social','comprovante_bancario','comprovante_ie','documento_identidade','comprovante_bancario_pf','documento_identidade_mot','comprovante_endereco_mot','comprovante_bancario_atu'];
     for(const[k,v]of fd.entries()){if(skip.includes(k))continue;if(v===''||v===undefined)continue;data[k]=v}
+
+    // ✅ CORREÇÃO: Garantir que o CNPJ seja capturado diretamente do campo para PJ
+    if(tipo==='pj'){
+      const cnpjVal=document.querySelector('[name=cnpj]')?.value?.trim();
+      if(!cnpjVal){
+        showToast('⚠️ CNPJ não encontrado. Volte ao passo 1 e verifique.');
+        btn.disabled=false;btn.textContent='✓ Confirmar e Enviar';
+        return;
+      }
+      data.cnpj=cnpjVal;
+    }
 
     if(tipo==='motorista'){
       if(data.nome_completo_mot){data.nome_completo=data.nome_completo_mot;delete data.nome_completo_mot}
