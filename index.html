@@ -526,95 +526,151 @@ async function uploadFile(file,folder){
   return SB_URL+'/storage/v1/object/public/comprovantes/'+path;
 }
 
-async function enviar(){
-  const btn=document.getElementById('sbtn');
-  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Enviando...';
-  try{
-    const apenasB=document.getElementById('apenasBoleto').checked;
-    const uploads={};
+async function enviar() {
+  const btn = document.getElementById('sbtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Enviando...';
 
-    if(tipo==='pj'){
-      const cnpjF=document.querySelector('[name=comprovante_cnpj]').files[0];
-      const csF=document.querySelector('[name=contrato_social]').files[0];
-      const bancF=document.querySelector('[name=comprovante_bancario]').files[0];
-      if(!cnpjF||!csF){showToast('Anexe Cartão CNPJ e Contrato Social');btn.disabled=false;btn.textContent='✓ Confirmar e Enviar';return}
-      if(!apenasB&&!bancF){showToast('Anexe comprovante bancário ou marque "Recebo apenas via boleto"');btn.disabled=false;btn.textContent='✓ Confirmar e Enviar';return}
-      const promises=[uploadFile(cnpjF,'cnpj'),uploadFile(csF,'contrato')];
-      if(bancF)promises.push(uploadFile(bancF,'bancario'));
-      const results=await Promise.all(promises);
-      uploads.comprovante_cnpj_url=results[0];
-      uploads.contrato_social_url=results[1];
-      if(bancF)uploads.comprovante_bancario_url=results[2];
-      const ieF=document.querySelector('[name=comprovante_ie]')?.files[0];
-      if(ieF)uploads.comprovante_ie_url=await uploadFile(ieF,'ie');
-    } else if(tipo==='pf'){
-      const docF=document.querySelector('[name=documento_identidade]').files[0];
-      const bancF=document.querySelector('[name=comprovante_bancario_pf]').files[0];
-      if(!docF){showToast('Anexe documento com foto');btn.disabled=false;btn.textContent='✓ Confirmar e Enviar';return}
-      if(!apenasB&&!bancF){showToast('Anexe comprovante bancário ou marque "Recebo apenas via boleto"');btn.disabled=false;btn.textContent='✓ Confirmar e Enviar';return}
-      uploads.documento_identidade_url=await uploadFile(docF,'doc_identidade');
-      if(bancF)uploads.comprovante_bancario_url=await uploadFile(bancF,'bancario');
-    } else if(tipo==='motorista'){
-      const docF=document.querySelector('[name=documento_identidade_mot]').files[0];
-      if(!docF){showToast('Anexe documento com foto (CNH)');btn.disabled=false;btn.textContent='✓ Confirmar e Enviar';return}
-      uploads.documento_identidade_url=await uploadFile(docF,'doc_motorista');
-      const endF=document.querySelector('[name=comprovante_endereco_mot]')?.files[0];
-      if(endF)uploads.comprovante_endereco_url=await uploadFile(endF,'endereco');
-    } else {
-      const bancF=document.querySelector('[name=comprovante_bancario_atu]').files[0];
-      if(!bancF){showToast('Anexe o novo comprovante bancário');btn.disabled=false;btn.textContent='✓ Confirmar e Enviar';return}
-      uploads.comprovante_bancario_url=await uploadFile(bancF,'bancario_atu');
+  try {
+    const apenasB = document.getElementById('apenasBoleto')?.checked || false;
+    const uploads = {};
+    const fd = new FormData(document.getElementById('frm'));
+    const data = {};
+
+    // 1. Extrair os dados (ignorando os inputs de arquivo no form loop)
+    const skipFiles = ['comprovante_cnpj', 'contrato_social', 'comprovante_bancario', 'comprovante_ie', 'documento_identidade', 'comprovante_bancario_pf', 'documento_identidade_mot', 'comprovante_endereco_mot', 'comprovante_bancario_atu'];
+    for (const [k, v] of fd.entries()) {
+      if (skipFiles.includes(k)) continue;
+      if (v === '' || v === undefined || v === null) continue;
+      data[k] = v;
     }
 
-    const fd=new FormData(document.getElementById('frm'));
-    const data={};
-    const skip=['comprovante_cnpj','contrato_social','comprovante_bancario','comprovante_ie','documento_identidade','comprovante_bancario_pf','documento_identidade_mot','comprovante_endereco_mot','comprovante_bancario_atu'];
-    for(const[k,v]of fd.entries()){if(skip.includes(k))continue;if(v===''||v===undefined)continue;data[k]=v}
+    // 2. Validação e Upload de acordo com o TIPO selecionado
+    if (tipo === 'pj') {
+      const cnpjF = document.querySelector('[name=comprovante_cnpj]').files[0];
+      const csF = document.querySelector('[name=contrato_social]').files[0];
+      const bancF = document.querySelector('[name=comprovante_bancario]').files[0];
+      const ieF = document.querySelector('[name=comprovante_ie]')?.files[0];
 
-    if(tipo==='motorista'){
-      if(data.nome_completo_mot){data.nome_completo=data.nome_completo_mot;delete data.nome_completo_mot}
-      if(data.cpf_mot){data.cpf=data.cpf_mot;delete data.cpf_mot}
-      if(data.rg_mot){data.rg=data.rg_mot;delete data.rg_mot}
+      if (!cnpjF || !csF) throw new Error('Anexe o Cartão CNPJ e o Contrato Social.');
+      if (!apenasB && !bancF) throw new Error('Anexe o comprovante bancário ou marque "Recebo apenas via boleto".');
+
+      const promises = [uploadFile(cnpjF, 'cnpj'), uploadFile(csF, 'contrato')];
+      if (bancF) promises.push(uploadFile(bancF, 'bancario'));
+      
+      const results = await Promise.all(promises);
+      uploads.comprovante_cnpj_url = results[0];
+      uploads.contrato_social_url = results[1];
+      if (bancF) uploads.comprovante_bancario_url = results[2];
+      if (ieF) uploads.comprovante_ie_url = await uploadFile(ieF, 'ie');
+
+    } else if (tipo === 'pf') {
+      const docF = document.querySelector('[name=documento_identidade]').files[0];
+      const bancF = document.querySelector('[name=comprovante_bancario_pf]').files[0];
+
+      if (!docF) throw new Error('Anexe o documento com foto.');
+      if (!apenasB && !bancF) throw new Error('Anexe o comprovante bancário ou marque "Recebo apenas via boleto".');
+
+      uploads.documento_identidade_url = await uploadFile(docF, 'doc_identidade');
+      if (bancF) uploads.comprovante_bancario_url = await uploadFile(bancF, 'bancario');
+
+    } else if (tipo === 'motorista') {
+      const docF = document.querySelector('[name=documento_identidade_mot]').files[0];
+      const endF = document.querySelector('[name=comprovante_endereco_mot]')?.files[0];
+
+      if (!docF) throw new Error('Anexe o documento com foto (CNH).');
+
+      uploads.documento_identidade_url = await uploadFile(docF, 'doc_motorista');
+      if (endF) uploads.comprovante_endereco_url = await uploadFile(endF, 'endereco');
+
+    } else if (tipo === 'atualizacao_bancaria') {
+      const bancF = document.querySelector('[name=comprovante_bancario_atu]').files[0];
+      if (!bancF) throw new Error('Anexe o novo comprovante bancário.');
+
+      uploads.comprovante_bancario_url = await uploadFile(bancF, 'bancario_atu');
     }
-    if(tipo==='atualizacao_bancaria'){
-      if(data.razao_social_atu){data.razao_social=data.razao_social_atu;delete data.razao_social_atu}
-      if(data.cnpj_cpf_atu){
-        const v=data.cnpj_cpf_atu.replace(/\D/g,'');
-        if(v.length>11)data.cnpj=data.cnpj_cpf_atu;
-        else data.cpf=data.cnpj_cpf_atu;
+
+    // 3. Limpeza Restrita: deletar propriedades de outros formulários que vazaram no HTML
+    if (tipo === 'motorista') {
+      if (data.nome_completo_mot) { data.nome_completo = data.nome_completo_mot; delete data.nome_completo_mot; }
+      if (data.cpf_mot) { data.cpf = data.cpf_mot; delete data.cpf_mot; }
+      if (data.rg_mot) { data.rg = data.rg_mot; delete data.rg_mot; }
+      delete data.tipo_conta;
+    }
+    
+    if (tipo === 'atualizacao_bancaria') {
+      if (data.razao_social_atu) { data.razao_social = data.razao_social_atu; delete data.razao_social_atu; }
+      if (data.cnpj_cpf_atu) {
+        const v = data.cnpj_cpf_atu.replace(/\D/g, '');
+        if (v.length > 11) data.cnpj = data.cnpj_cpf_atu;
+        else data.cpf = data.cnpj_cpf_atu;
         delete data.cnpj_cpf_atu;
       }
+      delete data.tipo_conta;
     }
 
-    if(!data.razao_social)data.razao_social=data.nome_completo||data.responsavel_nome||'Sem nome';
-    data.inscricao_estadual_isento=document.getElementById('ieIsento')?.checked||false;
-    data.apenas_boleto=apenasB;
-    Object.assign(data,uploads);
-    data.status='pendente';
-    Object.keys(data).forEach(k=>{if(data[k]==='')delete data[k]});
+    if (apenasB && tipo !== 'atualizacao_bancaria') {
+      delete data.banco; delete data.agencia; delete data.conta;
+      delete data.titular_conta; delete data.cpf_cnpj_titular; delete data.pix; delete data.tipo_conta;
+    }
 
-    console.log('Enviando:',data);
+    // 4. Normalização Final
+    if (!data.razao_social) data.razao_social = data.nome_completo || data.responsavel_nome || 'Sem nome';
+    data.inscricao_estadual_isento = document.getElementById('ieIsento')?.checked || false;
+    data.apenas_boleto = tipo === 'motorista' ? false : apenasB;
+    data.status = 'pendente';
 
-    const res=await fetch(SB_URL+'/rest/v1/fornecedores',{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(data)});
-    if(!res.ok){const err=await res.text();console.error('Erro Supabase:',err);throw new Error(err)}
+    // Mesclar as URLs no objeto principal e limpar chaves em branco
+    Object.assign(data, uploads);
+    Object.keys(data).forEach(k => { 
+      if (data[k] === '' || data[k] === null || data[k] === undefined) {
+        delete data[k];
+      } 
+    });
 
+    console.log('Enviando payload:', data);
+
+    // 5. Chamada à API
+    const res = await fetch(SB_URL + '/rest/v1/fornecedores', {
+      method: 'POST',
+      headers: {
+        'apikey': SB_KEY,
+        'Authorization': 'Bearer ' + SB_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('Erro Supabase:', err);
+      throw new Error(err || 'Erro ao comunicar com o banco de dados.');
+    }
+
+    // 6. Exibir Tela de Sucesso
     document.getElementById('frm').classList.add('hide');
     document.getElementById('progBar').classList.add('hide');
     document.getElementById('typeSel').classList.add('hide');
     document.getElementById('successScreen').classList.add('show');
-    if(tipo==='atualizacao_bancaria'){
-      document.getElementById('successTitle').textContent='Atualização Enviada!';
-      document.getElementById('successMsg').textContent='Os novos dados bancários foram recebidos. O Núcleo Fiscal Premix irá analisar e atualizar seu cadastro.';
+    
+    if (tipo === 'atualizacao_bancaria') {
+      document.getElementById('successTitle').textContent = 'Atualização Enviada!';
+      document.getElementById('successMsg').textContent = 'Os novos dados bancários foram recebidos. O Núcleo Fiscal Premix irá analisar e atualizar seu cadastro.';
     } else {
-      document.getElementById('successTitle').textContent='Cadastro Enviado!';
-      document.getElementById('successMsg').textContent='Seus dados foram recebidos com sucesso. O Núcleo Fiscal Premix irá analisar e entrar em contato em breve.';
+      document.getElementById('successTitle').textContent = 'Cadastro Enviado!';
+      document.getElementById('successMsg').textContent = 'Seus dados foram recebidos com sucesso. O Núcleo Fiscal Premix irá analisar e entrar em contato em breve.';
     }
-    window.scrollTo({top:0,behavior:'smooth'});
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  }catch(err){
-    console.error('Erro:',err);
-    showToast('Erro ao enviar: '+err.message,5000);
-    btn.disabled=false;btn.textContent='✓ Confirmar e Enviar';
+  } catch (err) {
+    // 7. Lidar com o erro de forma amigável
+    console.error('Erro detectado:', err);
+    showToast('Falha ao enviar: ' + err.message, 6000);
+  } finally {
+    // 8. O SEGREDO DO DESBLOQUEIO: Independente de dar erro ou não, restaure o botão!
+    btn.disabled = false;
+    btn.innerHTML = '✓ Confirmar e Enviar';
   }
 }
 </script>
