@@ -161,6 +161,7 @@ body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);m
           <div class="fld full"><label>Nome Completo <span class="req">*</span></label><input name="nome_completo" placeholder="Nome completo"><span class="emsg">Campo obrigatório</span></div>
           <div class="fld"><label>CPF <span class="req">*</span></label><input name="cpf" placeholder="000.000.000-00" maxlength="14"><span class="emsg">CPF inválido</span></div>
           <div class="fld"><label>RG <span class="req">*</span></label><input name="rg" placeholder="Número do RG"><span class="emsg">Campo obrigatório</span></div>
+          <div class="fld"><label>Data de Nascimento <span class="req">*</span></label><input name="data_nascimento" type="date"><span class="emsg">Campo obrigatório</span></div>
         </div>
       </div>
       <div id="fields-mot" class="hide">
@@ -168,8 +169,9 @@ body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);m
           <div class="fld full"><label>Nome Completo <span class="req">*</span></label><input name="nome_completo_mot" placeholder="Nome completo do motorista"><span class="emsg">Campo obrigatório</span></div>
           <div class="fld"><label>CPF <span class="req">*</span></label><input name="cpf_mot" placeholder="000.000.000-00" maxlength="14"><span class="emsg">CPF inválido</span></div>
           <div class="fld"><label>RG <span class="req">*</span></label><input name="rg_mot" placeholder="Número do RG"><span class="emsg">Campo obrigatório</span></div>
+          <div class="fld"><label>Data de Nascimento <span class="req">*</span></label><input name="data_nascimento_mot" type="date"><span class="emsg">Campo obrigatório</span></div>
           <div class="fld"><label>CNH Categoria <span class="req">*</span></label><select name="cnh_categoria"><option value="">Selecione</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>AB</option><option>AC</option><option>AD</option><option>AE</option></select><span class="emsg">Selecione a categoria</span></div>
-          <div class="fld"><label>ANTT / RNTRC</label><input name="antt" placeholder="Número ANTT"></div>
+          <div class="fld"><label>ANTT / RNTRC <span class="req">*</span></label><input name="antt" placeholder="Número ANTT"><span class="emsg">Campo obrigatório</span></div>
         </div>
       </div>
       <div id="fields-atualizacao" class="hide">
@@ -263,6 +265,16 @@ body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);m
         <div class="fld"><label>Novo Comprovante Bancário <span class="req">*</span></label><div class="fup" id="datu"><div class="ui">📎</div><div class="ut">Anexar <strong>comprovante bancário</strong></div><div class="fn" id="fatun"></div><input type="file" name="comprovante_bancario_atu" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fatun','datu')"></div></div>
       </div>
       <div class="grid" style="margin-top:12px"><div class="fld full" id="condPagBox"><label>Condições de Pagamento</label><input name="condicoes_pagamento" placeholder="Ex: 30/60/90 dias, à vista..."></div></div>
+      <div class="btns"><button type="button" class="btn btn2" onclick="prev()">← Voltar</button><button type="button" class="btn btn1" onclick="next()">Próximo →</button></div>
+    </div>
+
+    <div class="sec" id="s7">
+      <div class="stitle"><span class="ic" style="background:#E0E7FF">📨</span>Dados do Solicitante</div>
+      <p class="ssub">Quem está solicitando este cadastro? Usaremos esses dados para enviar o código do fornecedor após a aprovação.</p>
+      <div class="grid">
+        <div class="fld full"><label>Nome do Solicitante <span class="req">*</span></label><input name="nome_solicitante" placeholder="Seu nome completo"><span class="emsg">Campo obrigatório</span></div>
+        <div class="fld full"><label>E-mail do Solicitante <span class="req">*</span></label><input name="email_solicitante" type="email" placeholder="[email protected]"><span class="emsg">E-mail inválido</span></div>
+      </div>
       <div class="btns"><button type="button" class="btn btn2" onclick="prev()">← Voltar</button><button type="button" class="btn btn1" onclick="next()">Revisar Cadastro →</button></div>
     </div>
 
@@ -299,8 +311,8 @@ function showToast(msg,duration=4500){
 
 function setType(t){if(typeLocked)return;tipo=t;document.getElementById('tipoCadastro').value=t;document.querySelectorAll('.type-card').forEach(c=>c.classList.toggle('on',c.dataset.type===t))}
 
-function getStepsForType(t){if(t==='atualizacao_bancaria')return[1,2,3,4,5,6];if(t==='motorista')return[1,2,3,5,6];return[1,2,3,4,5,6]}
-function getStepLabel(s,t){if(s===1)return t==='atualizacao_bancaria'?'Identificação':'Dados';if(s===2)return'Contato';if(s===3)return'Endereço';if(s===4)return'Banco';if(s===5)return t==='atualizacao_bancaria'?'Comprovante':'Documentos';if(s===6)return'Revisão';return''}
+function getStepsForType(t){if(t==='atualizacao_bancaria')return[1,2,3,4,5,7,6];if(t==='motorista')return[1,2,3,5,7,6];return[1,2,3,4,5,7,6]}
+function getStepLabel(s,t){if(s===1)return t==='atualizacao_bancaria'?'Identificação':'Dados';if(s===2)return'Contato';if(s===3)return'Endereço';if(s===4)return'Banco';if(s===5)return t==='atualizacao_bancaria'?'Comprovante':'Documentos';if(s===7)return'Solicitante';if(s===6)return'Revisão';return''}
 
 function buildProgressBar(){
   const steps=getStepsForType(tipo);
@@ -412,8 +424,8 @@ function getRequired(s){
   const apenasB=document.getElementById('apenasBoleto')?.checked;
   if(s===1){
     if(tipo==='pj')return['razao_social','cnpj','inscricao_estadual'];
-    if(tipo==='pf')return['nome_completo','cpf','rg'];
-    if(tipo==='motorista')return['nome_completo_mot','cpf_mot','rg_mot','cnh_categoria'];
+    if(tipo==='pf')return['nome_completo','cpf','rg','data_nascimento'];
+    if(tipo==='motorista')return['nome_completo_mot','cpf_mot','rg_mot','data_nascimento_mot','cnh_categoria','antt'];
     if(tipo==='atualizacao_bancaria')return['razao_social_atu','cnpj_cpf_atu'];
   }
   if(s===2)return['responsavel_nome','celular','email'];
@@ -423,6 +435,7 @@ function getRequired(s){
     if(apenasB)return[];
     return['banco','agencia','conta','titular_conta','cpf_cnpj_titular'];
   }
+  if(s===7)return['nome_solicitante','email_solicitante'];
   return[];
 }
 
@@ -546,12 +559,14 @@ function buildReview(){
   const blocks=[];
 
   if(tipo==='pj')blocks.push({title:'🏢 Empresa',items:[['Razão Social',data.razao_social],['Nome Fantasia',data.nome_fantasia],['CNPJ',data.cnpj],['IE',ieIsento?'ISENTO':data.inscricao_estadual],['Ramo',data.ramo_atividade],['Produtos',data.produtos_servicos]]});
-  else if(tipo==='pf')blocks.push({title:'👤 Pessoa Física',items:[['Nome',data.nome_completo],['CPF',data.cpf],['RG',data.rg]]});
-  else if(tipo==='motorista')blocks.push({title:'🚛 Motorista',items:[['Nome',data.nome_completo_mot],['CPF',data.cpf_mot],['RG',data.rg_mot],['CNH',data.cnh_categoria],['ANTT',data.antt]]});
+  else if(tipo==='pf')blocks.push({title:'👤 Pessoa Física',items:[['Nome',data.nome_completo],['CPF',data.cpf],['RG',data.rg],['Data Nascimento',data.data_nascimento]]});
+  else if(tipo==='motorista')blocks.push({title:'🚛 Motorista',items:[['Nome',data.nome_completo_mot],['CPF',data.cpf_mot],['RG',data.rg_mot],['Data Nascimento',data.data_nascimento_mot],['CNH',data.cnh_categoria],['ANTT',data.antt]]});
   else blocks.push({title:'🔄 Atualização Bancária',items:[['Razão Social/Nome',data.razao_social_atu],['CNPJ/CPF',data.cnpj_cpf_atu]]});
 
   blocks.push({title:'📞 Contato',items:[['Responsável',data.responsavel_nome],['Cargo',data.responsavel_cargo],['Telefone',data.telefone],['Celular',data.celular],['E-mail',data.email],['Website',data.website]]});
   blocks.push({title:'📍 Endereço',items:[['CEP',data.cep],['Logradouro',(data.logradouro||'')+', '+(data.numero||'')],['Complemento',data.complemento],['Bairro',data.bairro],['Cidade/UF',(data.cidade||'')+' - '+(data.estado||'')]]});
+
+  blocks.push({title:'📨 Solicitante',items:[['Nome',data.nome_solicitante],['E-mail',data.email_solicitante]]});
 
   if(tipo!=='motorista'){
     if(apenasB&&tipo!=='atualizacao_bancaria'){
@@ -676,6 +691,7 @@ async function enviar() {
       if (data.nome_completo_mot) { data.nome_completo = data.nome_completo_mot; delete data.nome_completo_mot; }
       if (data.cpf_mot) { data.cpf = data.cpf_mot; delete data.cpf_mot; }
       if (data.rg_mot) { data.rg = data.rg_mot; delete data.rg_mot; }
+      if (data.data_nascimento_mot) { data.data_nascimento = data.data_nascimento_mot; delete data.data_nascimento_mot; }
       delete data.tipo_conta; delete data.cnpj; delete data.inscricao_estadual;
     } else if (tipo === 'atualizacao_bancaria') {
       if (data.razao_social_atu) { data.razao_social = data.razao_social_atu; delete data.razao_social_atu; }
