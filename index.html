@@ -668,7 +668,7 @@ async function uploadFile(file, folder) {
     headers: {
       'Authorization': 'Bearer ' + SB_KEY,
       'Content-Type': file.type || 'application/octet-stream',
-      'x-upsert': 'true'
+      'x-upsert': 'false'
     },
     body: file
   });
