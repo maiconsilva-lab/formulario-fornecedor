@@ -1,178 +1,226 @@
 <!DOCTYPE html>
-<!-- Premix Fornecedores · build 2026-05-23-r2 -->
+<!-- Premix Fornecedores · build 2026-10-15 (visual dos painéis) -->
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cadastro de Fornecedor — Premix</title>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#123d6b">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--green:#00A650;--green-d:#008C44;--green-l:#E8F5E9;--dark:#1A1A1A;--dark2:#2D2D2D;--gold:#C8A951;--bg:#F5F6F0;--card:#FFFFFF;--text:#1A1A1A;--muted:#6B7265;--border:#D8DDD2;--red:#D93025;--radius:8px}
-html{font-size:15px;scroll-behavior:smooth}
-body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
-.wrap{max-width:820px;margin:0 auto;padding:0 16px 80px}
-.hdr{background:var(--dark);padding:28px 28px 24px;text-align:center;position:relative;overflow:hidden}
-.hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--green),var(--gold),var(--green))}
-.hdr h1{font-family:'Montserrat',sans-serif;font-size:1.45rem;font-weight:800;color:#fff;letter-spacing:.5px;text-transform:uppercase}
-.hdr p{color:rgba(255,255,255,.55);font-size:.82rem;margin-top:4px}
-.hdr-logo{height:48px;margin-bottom:14px}
-.hdr-stripe{height:3px;background:var(--green)}
-.type-sel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin:24px 0;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-.type-sel h2{font-family:'Montserrat',sans-serif;font-size:.95rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
-.type-sel.locked h2::after{content:' (selecionado)';color:var(--green);font-size:.75rem;font-weight:600}
+/* Visual dos painéis Premix (Central de Cadastros, Contratos, Lançamentos): azul-marinho + laranja Premix. */
+:root{--navy:#1b5596;--navy-2:#123d6b;--navy-3:#0c2d52;--ink:#0f2747;--orange:#f15a24;--orange-d:#d9480f;--grad:linear-gradient(135deg,#1b5596 0%,#123d6b 55%,#0c2d52 100%);--bg:#eef3f9;--card:#fff;--field:#f3f6fb;--text:#14213a;--txt2:#4a5872;--muted:#8792a6;--border:#e3e8ef;--focus:#9dbbe0;--soft:#eaf1fb;--green:#079455;--green-l:#e3f7ec;--red:#d92d20;--radius:20px;--sombra:0 1px 2px rgba(16,36,74,.04),0 6px 18px rgba(16,36,74,.06)}
+html{font-size:15px;scroll-behavior:smooth;background:#eef3f9}
+body{font-family:'Geist',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;background:radial-gradient(1200px 520px at 85% -120px,rgba(241,90,36,.10),transparent 60%),radial-gradient(900px 480px at -10% 0,rgba(27,85,150,.10),transparent 60%),linear-gradient(180deg,#f5f8fc 0%,var(--bg) 100%);background-attachment:fixed;color:var(--text);min-height:100vh;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:860px;margin:0 auto;padding:28px 16px 80px}
+svg.i{width:1em;height:1em;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.125em}
+
+/* Cabeçalho */
+.hdr{position:relative;overflow:hidden;background:var(--grad);border-radius:24px;padding:26px 28px 28px;color:#fff;box-shadow:0 16px 36px rgba(18,61,107,.28);display:flex;flex-direction:column;align-items:flex-start;text-align:left}
+.hdr::before{content:'';position:absolute;right:-60px;top:-90px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(255,138,76,.42),transparent 68%);pointer-events:none}
+.hdr::after{content:'';position:absolute;left:0;right:0;bottom:0;height:4px;background:linear-gradient(90deg,var(--orange),#ff8a4c 40%,transparent)}
+.hdr-logo{height:40px;margin-bottom:18px;background:#fff;border-radius:12px;padding:7px 12px;box-shadow:0 6px 16px rgba(0,0,0,.18);position:relative;z-index:1}
+.hdr h1{font-size:1.75rem;font-weight:700;letter-spacing:-.6px;line-height:1.15;color:#fff;position:relative;z-index:1}
+.hdr p{color:#bcd2ea;font-size:.88rem;margin-top:6px;position:relative;z-index:1}
+.hdr-eyebrow{position:relative;z-index:1;font-size:.72rem;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:#ffb38c;margin-bottom:4px}
+@media(max-width:600px){.hdr{padding:22px 20px 24px}.hdr h1{font-size:1.4rem}}
+.hdr-stripe{display:none}
+
+/* Cartões */
+.type-sel,.sec,.success-screen{background:var(--card);border:0;border-radius:var(--radius);box-shadow:var(--sombra)}
+.type-sel{padding:22px;margin:16px 0}
+.type-sel h2{font-size:1rem;font-weight:700;color:var(--ink);letter-spacing:-.2px;margin-bottom:14px}
+.type-sel.locked h2::after{content:' · selecionado';color:var(--muted);font-size:.8rem;font-weight:500}
 .type-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;transition:.4s}
 @media(max-width:600px){.type-cards{grid-template-columns:1fr}}
 .type-cards.locked{grid-template-columns:1fr}
-.type-card{border:2px solid var(--border);border-radius:var(--radius);padding:18px 14px;text-align:center;cursor:pointer;transition:.25s;position:relative}
-.type-card:hover{border-color:var(--green);background:rgba(0,166,80,.03)}
-.type-card.on{border-color:var(--green);background:rgba(0,166,80,.06)}
-.type-card.on::after{content:'✓';position:absolute;top:8px;right:10px;width:22px;height:22px;background:var(--green);color:#fff;border-radius:50%;font-size:.7rem;display:flex;align-items:center;justify-content:center;font-weight:700}
+.type-card{border:1.5px solid var(--border);border-radius:16px;padding:16px 16px 15px 66px;text-align:left;cursor:pointer;transition:.18s;position:relative;min-height:74px;background:#fff}
+.type-card:hover{border-color:var(--focus);background:#f8fbff}
+.type-card.on{border-color:var(--navy);background:var(--soft);box-shadow:0 0 0 3px rgba(27,85,150,.10)}
+.type-card.on::after{content:'✓';position:absolute;top:12px;right:12px;width:22px;height:22px;background:var(--navy);color:#fff;border-radius:50%;font-size:.7rem;display:flex;align-items:center;justify-content:center;font-weight:700}
 .type-card.hidden{display:none}
-.tc-icon{font-size:1.6rem;margin-bottom:6px}
-.tc-title{font-family:'Montserrat',sans-serif;font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
-.tc-desc{font-size:.72rem;color:var(--muted);margin-top:3px}
+.tc-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:1.15rem;color:var(--navy);background:var(--soft);margin:0}
+.type-card.on .tc-icon{background:var(--grad);color:#fff;box-shadow:0 6px 14px rgba(18,61,107,.25)}
+.tc-title{font-size:.92rem;font-weight:700;color:var(--ink)}
+.tc-desc{font-size:.78rem;color:var(--muted);margin-top:1px}
 .change-type{margin-top:10px;text-align:right}
-.change-type button{background:none;border:none;color:var(--green);font-size:.75rem;cursor:pointer;text-decoration:underline;font-family:'Montserrat',sans-serif;font-weight:600}
-.prog{position:relative;display:flex;justify-content:space-between;align-items:flex-start;margin:0 auto 28px;padding:0 8px;max-width:680px;flex-wrap:nowrap}
-.prog::before{content:'';position:absolute;top:14px;left:24px;right:24px;height:2px;background:var(--border);z-index:0;border-radius:2px}
-.prog::after{content:'';position:absolute;top:14px;left:24px;height:2px;background:linear-gradient(90deg,var(--green),var(--green-d));z-index:1;border-radius:2px;width:var(--prog-fill,0%);transition:width .45s cubic-bezier(.22,1,.36,1)}
+.change-type button{background:none;border:none;color:var(--navy);font-size:.8rem;cursor:pointer;font-family:inherit;font-weight:600}
+.change-type button:hover{text-decoration:underline}
+
+/* Progresso */
+.prog{position:relative;display:flex;justify-content:space-between;align-items:flex-start;margin:6px auto 22px;padding:16px 10px 12px;max-width:none;flex-wrap:nowrap;background:var(--card);border-radius:18px;box-shadow:var(--sombra)}
+.prog::before,.prog::after{content:'';position:absolute;top:31px;left:calc(10px + (100% - 20px) / (2 * var(--prog-n,5)));height:3px;border-radius:3px}
+.prog::before{right:calc(10px + (100% - 20px) / (2 * var(--prog-n,5)));background:#e6ecf5;z-index:0}
+.prog::after{width:calc((100% - 20px) * (var(--prog-n,5) - 1) / var(--prog-n,5) * var(--prog-f,0));background:linear-gradient(90deg,var(--navy),var(--orange));z-index:1;transition:width .45s cubic-bezier(.22,1,.36,1)}
 .prog-s{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;flex:1;min-width:0;background:none;border:none;padding:0;font-family:inherit;transition:.25s}
-.prog-s .prog-label{font-size:.62rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:'Montserrat',sans-serif;text-align:center;line-height:1.1;transition:.25s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.prog-s.on .prog-label{color:var(--green-d);font-weight:800}
-.prog-s.done .prog-label{color:var(--dark)}
-.sn{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;background:#fff;color:var(--muted);transition:.3s;border:2px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.04);font-family:'Montserrat',sans-serif}
-.prog-s.on .sn{background:#fff;color:var(--green-d);border-color:var(--green);box-shadow:0 0 0 4px rgba(0,166,80,.12),0 2px 6px rgba(0,166,80,.18);transform:scale(1.08)}
-.prog-s.done .sn{background:var(--green);color:#fff;border-color:var(--green)}
-.prog-s.done .sn::before{content:'✓';font-size:.95rem}
+.prog-s .prog-label{font-size:.7rem;font-weight:600;color:var(--muted);text-align:center;line-height:1.15;transition:.25s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.prog-s.on .prog-label{color:var(--ink);font-weight:700}
+.prog-s.done .prog-label{color:var(--txt2)}
+.sn{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;background:#fff;color:var(--muted);transition:.3s;border:2px solid #dbe3ee}
+.prog-s.on .sn{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 0 0 4px rgba(27,85,150,.14),0 6px 14px rgba(18,61,107,.25);transform:scale(1.06)}
+.prog-s.done .sn{background:var(--soft);color:var(--navy);border-color:var(--soft)}
+.prog-s.done .sn::before{content:'✓';font-size:.9rem}
 .prog-s.done .sn span{display:none}
-@media(max-width:600px){.prog-s .prog-label{display:none}.prog{max-width:100%;padding:0 4px}.prog::before,.prog::after{left:18px;right:18px}.sn{width:26px;height:26px;font-size:.7rem}}
-.sec{background:var(--card);border-radius:var(--radius);padding:26px 22px;margin-bottom:14px;border:1px solid var(--border);display:none;animation:fadeUp .3s ease;box-shadow:0 1px 4px rgba(0,0,0,.03)}
+@media(max-width:600px){.prog-s .prog-label{display:none}.prog{padding:12px 10px}.prog::before,.prog::after{top:25px}.sn{width:28px;height:28px;font-size:.72rem}}
+
+/* Seções */
+.sec{padding:26px 26px 24px;margin-bottom:14px;display:none;animation:fadeUp .3s ease}
 .sec.on{display:block}
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.stitle{font-family:'Montserrat',sans-serif;font-size:.95rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:10px;margin-bottom:2px}
-.stitle .ic{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.9rem}
-.ssub{font-size:.78rem;color:var(--muted);margin-bottom:20px}
-.alert-box{background:#FFF8E1;border:1px solid #FFD54F;border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;font-size:.8rem;line-height:1.5;color:#5D4037;display:flex;gap:10px;align-items:flex-start}
-.alert-box.red{background:#FEE2E2;border-color:#EF9A9A;color:#B71C1C}
-.alert-box.blue{background:#E3F2FD;border-color:#90CAF9;color:#0D47A1}
-.ab-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stitle{font-size:1.15rem;font-weight:700;letter-spacing:-.3px;color:var(--ink);display:flex;align-items:center;gap:12px;margin-bottom:4px}
+.stitle .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:1.1rem;color:#fff;background:var(--grad)!important;box-shadow:0 6px 14px rgba(18,61,107,.22);flex-shrink:0}
+.ssub{font-size:.86rem;color:var(--txt2);margin:0 0 22px 52px}
+@media(max-width:600px){.ssub{margin-left:0}}
+
+/* Avisos */
+.alert-box{background:#fffaeb;border:1px solid #fedf89;border-radius:14px;padding:13px 16px;margin-bottom:16px;font-size:.84rem;line-height:1.5;color:#93370d;display:flex;gap:11px;align-items:flex-start}
+.alert-box.red{background:#fef3f2;border-color:#fecdca;color:#b42318}
+.alert-box.blue{background:#f0f6fd;border-color:#cddff3;color:#174a85}
+.ab-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px;display:inline-flex}
+
+/* Campos */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 14px}
 .grid .full{grid-column:1/-1}
 @media(max-width:600px){.grid{grid-template-columns:1fr}}
-.fld{display:flex;flex-direction:column;gap:4px}
-.fld label{font-size:.75rem;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.3px;font-family:'Montserrat',sans-serif}
-.fld label .req{color:var(--green)}
-.fld input,.fld select,.fld textarea{padding:10px 12px;border:1.5px solid var(--border);border-radius:6px;font-family:'Open Sans',sans-serif;font-size:.88rem;color:var(--text);background:#FAFBF8;outline:none;transition:.2s;width:100%}
-.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(0,166,80,.1);background:#fff}
-.fld input.err,.fld select.err{border-color:var(--red);box-shadow:0 0 0 3px rgba(217,48,37,.07)}
-.fld textarea{resize:vertical;min-height:70px}
-.fld .hint{font-size:.7rem;color:var(--muted)}
-.fld .emsg{font-size:.7rem;color:var(--red);display:none}
+.fld{display:flex;flex-direction:column;gap:6px;min-width:0}
+.fld label{font-size:.8rem;font-weight:600;color:var(--txt2)}
+.fld label .req{color:var(--orange)}
+.fld input,.fld select,.fld textarea{padding:11px 13px;border:1.5px solid transparent;border-radius:12px;font-family:inherit;font-size:.93rem;color:var(--ink);background:var(--field);outline:none;transition:border-color .15s,background .15s,box-shadow .15s;width:100%;min-height:44px}
+.fld input::placeholder,.fld textarea::placeholder{color:#a3adbd}
+.fld input:hover,.fld select:hover,.fld textarea:hover{background:#edf2f9}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--focus);box-shadow:0 0 0 4px rgba(27,85,150,.10);background:#fff}
+.fld input.err,.fld select.err,.fld textarea.err{border-color:#f04438;background:#fffbfa;box-shadow:0 0 0 4px rgba(217,45,32,.08)}
+.fld select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238792a6' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;cursor:pointer}
+.fld textarea{resize:vertical;min-height:84px}
+.fld .hint{font-size:.75rem;color:var(--muted)}
+.fld .emsg{font-size:.75rem;color:var(--red);display:none;font-weight:500}
 .fld .emsg.show{display:block}
-.chk-field{display:flex;align-items:center;gap:8px;padding:4px 0}
-.chk-field input[type=checkbox]{width:18px;height:18px;accent-color:var(--green);cursor:pointer}
-.chk-field label{font-size:.82rem;font-weight:500;cursor:pointer;text-transform:none;letter-spacing:0}
-.toggle-box{background:#FAFBF8;border:1.5px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;gap:10px;transition:.2s}
-.toggle-box:hover{border-color:var(--green)}
-.toggle-box input[type=checkbox]{width:20px;height:20px;accent-color:var(--green);cursor:pointer;flex-shrink:0}
-.toggle-box .toggle-label{flex:1;font-size:.85rem;font-weight:600;font-family:'Montserrat',sans-serif;cursor:pointer}
-.toggle-box .toggle-desc{font-size:.72rem;color:var(--muted);font-weight:400;margin-top:2px;font-family:'Open Sans',sans-serif;text-transform:none;letter-spacing:0}
-.toggle-box.active{background:rgba(0,166,80,.05);border-color:var(--green)}
-.fup{border:2px dashed var(--border);border-radius:8px;padding:20px 14px;text-align:center;cursor:pointer;transition:.25s;background:#FAFBF8;position:relative}
-.fup:hover{border-color:var(--green);background:rgba(0,166,80,.015)}
-.fup.ok{border-color:var(--green);background:rgba(0,166,80,.03)}
-.fup input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
-.fup .ui{font-size:1.4rem;margin-bottom:4px}
-.fup .ut{font-size:.78rem;color:var(--muted)}
-.fup .ut strong{color:var(--green)}
-.fup .fn{font-size:.75rem;color:var(--green);font-weight:700;margin-top:4px}
+.chk-field{display:flex;align-items:center;gap:8px;padding:2px 0}
+.chk-field input[type=checkbox]{width:18px;height:18px;min-height:0;accent-color:var(--navy);cursor:pointer}
+.chk-field label{font-size:.85rem;font-weight:500;cursor:pointer;color:var(--ink)}
+.toggle-box{background:var(--field);border:1.5px solid transparent;border-radius:14px;padding:13px 15px;margin-bottom:16px;display:flex;align-items:center;gap:12px;transition:.2s}
+.toggle-box:hover{border-color:var(--focus)}
+.toggle-box input[type=checkbox]{width:20px;height:20px;accent-color:var(--navy);cursor:pointer;flex-shrink:0}
+.toggle-box .toggle-label{flex:1;font-size:.9rem;font-weight:600;color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.toggle-box .toggle-desc{font-size:.78rem;color:var(--muted);font-weight:400;margin-top:2px}
+.toggle-box.active{background:var(--soft);border-color:var(--focus)}
+
+/* Anexos */
+.fup{border:1.5px dashed #c9d6e8;border-radius:14px;padding:18px 14px;text-align:center;cursor:pointer;transition:.2s;background:#f8fafd;position:relative}
+.fup:hover{border-color:var(--navy);background:var(--soft)}
+.fup.ok{border-style:solid;border-color:#75e0a7;background:var(--green-l)}
+.fup input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;min-height:0}
+.fup .ui{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;margin:0 auto 8px;background:#fff;color:var(--navy);font-size:1.05rem;box-shadow:0 2px 6px rgba(16,36,74,.08)}
+.fup.ok .ui{color:var(--green)}
+.fup .ut{font-size:.82rem;color:var(--txt2)}
+.fup .ut strong{color:var(--navy);font-weight:600}
+.fup .fn{font-size:.8rem;color:var(--green);font-weight:600;margin-top:4px;word-break:break-all}
+
+/* Opções (rádio) */
 .rg{display:flex;gap:8px}
-.ro{flex:1;position:relative}
-.ro input[type=radio]{position:absolute;opacity:0}
-.ro label{display:block;padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;text-align:center;cursor:pointer;font-size:.82rem;font-weight:600;transition:.2s;background:#FAFBF8}
-.ro input:checked+label{border-color:var(--green);background:rgba(0,166,80,.06);color:var(--green)}
-.btns{display:flex;justify-content:space-between;gap:10px;margin-top:22px;flex-wrap:wrap}
-.btn{padding:11px 26px;border-radius:6px;font-family:'Montserrat',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;transition:.2s;border:none;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.5px}
-.btn2{background:var(--bg);color:var(--muted);border:1.5px solid var(--border)}
-.btn2:hover{background:#E4E8DF}
-.btn1{background:var(--green);color:#fff;box-shadow:0 2px 8px rgba(0,166,80,.25)}
-.btn1:hover{background:var(--green-d);transform:translateY(-1px)}
-.btns3{background:var(--dark);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.25)}
-.btns3:hover{background:var(--dark2);transform:translateY(-1px)}
-.btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
-.review-intro{background:linear-gradient(135deg,#fafbf8 0%,#f0f5ea 100%);border:1px solid var(--border);border-left:4px solid var(--green);border-radius:10px;padding:18px 22px;margin-bottom:20px;display:flex;align-items:center;gap:14px}
-.review-intro .ri-icon{width:42px;height:42px;flex-shrink:0;border-radius:10px;background:#fff;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--green-d)}
-.review-intro .ri-icon svg{width:22px;height:22px}
+.ro{flex:1;position:relative;min-width:0}
+.ro input[type=radio]{position:absolute;opacity:0;pointer-events:none}
+.ro label{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:44px;padding:10px 12px;border:1.5px solid transparent;border-radius:12px;text-align:center;cursor:pointer;font-size:.88rem;font-weight:600;color:var(--txt2);transition:.15s;background:var(--field);line-height:1.25}
+.ro label:hover{background:#edf2f9}
+.ro input:checked+label{border-color:var(--navy);background:var(--soft);color:var(--navy);box-shadow:0 0 0 3px rgba(27,85,150,.08)}
+.ro input:focus-visible+label{box-shadow:0 0 0 4px rgba(27,85,150,.18)}
+
+/* Botões */
+.btns{display:flex;justify-content:space-between;gap:10px;margin-top:24px;padding-top:18px;border-top:1px solid #eef2f7;flex-wrap:wrap}
+.btn{padding:12px 22px;border-radius:12px;font-family:inherit;font-size:.9rem;font-weight:650;cursor:pointer;transition:.18s;border:none;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px}
+.btn2{background:#fff;color:var(--txt2);border:1.5px solid var(--border)}
+.btn2:hover{background:#f6f8fb;color:var(--ink);border-color:#cfd7e3}
+.btn1{background:var(--grad);color:#fff;box-shadow:0 6px 14px rgba(18,61,107,.25)}
+.btn1:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(18,61,107,.3)}
+.btns3{background:linear-gradient(135deg,#f15a24 0%,#d9480f 100%);color:#fff;box-shadow:0 6px 16px rgba(217,72,15,.3)}
+.btns3:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(217,72,15,.34)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+#startBtn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;padding:14px 28px!important;background:var(--grad)!important;color:#fff!important;border:0!important;border-radius:14px!important;font-family:inherit!important;font-size:1rem!important;font-weight:650!important;text-transform:none!important;letter-spacing:0!important;box-shadow:0 10px 24px rgba(18,61,107,.28)!important;cursor:pointer;transition:.18s}
+#startBtn:hover{transform:translateY(-1px)}
+
+/* Revisão */
+.review-intro{background:var(--soft);border:0;border-radius:16px;padding:16px 18px;margin-bottom:18px;display:flex;align-items:center;gap:14px}
+.review-intro .ri-icon{width:42px;height:42px;flex-shrink:0;border-radius:12px;background:var(--grad);border:0;display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 6px 14px rgba(18,61,107,.22)}
+.review-intro .ri-icon svg{width:20px;height:20px}
 .review-intro .ri-text{flex:1}
-.review-intro .ri-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:.85rem;color:var(--dark);margin-bottom:2px}
-.review-intro .ri-sub{font-size:.74rem;color:var(--muted);line-height:1.45}
-.review-box{background:#fff;border:1px solid var(--border);border-radius:12px;padding:0;margin-bottom:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04);transition:box-shadow .2s}
-.review-box:hover{box-shadow:0 4px 14px rgba(0,0,0,.06)}
-.review-title{font-family:'Montserrat',sans-serif;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--green-d);margin:0;padding:14px 20px 13px;background:linear-gradient(180deg,#fafbf8 0%,#f4f7ed 100%);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.review-title .rt-icon{width:26px;height:26px;border-radius:7px;background:rgba(0,166,80,.1);display:inline-flex;align-items:center;justify-content:center;color:var(--green-d);flex-shrink:0}
-.review-title .rt-icon svg{width:14px;height:14px}
-.review-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:6px 20px 14px}
-@media(max-width:600px){.review-grid{grid-template-columns:1fr}.review-title{padding:12px 16px}.review-grid{padding:6px 16px 12px}}
-.review-item{padding:11px 0;border-bottom:1px solid #f0f2eb;display:flex;flex-direction:column;gap:3px;min-width:0}
+.review-intro .ri-title{font-weight:700;font-size:.95rem;color:var(--ink);margin-bottom:2px}
+.review-intro .ri-sub{font-size:.8rem;color:var(--txt2);line-height:1.45}
+.review-box{background:#fff;border:1px solid #e8edf4;border-radius:16px;padding:0;margin-bottom:12px;overflow:hidden;box-shadow:none}
+.review-title{font-size:.88rem;font-weight:700;color:var(--ink);margin:0;padding:13px 18px;background:#f8fafd;border-bottom:1px solid #eef2f7;display:flex;align-items:center;gap:10px}
+.review-title .rt-icon{width:28px;height:28px;border-radius:9px;background:var(--soft);display:inline-flex;align-items:center;justify-content:center;color:var(--navy);flex-shrink:0}
+.review-title .rt-icon svg{width:15px;height:15px}
+.review-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:4px 18px 12px}
+@media(max-width:600px){.review-grid{grid-template-columns:1fr}.review-title{padding:12px 16px}.review-grid{padding:4px 16px 10px}}
+.review-item{padding:10px 0;border-bottom:1px solid #f0f3f8;display:flex;flex-direction:column;gap:2px;min-width:0}
 .review-grid .review-item:nth-last-child(-n+2){border-bottom:none}
-.review-grid .review-item:nth-last-child(-n+2):not(:nth-last-child(2)){border-bottom:none}
-@media(max-width:600px){.review-grid .review-item:nth-last-child(1){border-bottom:none}.review-grid .review-item:nth-last-child(2){border-bottom:1px solid #f0f2eb}}
+@media(max-width:600px){.review-grid .review-item:nth-last-child(1){border-bottom:none}.review-grid .review-item:nth-last-child(2){border-bottom:1px solid #f0f3f8}}
 .review-grid .review-item:nth-child(odd){padding-right:14px}
-.review-grid .review-item:nth-child(even){padding-left:14px;border-left:1px solid #f0f2eb}
+.review-grid .review-item:nth-child(even){padding-left:14px;border-left:1px solid #f0f3f8}
 @media(max-width:600px){.review-grid .review-item:nth-child(even){padding-left:0;border-left:none}.review-grid .review-item:nth-child(odd){padding-right:0}}
-.review-item .rl{font-size:.62rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.6px;font-family:'Montserrat',sans-serif}
-.review-item .rv{font-size:.92rem;font-weight:600;color:var(--dark);word-break:break-word;line-height:1.35;font-family:'Open Sans',sans-serif}
-.review-item .rv.muted{color:var(--muted);font-weight:500;font-style:italic;font-size:.85rem}
-.review-docs-list{padding:6px 20px 16px}
-.review-doc{display:flex;align-items:center;gap:10px;padding:8px 12px;background:#fafbf8;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;font-size:.82rem;font-weight:600;color:var(--dark)}
+.review-item .rl{font-size:.74rem;color:var(--muted);font-weight:600}
+.review-item .rv{font-size:.93rem;font-weight:600;color:var(--ink);word-break:break-word;line-height:1.35}
+.review-item .rv.muted{color:var(--muted);font-weight:500;font-style:italic;font-size:.87rem}
+.review-docs-list{padding:10px 18px 14px}
+.review-doc{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--green-l);border:0;border-radius:10px;margin-bottom:6px;font-size:.86rem;font-weight:600;color:#085d3a}
 .review-doc:last-child{margin-bottom:0}
-.review-doc .rd-check{width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0;font-weight:800}
-@media(max-width:600px){.review-docs-list{padding:6px 16px 12px}}
-.success-screen{display:none;background:var(--card);border-radius:var(--radius);padding:48px 32px;text-align:center;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,.06);position:relative;overflow:hidden;margin-top:24px}
+.review-doc .rd-check{width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0}
+.review-doc .rd-check svg{width:12px;height:12px}
+@media(max-width:600px){.review-docs-list{padding:8px 16px 12px}}
+
+/* Enviado */
+.success-screen{display:none;padding:46px 30px 38px;text-align:center;position:relative;overflow:hidden;margin-top:16px}
 .success-screen.show{display:block;animation:fadeUp .4s ease}
-.success-screen::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--green),var(--gold))}
-.success-screen .check-big{width:72px;height:72px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:2rem;color:#fff;animation:pop .4s cubic-bezier(.34,1.56,.64,1)}
+.success-screen::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy),var(--orange))}
+.success-screen .check-big{width:74px;height:74px;background:linear-gradient(135deg,#12b76a,#079455);border-radius:22px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:2rem;color:#fff;box-shadow:0 12px 26px rgba(7,148,85,.3);animation:pop .4s cubic-bezier(.34,1.56,.64,1)}
 @keyframes pop{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
-.success-screen h2{font-family:'Montserrat',sans-serif;font-size:1.3rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
-.success-screen p{font-size:.9rem;color:var(--muted);max-width:420px;margin:0 auto 24px}
+.success-screen h2{font-size:1.5rem;font-weight:700;letter-spacing:-.5px;color:var(--ink);margin-bottom:8px}
+.success-screen p{font-size:.93rem;color:var(--txt2);max-width:440px;margin:0 auto 22px}
 .success-screen .btn-stack{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
 .spinner{display:inline-block;width:16px;height:16px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .hide{display:none!important}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--red);color:#fff;padding:12px 20px;border-radius:8px;font-size:.85rem;font-weight:600;z-index:2000;display:none;box-shadow:0 4px 16px rgba(0,0,0,.2);max-width:90%}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#b42318;color:#fff;padding:12px 20px;border-radius:12px;font-size:.88rem;font-weight:600;z-index:2000;display:none;box-shadow:0 12px 28px rgba(16,36,74,.25);max-width:90%}
 .toast.show{display:block;animation:slideUp .3s ease}
 @keyframes slideUp{from{opacity:0;transform:translate(-50%,20px)}to{opacity:1;transform:translate(-50%,0)}}
+.foot{text-align:center;font-size:.75rem;color:var(--muted);margin-top:22px}
+.fup.err{border-color:#f04438;background:#fffbfa}
+.fld .aviso{font-size:.78rem;color:#93370d;background:#fffaeb;border:1px solid #fedf89;border-radius:10px;padding:8px 11px;display:none;line-height:1.4}
+.fld .aviso.show{display:block}
+.fld input[readonly]{color:var(--txt2);background:#eceff4;cursor:default}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="hdr">
     <img src="https://premix.com.br/wp-content/uploads/2023/06/Logotipo_Premix_Positivo_Com-Bandeira.png" alt="Premix" class="hdr-logo">
-    <h1 id="hdrTitle">Cadastro de Fornecedor</h1>
-    <p>Núcleo Fiscal — Preencha os dados para cadastro</p>
+    <span class="hdr-eyebrow">Núcleo Fiscal · Premix</span>
+<h1 id="hdrTitle">Cadastro de Fornecedor</h1>
+    <p>Preencha os dados para cadastro</p>
   </div>
   <div class="hdr-stripe"></div>
 
   <div class="type-sel" id="typeSel">
     <h2 id="typeSelTitle">Tipo de Cadastro</h2>
     <div class="type-cards" id="typeCards">
-      <div class="type-card on" data-type="pj" onclick="setType('pj')"><div class="tc-icon">🏢</div><div class="tc-title">Pessoa Jurídica</div><div class="tc-desc">Fornecedor PJ / Empresa</div></div>
-      <div class="type-card" data-type="pf" onclick="setType('pf')"><div class="tc-icon">👤</div><div class="tc-title">Pessoa Física</div><div class="tc-desc">Fornecedor pessoa física</div></div>
-      <div class="type-card" data-type="motorista" onclick="setType('motorista')"><div class="tc-icon">🚛</div><div class="tc-title">Motorista Premix</div><div class="tc-desc">Cadastro de motorista</div></div>
-      <div class="type-card" data-type="atualizacao_bancaria" onclick="setType('atualizacao_bancaria')"><div class="tc-icon">🔄</div><div class="tc-title">Atualização Bancária</div><div class="tc-desc">Já sou fornecedor — atualizar dados bancários</div></div>
+      <div class="type-card on" data-type="pj" onclick="setType('pj')"><div class="tc-icon"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg></div><div class="tc-title">Pessoa Jurídica</div><div class="tc-desc">Fornecedor PJ / Empresa</div></div>
+      <div class="type-card" data-type="pf" onclick="setType('pf')"><div class="tc-icon"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg></div><div class="tc-title">Pessoa Física</div><div class="tc-desc">Fornecedor pessoa física</div></div>
+      <div class="type-card" data-type="motorista" onclick="setType('motorista')"><div class="tc-icon"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg></div><div class="tc-title">Motorista Premix</div><div class="tc-desc">Cadastro de motorista</div></div>
+      <div class="type-card" data-type="atualizacao_bancaria" onclick="setType('atualizacao_bancaria')"><div class="tc-icon"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg></div><div class="tc-title">Atualização Bancária</div><div class="tc-desc">Já sou fornecedor — atualizar dados bancários</div></div>
     </div>
     <div class="change-type hide" id="changeType"><button type="button" onclick="unlockType()">↺ Trocar tipo de cadastro</button></div>
   </div>
 
   <div class="prog hide" id="progBar"></div>
-  <button id="startBtn" type="button" onclick="startForm()" style="background:var(--green);color:#fff;border:none;padding:14px 32px;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:.88rem;font-weight:800;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;width:100%;box-shadow:0 4px 14px rgba(0,166,80,.3)">Iniciar Cadastro →</button>
+  <button id="startBtn" type="button" onclick="startForm()" style="background:var(--green);color:#fff;border:none;padding:14px 32px;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:.88rem;font-weight:800;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;width:100%;box-shadow:0 4px 14px rgba(0,166,80,.3)">Iniciar cadastro →</button>
 
   <form id="frm" novalidate class="hide">
     <input type="hidden" name="tipo_cadastro" id="tipoCadastro" value="pj">
 
     <div class="sec on" id="s1">
-      <div class="stitle"><span class="ic" style="background:#E8F5E9">🏢</span><span id="s1title">Dados da Empresa</span></div>
+      <div class="stitle"><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg></span><span id="s1title">Dados da Empresa</span></div>
       <p class="ssub" id="s1sub">Informações básicas do fornecedor</p>
       <div id="fields-pj">
         <div class="grid">
@@ -203,7 +251,7 @@ body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);m
         </div>
       </div>
       <div id="fields-atualizacao" class="hide">
-        <div class="alert-box blue"><span class="ab-icon">ℹ️</span><div>Esse formulário é apenas para <strong>atualização de dados bancários</strong> de fornecedores já cadastrados. Informe os dados do cadastro existente.</div></div>
+        <div class="alert-box blue"><span class="ab-icon"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span><div>Esse formulário é apenas para <strong>atualização de dados bancários</strong> de fornecedores já cadastrados. Informe os dados do cadastro existente.</div></div>
         <div class="grid">
           <div class="fld full"><label>Razão Social / Nome <span class="req">*</span></label><input name="razao_social_atu" placeholder="Razão Social ou nome do fornecedor"><span class="emsg">Campo obrigatório</span></div>
           <div class="fld full"><label>CNPJ / CPF <span class="req">*</span></label><input name="cnpj_cpf_atu" placeholder="CNPJ ou CPF do cadastro existente"><span class="emsg">Campo obrigatório</span></div>
@@ -213,7 +261,7 @@ body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);m
     </div>
 
     <div class="sec" id="s2">
-      <div class="stitle"><span class="ic" style="background:#FFF3E0">📞</span>Contato</div>
+      <div class="stitle"><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>Contato</div>
       <p class="ssub">Dados de contato</p>
       <div class="grid">
         <div class="fld"><label>Nome do Responsável <span class="req">*</span></label><input name="responsavel_nome" placeholder="Nome completo"><span class="emsg">Campo obrigatório</span></div>
@@ -227,11 +275,11 @@ body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);m
     </div>
 
     <div class="sec" id="s3">
-      <div class="stitle"><span class="ic" style="background:#E8F5E9">📍</span>Endereço</div>
+      <div class="stitle"><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>Endereço</div>
       <p class="ssub">Localização</p>
       <div class="grid">
         <div class="fld"><label>CEP <span class="req">*</span></label><input name="cep" placeholder="00000-000" maxlength="9"><span class="hint">Digite o CEP e clique buscar</span><span class="emsg">CEP inválido</span></div>
-        <div class="fld" style="align-self:end"><button type="button" class="btn btn2" onclick="buscaCEP()" style="width:100%">🔍 Buscar CEP</button></div>
+        <div class="fld" style="align-self:end"><button type="button" class="btn btn2" onclick="buscaCEP()" style="width:100%"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> Buscar CEP</button></div>
         <div class="fld"><label>Logradouro <span class="req">*</span></label><input name="logradouro" placeholder="Rua, Avenida..."><span class="emsg">Campo obrigatório</span></div>
         <div class="fld"><label>Número <span class="req">*</span></label><input name="numero" placeholder="Nº"><span class="emsg">Campo obrigatório</span></div>
         <div class="fld"><label>Complemento</label><input name="complemento" placeholder="Sala, Andar, Bloco..."></div>
@@ -243,13 +291,13 @@ body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);m
     </div>
 
     <div class="sec" id="s4">
-      <div class="stitle"><span class="ic" style="background:#F3E8FF">🏦</span>Dados Bancários</div>
+      <div class="stitle"><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 22h18"/><path d="M6 18v-7M10 18v-7M14 18v-7M18 18v-7"/><path d="m12 2 8 5H4z"/></svg></span>Dados Bancários</div>
       <p class="ssub">Informações para pagamento</p>
-      <div class="alert-box red" id="alertBancoPJ"><span class="ab-icon">⚠️</span><div><strong>ATENÇÃO — Regra Bancária Premix:</strong><br>A Premix <strong>NÃO</strong> realiza pagamentos para terceiros. Os dados bancários devem ser obrigatoriamente do <strong>CNPJ do fornecedor ou de sua matriz</strong>. Contas de sócios, funcionários ou outras pessoas físicas/jurídicas não serão aceitas.</div></div>
-      <div class="alert-box red hide" id="alertBancoPF"><span class="ab-icon">⚠️</span><div><strong>ATENÇÃO:</strong> Os dados bancários devem ser do <strong>mesmo CPF</strong> informado no cadastro.</div></div>
+      <div class="alert-box red" id="alertBancoPJ"><span class="ab-icon"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4M12 17h.01"/></svg></span><div><strong>ATENÇÃO — Regra Bancária Premix:</strong><br>A Premix <strong>NÃO</strong> realiza pagamentos para terceiros. Os dados bancários devem ser obrigatoriamente do <strong>CNPJ do fornecedor ou de sua matriz</strong>. Contas de sócios, funcionários ou outras pessoas físicas/jurídicas não serão aceitas.</div></div>
+      <div class="alert-box red hide" id="alertBancoPF"><span class="ab-icon"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4M12 17h.01"/></svg></span><div><strong>ATENÇÃO:</strong> Os dados bancários devem ser do <strong>mesmo CPF</strong> informado no cadastro.</div></div>
       <div class="toggle-box" id="toggleBoletoBox">
         <input type="checkbox" id="apenasBoleto" name="apenas_boleto" onchange="toggleApenasBoleto()">
-        <div style="flex:1"><label class="toggle-label" for="apenasBoleto">📄 Recebo apenas via boleto bancário</label><div class="toggle-desc">Marque essa opção se sua empresa não recebe via depósito/PIX. Os campos bancários se tornarão opcionais.</div></div>
+        <div style="flex:1"><label class="toggle-label" for="apenasBoleto"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 13h4M10 17h4"/></svg> Recebo apenas via boleto bancário</label><div class="toggle-desc">Marque essa opção se sua empresa não recebe via depósito/PIX. Os campos bancários se tornarão opcionais.</div></div>
       </div>
       <div id="bancoFields">
         <div class="grid">
@@ -266,38 +314,38 @@ body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);m
     </div>
 
     <div class="sec" id="s5">
-      <div class="stitle"><span class="ic" style="background:#FEE2E2">📄</span>Documentos</div>
+      <div class="stitle"><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 13h4M10 17h4"/></svg></span>Documentos</div>
       <p class="ssub">Anexe os comprovantes</p>
       <div id="docs-pj">
         <div class="grid">
-          <div class="fld"><label>Cartão CNPJ <span class="req">*</span></label><div class="fup" id="dc"><div class="ui">📎</div><div class="ut">Anexar <strong>Cartão CNPJ</strong></div><div class="fn" id="fcn"></div><input type="file" name="comprovante_cnpj" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fcn','dc')"></div><span class="hint">PDF, JPG ou PNG (máx. 5MB)</span></div>
-          <div class="fld"><label>Contrato Social <span class="req">*</span></label><div class="fup" id="dcs"><div class="ui">📎</div><div class="ut">Anexar <strong>Contrato Social</strong></div><div class="fn" id="fcsn"></div><input type="file" name="contrato_social" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fcsn','dcs')"></div><span class="hint">PDF, JPG ou PNG (máx. 5MB)</span></div>
-          <div class="fld"><label>Comprovante Bancário <span class="bcDocReq req">*</span></label><div class="fup" id="db"><div class="ui">📎</div><div class="ut">Anexar <strong>comprovante bancário</strong></div><div class="fn" id="fbn"></div><input type="file" name="comprovante_bancario" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fbn','db')"></div><span class="hint" id="bcDocHint">PDF, JPG ou PNG (máx. 5MB)</span></div>
-          <div class="fld"><label>Comprovante IE</label><div class="fup" id="die"><div class="ui">📎</div><div class="ut">Anexar <strong>comprovante de IE</strong></div><div class="fn" id="fien"></div><input type="file" name="comprovante_ie" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fien','die')"></div><span class="hint">Obrigatório se não for isento</span></div>
+          <div class="fld"><label>Cartão CNPJ <span class="req">*</span></label><div class="fup" id="dc"><div class="ui"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg></div><div class="ut">Anexar <strong>Cartão CNPJ</strong></div><div class="fn" id="fcn"></div><input type="file" name="comprovante_cnpj" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fcn','dc')"></div><span class="hint">PDF, JPG ou PNG (máx. 5MB)</span></div>
+          <div class="fld"><label>Contrato Social <span class="req">*</span></label><div class="fup" id="dcs"><div class="ui"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg></div><div class="ut">Anexar <strong>Contrato Social</strong></div><div class="fn" id="fcsn"></div><input type="file" name="contrato_social" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fcsn','dcs')"></div><span class="hint">PDF, JPG ou PNG (máx. 5MB)</span></div>
+          <div class="fld"><label>Comprovante Bancário <span class="bcDocReq req">*</span></label><div class="fup" id="db"><div class="ui"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg></div><div class="ut">Anexar <strong>comprovante bancário</strong></div><div class="fn" id="fbn"></div><input type="file" name="comprovante_bancario" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fbn','db')"></div><span class="hint" id="bcDocHint">PDF, JPG ou PNG (máx. 5MB)</span></div>
+          <div class="fld"><label>Comprovante IE</label><div class="fup" id="die"><div class="ui"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg></div><div class="ut">Anexar <strong>comprovante de IE</strong></div><div class="fn" id="fien"></div><input type="file" name="comprovante_ie" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fien','die')"></div><span class="hint">Obrigatório se não for isento</span></div>
         </div>
       </div>
       <div id="docs-pf" class="hide">
         <div class="grid">
-          <div class="fld"><label>Documento com Foto <span class="req">*</span></label><div class="fup" id="dpf"><div class="ui">📎</div><div class="ut">Anexar <strong>RG, CNH ou doc com foto</strong></div><div class="fn" id="fpfn"></div><input type="file" name="documento_identidade" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fpfn','dpf')"></div></div>
-          <div class="fld"><label>Comprovante Bancário <span class="bcDocReq req">*</span></label><div class="fup" id="dbpf"><div class="ui">📎</div><div class="ut">Anexar <strong>comprovante bancário</strong></div><div class="fn" id="fbpfn"></div><input type="file" name="comprovante_bancario_pf" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fbpfn','dbpf')"></div></div>
+          <div class="fld"><label>Documento com Foto <span class="req">*</span></label><div class="fup" id="dpf"><div class="ui"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg></div><div class="ut">Anexar <strong>RG, CNH ou doc com foto</strong></div><div class="fn" id="fpfn"></div><input type="file" name="documento_identidade" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fpfn','dpf')"></div></div>
+          <div class="fld"><label>Comprovante Bancário <span class="bcDocReq req">*</span></label><div class="fup" id="dbpf"><div class="ui"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg></div><div class="ut">Anexar <strong>comprovante bancário</strong></div><div class="fn" id="fbpfn"></div><input type="file" name="comprovante_bancario_pf" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fbpfn','dbpf')"></div></div>
         </div>
       </div>
       <div id="docs-mot" class="hide">
         <div class="grid">
-          <div class="fld"><label>Documento com Foto (CNH) <span class="req">*</span></label><div class="fup" id="dmot"><div class="ui">📎</div><div class="ut">Anexar <strong>CNH ou doc com foto</strong></div><div class="fn" id="fmotn"></div><input type="file" name="documento_identidade_mot" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fmotn','dmot')"></div></div>
-          <div class="fld"><label>Comprovante de Endereço</label><div class="fup" id="dend"><div class="ui">📎</div><div class="ut">Anexar <strong>comprovante de endereço</strong></div><div class="fn" id="fendn"></div><input type="file" name="comprovante_endereco_mot" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fendn','dend')"></div></div>
+          <div class="fld"><label>Documento com Foto (CNH) <span class="req">*</span></label><div class="fup" id="dmot"><div class="ui"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg></div><div class="ut">Anexar <strong>CNH ou doc com foto</strong></div><div class="fn" id="fmotn"></div><input type="file" name="documento_identidade_mot" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fmotn','dmot')"></div></div>
+          <div class="fld"><label>Comprovante de Endereço</label><div class="fup" id="dend"><div class="ui"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg></div><div class="ut">Anexar <strong>comprovante de endereço</strong></div><div class="fn" id="fendn"></div><input type="file" name="comprovante_endereco_mot" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fendn','dend')"></div></div>
         </div>
       </div>
       <div id="docs-atualizacao" class="hide">
-        <div class="alert-box blue"><span class="ab-icon">📌</span><div>Anexe o <strong>novo comprovante bancário</strong> com os dados atualizados.</div></div>
-        <div class="fld"><label>Novo Comprovante Bancário <span class="req">*</span></label><div class="fup" id="datu"><div class="ui">📎</div><div class="ut">Anexar <strong>comprovante bancário</strong></div><div class="fn" id="fatun"></div><input type="file" name="comprovante_bancario_atu" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fatun','datu')"></div></div>
+        <div class="alert-box blue"><span class="ab-icon"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span><div>Anexe o <strong>novo comprovante bancário</strong> com os dados atualizados.</div></div>
+        <div class="fld"><label>Novo Comprovante Bancário <span class="req">*</span></label><div class="fup" id="datu"><div class="ui"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg></div><div class="ut">Anexar <strong>comprovante bancário</strong></div><div class="fn" id="fatun"></div><input type="file" name="comprovante_bancario_atu" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fatun','datu')"></div></div>
       </div>
       <div class="grid" style="margin-top:12px"><div class="fld full" id="condPagBox"><label>Condições de Pagamento</label><input name="condicoes_pagamento" placeholder="Ex: 30/60/90 dias, à vista..."></div></div>
       <div class="btns"><button type="button" class="btn btn2" onclick="prev()">← Voltar</button><button type="button" class="btn btn1" onclick="next()">Próximo →</button></div>
     </div>
 
     <div class="sec" id="s7">
-      <div class="stitle"><span class="ic" style="background:#E0E7FF">📨</span>Dados do Solicitante</div>
+      <div class="stitle"><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>Dados do Solicitante</div>
       <p class="ssub">Quem está solicitando este cadastro? Usaremos esses dados para enviar o código do fornecedor após a aprovação.</p>
       <div class="grid">
         <div class="fld full"><label>Nome do Solicitante <span class="req">*</span></label><input name="nome_solicitante" placeholder="Seu nome completo"><span class="emsg">Campo obrigatório</span></div>
@@ -307,7 +355,7 @@ body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);m
     </div>
 
     <div class="sec" id="s6">
-      <div class="stitle"><span class="ic" style="background:#E8F5E9">✓</span>Revisar e Confirmar</div>
+      <div class="stitle"><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>Revisar e Confirmar</div>
       <p class="ssub">Confira todos os dados antes de enviar. Se precisar corrigir, clique em "Voltar e Editar".</p>
       <div id="reviewContent"></div>
       <div class="btns"><button type="button" class="btn btn2" onclick="prev()">← Voltar e Editar</button><button type="button" class="btn btns3" id="sbtn" onclick="enviar()">✓ Confirmar e Enviar</button></div>
@@ -364,7 +412,7 @@ function updateProgressBar(){
   const total=steps.length-1;
   const fillPct=total>0?(curIdx/total)*100:0;
   const bar=document.getElementById('progBar');
-  if(bar)bar.style.setProperty('--prog-fill',fillPct+'%');
+  if(bar){bar.style.setProperty('--prog-fill',fillPct+'%');bar.style.setProperty('--prog-n',steps.length);bar.style.setProperty('--prog-f',fillPct/100);}
   document.querySelectorAll('.prog-s').forEach(e=>{
     const s=parseInt(e.dataset.step);
     e.classList.remove('on','done');
@@ -416,6 +464,9 @@ function resetForm(){
   document.getElementById('progBar').classList.add('hide');
   document.getElementById('frm').classList.add('hide');
   document.getElementById('frm').reset();
+  document.querySelectorAll('.err').forEach(e=>e.classList.remove('err'));
+  document.querySelectorAll('.emsg.show,.aviso.show').forEach(e=>e.classList.remove('show'));
+  formSujo=false;
   document.getElementById('successScreen').classList.remove('show');
   document.querySelectorAll('.fup').forEach(f=>f.classList.remove('ok'));
   document.querySelectorAll('.fn').forEach(f=>f.textContent='');
@@ -440,18 +491,110 @@ function toggleApenasBoleto(){
   if(h)h.textContent=apenas?'Opcional — recebe via boleto':'PDF, JPG ou PNG (máx. 5MB)';
 }
 
-const mCNPJ=v=>v.replace(/\D/g,'').replace(/^(\d{2})(\d)/,'$1.$2').replace(/^(\d{2}\.\d{3})(\d)/,'$1.$2').replace(/\.(\d{3})(\d)/,'.$1/$2').replace(/(\d{4})(\d)/,'$1-$2').substring(0,18);
-const mCPF=v=>v.replace(/\D/g,'').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2').substring(0,14);
-const mTel=v=>{v=v.replace(/\D/g,'');return v.length<=10?v.replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{4})(\d)/,'$1-$2'):v.replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d)/,'$1-$2')};
+const limpa=v=>String(v||'').replace(/[^0-9A-Za-z]/g,'').toUpperCase();
+const mCNPJ=v=>{const c=limpa(v).slice(0,14);let o='';for(let i=0;i<c.length;i++){o+=c[i];if(i===1||i===4)o+='.';else if(i===7)o+='/';else if(i===11)o+='-'}return o.replace(/[./-]$/,'')};
+const mCPF=v=>{const c=String(v||'').replace(/\D/g,'').slice(0,11);let o='';for(let i=0;i<c.length;i++){o+=c[i];if(i===2||i===5)o+='.';else if(i===8)o+='-'}return o.replace(/[.-]$/,'')};
+const ehCnpj=v=>{const c=limpa(v);return c.length>11||/[A-Z]/.test(c)};
+const mDoc=v=>ehCnpj(v)?mCNPJ(v):mCPF(v);
+function validCNPJ(v){const c=limpa(v);if(!/^[0-9A-Z]{12}\d{2}$/.test(c)||/^(.)\1{13}$/.test(c))return false;
+  const dv=b=>{let w=b.length-7,s=0;for(const ch of b){s+=(ch.charCodeAt(0)-48)*w--;if(w<2)w=9}const r=s%11;return r<2?0:11-r};
+  const d1=dv(c.slice(0,12));const d2=dv(c.slice(0,12)+d1);return c[12]==d1&&c[13]==d2}
+function validCPF(v){const c=String(v||'').replace(/\D/g,'');if(c.length!==11||/^(\d)\1{10}$/.test(c))return false;
+  const dv=n=>{let s=0;for(let i=0;i<n;i++)s+=c[i]*(n+1-i);const r=(s*10)%11;return r===10?0:r};
+  return dv(9)==c[9]&&dv(10)==c[10]}
+const mTel=v=>{v=String(v).replace(/\D/g,'').slice(0,11);return v.length<=10?v.replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{4})(\d)/,'$1-$2'):v.replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d)/,'$1-$2')};
 const mCEP=v=>v.replace(/\D/g,'').replace(/(\d{5})(\d)/,'$1-$2').substring(0,9);
+const soNum=(v,extra='')=>String(v).replace(new RegExp('[^0-9'+extra+']','g'),'');
 
-document.querySelector('[name=cnpj]').addEventListener('input',function(){this.value=mCNPJ(this.value)});
-document.querySelector('[name=cpf]').addEventListener('input',function(){this.value=mCPF(this.value)});
-document.querySelector('[name=cpf_mot]').addEventListener('input',function(){this.value=mCPF(this.value)});
-document.querySelector('[name=cnpj_cpf_atu]').addEventListener('input',function(){const v=this.value.replace(/\D/g,'');this.value=v.length>11?mCNPJ(v):mCPF(v)});
-document.querySelector('[name=telefone]').addEventListener('input',function(){this.value=mTel(this.value)});
-document.querySelector('[name=celular]').addEventListener('input',function(){this.value=mTel(this.value)});
-document.querySelector('[name=cep]').addEventListener('input',function(){this.value=mCEP(this.value)});
+const $in=(n)=>document.querySelector('[name='+n+']');
+$in('cnpj').addEventListener('input',function(){this.value=mCNPJ(this.value)});
+$in('cpf').addEventListener('input',function(){this.value=mCPF(this.value)});
+$in('cpf_mot').addEventListener('input',function(){this.value=mCPF(this.value)});
+$in('cnpj_cpf_atu').addEventListener('input',function(){this.value=mDoc(this.value)});
+$in('cpf_cnpj_titular').addEventListener('input',function(){this.value=mDoc(this.value)});
+$in('telefone').addEventListener('input',function(){this.value=mTel(this.value)});
+$in('celular').addEventListener('input',function(){this.value=mTel(this.value)});
+$in('cep').addEventListener('input',function(){this.value=mCEP(this.value)});
+$in('agencia').addEventListener('input',function(){this.value=soNum(this.value,'-')});
+$in('conta').addEventListener('input',function(){this.value=soNum(this.value,'xX-').toUpperCase()});
+
+/* Teclado certo no celular + preenchimento automático dos dados de quem solicita */
+[['cnpj','text'],['cnpj_cpf_atu','text'],['cpf_cnpj_titular','text'],['cpf','numeric'],['cpf_mot','numeric'],['cep','numeric'],['agencia','numeric'],['conta','text'],['telefone','tel'],['celular','tel']].forEach(([n,m])=>{const e=$in(n);if(e)e.setAttribute('inputmode',m)});
+[['telefone','tel'],['celular','tel'],['cep','postal-code'],['nome_solicitante','name'],['email_solicitante','email']].forEach(([n,a])=>$in(n).setAttribute('autocomplete',a));
+['email','email_solicitante'].forEach(n=>{const e=$in(n);e.setAttribute('autocapitalize','none');e.setAttribute('spellcheck','false')});
+['cnpj','cnpj_cpf_atu','cpf_cnpj_titular'].forEach(n=>$in(n).setAttribute('autocapitalize','characters'));
+['data_nascimento','data_nascimento_mot'].forEach(n=>{$in(n).max=new Date().toISOString().slice(0,10)});
+
+/* ---- Regras de validação por campo (a mensagem aparece embaixo do campo) ---- */
+const digitos=v=>String(v).replace(/\D/g,'');
+const rNome=v=>v.trim().split(/\s+/).filter(p=>p.length>1).length>=2?'':'Informe nome e sobrenome';
+const rEmail=v=>/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)?'':'E-mail inválido (ex: nome@empresa.com.br)';
+const rDoc=v=>ehCnpj(v)?(validCNPJ(v)?'':'CNPJ inválido — confira os números'):(validCPF(v)?'':'CPF inválido — confira os números');
+const rTel=cel=>v=>{const d=digitos(v);if(+d.slice(0,2)<11&&d.length>=2)return 'DDD inválido';if(cel)return d.length===11&&d[2]==='9'?'':'Celular incompleto — informe DDD + 9 dígitos (ex: (16) 99999-8888)';return d.length===10||d.length===11?'':'Telefone incompleto — informe com DDD'};
+const rData=min=>v=>{const d=new Date(v+'T12:00:00');if(isNaN(d))return 'Data inválida';const h=new Date();if(d>h)return 'A data não pode ser futura';if(d.getFullYear()<1900)return 'Data inválida';if(min&&(h-d)/31557600000<min)return 'É necessário ter '+min+' anos ou mais';return ''};
+const RULES={
+  cnpj:v=>validCNPJ(v)?'':'CNPJ inválido — confira os números',
+  cpf:v=>validCPF(v)?'':'CPF inválido — confira os números',
+  cpf_mot:v=>validCPF(v)?'':'CPF inválido — confira os números',
+  cnpj_cpf_atu:rDoc, cpf_cnpj_titular:rDoc,
+  nome_completo:rNome, nome_completo_mot:rNome, responsavel_nome:rNome, nome_solicitante:rNome,
+  email:rEmail, email_solicitante:rEmail,
+  celular:rTel(true), telefone:rTel(false),
+  cep:v=>digitos(v).length===8?'':'CEP inválido — são 8 números',
+  data_nascimento:rData(18), data_nascimento_mot:rData(18),
+  agencia:v=>/^\d[\d-]*$/.test(v)?'':'Somente números (e hífen)',
+  conta:v=>/^\d[\dX-]*$/i.test(v)?'':'Somente números, hífen e dígito X',
+  website:v=>{try{const u=new URL(/^https?:\/\//i.test(v)?v:'https://'+v);return u.hostname.includes('.')?'':'Endereço inválido'}catch{return 'Endereço inválido'}}
+};
+function isRequired(n){return [1,2,3,4,7].some(s=>getRequired(s).includes(n))}
+function showFieldError(f,msg){
+  let em=f.closest('.fld')?.querySelector('.emsg');
+  if(!em&&msg&&f.closest('.fld')){em=document.createElement('span');em.className='emsg';f.closest('.fld').appendChild(em)}
+  f.classList.toggle('err',!!msg);
+  if(em){if(msg){em.textContent=msg;em.classList.add('show')}else em.classList.remove('show')}
+}
+function validateField(f){
+  const em=f.closest('.fld')?.querySelector('.emsg');
+  if(em&&em.dataset.orig===undefined)em.dataset.orig=em.textContent;
+  const v=f.value.trim();let msg='';
+  if(!v){if(isRequired(f.name)){const o=em?.dataset.orig||'';msg=/obrigat|Informe|Selecione/.test(o)?o:'Campo obrigatório'}}
+  else if(RULES[f.name])msg=RULES[f.name](v,f);
+  showFieldError(f,msg);
+  return !msg;
+}
+
+/* Feedback enquanto digita: valida ao sair do campo (se tiver algo) e limpa o erro ao voltar a digitar */
+let formSujo=false;
+const FRM=document.getElementById('frm');
+const ehCampo=e=>e&&e.matches&&e.matches('input[name],select[name],textarea[name]')&&!['file','checkbox','radio','hidden'].includes(e.type);
+FRM.addEventListener('focusout',e=>{
+  const f=e.target;if(!ehCampo(f))return;
+  if(f.tagName!=='SELECT'&&!f.readOnly)f.value=f.value.trim();
+  if(f.name==='website'&&f.value&&!/^https?:\/\//i.test(f.value))f.value='https://'+f.value;
+  if(f.value.trim())validateField(f);
+  if(f.name==='cpf_cnpj_titular'||f.name==='cnpj'||f.name==='cpf'||f.name==='cnpj_cpf_atu')avisoTitular();
+});
+FRM.addEventListener('input',e=>{const f=e.target;formSujo=true;if(ehCampo(f)&&f.classList.contains('err')&&!f.closest('.hide'))showFieldError(f,'')});
+window.addEventListener('beforeunload',e=>{if(formSujo&&!document.getElementById('successScreen').classList.contains('show')){e.preventDefault();e.returnValue=''}});
+
+/* Conta bancária: a Premix só paga o CNPJ do próprio fornecedor (ou da matriz) / o mesmo CPF */
+function docCadastro(){
+  if(tipo==='pj')return $in('cnpj').value;
+  if(tipo==='pf')return $in('cpf').value;
+  if(tipo==='atualizacao_bancaria')return $in('cnpj_cpf_atu').value;
+  return '';
+}
+function avisoTitular(){
+  const t=$in('cpf_cnpj_titular');if(!t)return;
+  let a=document.getElementById('avisoTitular');
+  if(!a){a=document.createElement('span');a.id='avisoTitular';a.className='aviso';t.closest('.fld').appendChild(a)}
+  const cad=limpa(docCadastro()),tit=limpa(t.value);let msg='';
+  if(cad&&tit&&validCNPJ(tit.length===14?tit:'')||(cad&&tit&&validCPF(tit.length===11?tit:''))){
+    const mesma=tit.length===14&&cad.length===14?tit.slice(0,8)===cad.slice(0,8):tit===cad;
+    if(!mesma)msg='Diferente do documento do cadastro. A Premix só aceita conta do próprio fornecedor (ou da matriz) — confira antes de continuar.';
+  }
+  a.textContent=msg;a.classList.toggle('show',!!msg);
+}
 
 function getRequired(s){
   const apenasB=document.getElementById('apenasBoleto')?.checked;
@@ -475,23 +618,38 @@ function getRequired(s){
 function validateStep(s){
   const sec=document.getElementById('s'+s);
   let ok=true;let firstErr=null;
-  const fields=getRequired(s);
-  fields.forEach(name=>{
-    const f=sec.querySelector('[name="'+name+'"]');
-    if(!f)return;
-    if(f.closest('.hide'))return;
-    const em=f.closest('.fld')?.querySelector('.emsg');
-    if(!f.value.trim()){f.classList.add('err');if(em)em.classList.add('show');if(!firstErr)firstErr=f;ok=false}
-    else{f.classList.remove('err');if(em)em.classList.remove('show')}
+  sec.querySelectorAll('input[name],select[name],textarea[name]').forEach(f=>{
+    if(!ehCampo(f)||f.closest('.hide'))return;
+    if(!validateField(f)){ok=false;if(!firstErr)firstErr=f}
   });
-  if(!ok){showToast('⚠️ Preencha todos os campos obrigatórios');if(firstErr)firstErr.focus()}
+  if(s===5&&!validateDocs())ok=false;
+  if(!ok){showToast('⚠️ Revise os campos destacados');if(firstErr)firstErr.focus()}
   return ok;
+}
+
+/* Anexos obrigatórios: cobrados na própria etapa (antes só davam erro no envio final) */
+const DOCS={
+  pj:[['comprovante_cnpj','Cartão CNPJ','dc'],['contrato_social','Contrato Social','dcs'],['comprovante_bancario','Comprovante bancário','db',1]],
+  pf:[['documento_identidade','Documento com foto','dpf'],['comprovante_bancario_pf','Comprovante bancário','dbpf',1]],
+  motorista:[['documento_identidade_mot','CNH ou documento com foto','dmot']],
+  atualizacao_bancaria:[['comprovante_bancario_atu','Novo comprovante bancário','datu']]
+};
+function validateDocs(){
+  const apenasB=document.getElementById('apenasBoleto')?.checked&&tipo!=='atualizacao_bancaria';
+  const faltam=[];
+  (DOCS[tipo]||[]).forEach(([n,rot,id,opcBoleto])=>{
+    const box=document.getElementById(id);const falta=!$in(n)?.files[0]&&!(opcBoleto&&apenasB);
+    box.classList.toggle('err',falta);if(falta)faltam.push(rot);
+  });
+  if(faltam.length)showToast('📎 Anexe: '+faltam.join(', '),5500);
+  return !faltam.length;
 }
 
 function go(s){
   document.querySelectorAll('.sec').forEach(e=>e.classList.remove('on'));
   document.getElementById('s'+s).classList.add('on');
   cur=s;
+  if(s===4)preencherBanco();
   updateProgressBar();
   
   if(s===6) {
@@ -509,12 +667,21 @@ function go(s){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
+/* Etapa do banco: sugere titular e documento do próprio cadastro (a regra é a mesma conta do fornecedor) */
+function preencherBanco(){
+  const t=$in('titular_conta'),d=$in('cpf_cnpj_titular');
+  const nome=tipo==='pj'?$in('razao_social').value:tipo==='pf'?$in('nome_completo').value:tipo==='atualizacao_bancaria'?$in('razao_social_atu').value:'';
+  if(t&&!t.value.trim()&&nome.trim())t.value=nome.trim();
+  if(d&&!d.value.trim()&&docCadastro())d.value=docCadastro();
+  avisoTitular();
+}
+
 function tryGo(s){const steps=getStepsForType(tipo);const idx=steps.indexOf(s);const curIdx=steps.indexOf(cur);if(idx>curIdx)return;go(s)}
 
 function next(){if(!validateStep(cur))return;const steps=getStepsForType(tipo);const idx=steps.indexOf(cur);if(idx<steps.length-1)go(steps[idx+1])}
 function prev(){const steps=getStepsForType(tipo);const idx=steps.indexOf(cur);if(idx>0)go(steps[idx-1])}
 
-function hf(inp,fnId,dropId){const f=inp.files[0];if(!f)return;if(!/\.(pdf|jpe?g|png)$/i.test(f.name)){showToast('Formato não aceito. Envie PDF, JPG ou PNG.');inp.value='';return}if(f.size>5*1024*1024){showToast('Arquivo muito grande. Máximo 5MB.');inp.value='';return}document.getElementById(fnId).textContent='✓ '+f.name;document.getElementById(dropId).classList.add('ok')}
+function hf(inp,fnId,dropId){const box=document.getElementById(dropId);const f=inp.files[0];if(!f){document.getElementById(fnId).textContent='';box.classList.remove('ok');return}if(!/\.(pdf|jpe?g|png)$/i.test(f.name)){showToast('Formato não aceito. Envie PDF, JPG ou PNG.');inp.value='';document.getElementById(fnId).textContent='';box.classList.remove('ok');return}if(f.size>5*1024*1024){showToast('Arquivo muito grande. Máximo 5MB.');inp.value='';document.getElementById(fnId).textContent='';box.classList.remove('ok');return}document.getElementById(fnId).textContent='✓ '+f.name;box.classList.add('ok');box.classList.remove('err');formSujo=true}
 
 async function buscaCEP() {
   const btn = document.querySelector('button[onclick="buscaCEP()"]');
@@ -800,6 +967,7 @@ async function enviar() {
     document.getElementById('frm').classList.add('hide');
     document.getElementById('progBar').classList.add('hide');
     document.getElementById('typeSel').classList.add('hide');
+    formSujo=false;
     document.getElementById('successScreen').classList.add('show');
     
     if (tipo === 'atualizacao_bancaria') {
