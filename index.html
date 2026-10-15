@@ -321,7 +321,7 @@ svg.i{width:1em;height:1em;flex-shrink:0;fill:none;stroke:currentColor;stroke-wi
           <div class="fld"><label>Cartão CNPJ <span class="req">*</span></label><div class="fup" id="dc"><div class="ui"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg></div><div class="ut">Anexar <strong>Cartão CNPJ</strong></div><div class="fn" id="fcn"></div><input type="file" name="comprovante_cnpj" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fcn','dc')"></div><span class="hint">PDF, JPG ou PNG (máx. 5MB)</span></div>
           <div class="fld"><label>Contrato Social <span class="req">*</span></label><div class="fup" id="dcs"><div class="ui"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg></div><div class="ut">Anexar <strong>Contrato Social</strong></div><div class="fn" id="fcsn"></div><input type="file" name="contrato_social" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fcsn','dcs')"></div><span class="hint">PDF, JPG ou PNG (máx. 5MB)</span></div>
           <div class="fld"><label>Comprovante Bancário <span class="bcDocReq req">*</span></label><div class="fup" id="db"><div class="ui"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg></div><div class="ut">Anexar <strong>comprovante bancário</strong></div><div class="fn" id="fbn"></div><input type="file" name="comprovante_bancario" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fbn','db')"></div><span class="hint" id="bcDocHint">PDF, JPG ou PNG (máx. 5MB)</span></div>
-          <div class="fld"><label>Comprovante IE</label><div class="fup" id="die"><div class="ui"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg></div><div class="ut">Anexar <strong>comprovante de IE</strong></div><div class="fn" id="fien"></div><input type="file" name="comprovante_ie" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fien','die')"></div><span class="hint">Obrigatório se não for isento</span></div>
+          <div class="fld"><label>Comprovante IE <span class="req ieDocReq">*</span></label><div class="fup" id="die"><div class="ui"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg></div><div class="ut">Anexar <strong>comprovante de IE</strong></div><div class="fn" id="fien"></div><input type="file" name="comprovante_ie" accept=".pdf,.jpg,.jpeg,.png" onchange="hf(this,'fien','die')"></div><span class="hint" id="ieDocHint">Obrigatório — dispensado se a empresa for isenta</span></div>
         </div>
       </div>
       <div id="docs-pf" class="hide">
@@ -471,6 +471,7 @@ function resetForm(){
   document.querySelectorAll('.fup').forEach(f=>f.classList.remove('ok'));
   document.querySelectorAll('.fn').forEach(f=>f.textContent='');
   document.getElementById('apenasBoleto').checked=false;
+  document.getElementById('ieIsento').checked=false;toggleIE();
   document.getElementById('toggleBoletoBox').classList.remove('active');
   document.getElementById('hdrTitle').textContent='Cadastro de Fornecedor';
   cur=1;tipo='pj';
@@ -481,7 +482,11 @@ function resetForm(){
 
 function novoFormulario(){resetForm()}
 
-function toggleIE(){const isento=document.getElementById('ieIsento').checked;const inp=document.getElementById('ieInput');if(isento){inp.value='ISENTO';inp.readOnly=true;inp.classList.remove('err')}else{inp.value='';inp.readOnly=false}}
+function toggleIE(){const isento=document.getElementById('ieIsento').checked;const inp=document.getElementById('ieInput');if(isento){inp.value='ISENTO';inp.readOnly=true;inp.classList.remove('err')}else{inp.value='';inp.readOnly=false}
+  document.querySelectorAll('.ieDocReq').forEach(x=>x.style.display=isento?'none':'inline');
+  const h=document.getElementById('ieDocHint');if(h)h.textContent=isento?'Dispensado — empresa isenta de Inscrição Estadual':'Obrigatório — dispensado se a empresa for isenta';
+  if(isento)document.getElementById('die').classList.remove('err');
+}
 
 function toggleApenasBoleto(){
   const apenas=document.getElementById('apenasBoleto').checked;
@@ -622,14 +627,15 @@ function validateStep(s){
     if(!ehCampo(f)||f.closest('.hide'))return;
     if(!validateField(f)){ok=false;if(!firstErr)firstErr=f}
   });
+  const camposOk=ok;
   if(s===5&&!validateDocs())ok=false;
-  if(!ok){showToast('⚠️ Revise os campos destacados');if(firstErr)firstErr.focus()}
+  if(!camposOk){showToast('⚠️ Revise os campos destacados');if(firstErr)firstErr.focus()}
   return ok;
 }
 
 /* Anexos obrigatórios: cobrados na própria etapa (antes só davam erro no envio final) */
 const DOCS={
-  pj:[['comprovante_cnpj','Cartão CNPJ','dc'],['contrato_social','Contrato Social','dcs'],['comprovante_bancario','Comprovante bancário','db',1]],
+  pj:[['comprovante_cnpj','Cartão CNPJ','dc'],['contrato_social','Contrato Social','dcs'],['comprovante_bancario','Comprovante bancário','db',1],['comprovante_ie','Comprovante de Inscrição Estadual','die',0,1]],
   pf:[['documento_identidade','Documento com foto','dpf'],['comprovante_bancario_pf','Comprovante bancário','dbpf',1]],
   motorista:[['documento_identidade_mot','CNH ou documento com foto','dmot']],
   atualizacao_bancaria:[['comprovante_bancario_atu','Novo comprovante bancário','datu']]
@@ -637,8 +643,9 @@ const DOCS={
 function validateDocs(){
   const apenasB=document.getElementById('apenasBoleto')?.checked&&tipo!=='atualizacao_bancaria';
   const faltam=[];
-  (DOCS[tipo]||[]).forEach(([n,rot,id,opcBoleto])=>{
-    const box=document.getElementById(id);const falta=!$in(n)?.files[0]&&!(opcBoleto&&apenasB);
+  const isento=document.getElementById('ieIsento')?.checked;
+  (DOCS[tipo]||[]).forEach(([n,rot,id,opcBoleto,opcIsento])=>{
+    const box=document.getElementById(id);const falta=!$in(n)?.files[0]&&!(opcBoleto&&apenasB)&&!(opcIsento&&isento);
     box.classList.toggle('err',falta);if(falta)faltam.push(rot);
   });
   if(faltam.length)showToast('📎 Anexe: '+faltam.join(', '),5500);
@@ -875,6 +882,7 @@ async function enviar() {
 
       if (!cnpjF || !csF) throw new Error('Cartão CNPJ e Contrato Social são obrigatórios.');
       if (!apenasB && !bancF) throw new Error('Anexe o comprovante bancário.');
+      if (!document.getElementById('ieIsento')?.checked && !ieF) throw new Error('Anexe o comprovante de Inscrição Estadual (ou marque Isento).');
 
       uploads.comprovante_cnpj_url = await uploadFile(cnpjF, 'cnpj');
       uploads.contrato_social_url = await uploadFile(csF, 'contrato');
