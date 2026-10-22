@@ -101,34 +101,56 @@ body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);m
 .btns3{background:var(--dark);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.25)}
 .btns3:hover{background:var(--dark2);transform:translateY(-1px)}
 .btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
-.review-intro{background:linear-gradient(135deg,#fafbf8 0%,#f0f5ea 100%);border:1px solid var(--border);border-left:4px solid var(--green);border-radius:10px;padding:18px 22px;margin-bottom:20px;display:flex;align-items:center;gap:14px}
-.review-intro .ri-icon{width:42px;height:42px;flex-shrink:0;border-radius:10px;background:#fff;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--green-d)}
-.review-intro .ri-icon svg{width:22px;height:22px}
-.review-intro .ri-text{flex:1}
-.review-intro .ri-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:.85rem;color:var(--dark);margin-bottom:2px}
-.review-intro .ri-sub{font-size:.74rem;color:var(--muted);line-height:1.45}
-.review-box{background:#fff;border:1px solid var(--border);border-radius:12px;padding:0;margin-bottom:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04);transition:box-shadow .2s}
-.review-box:hover{box-shadow:0 4px 14px rgba(0,0,0,.06)}
-.review-title{font-family:'Montserrat',sans-serif;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--green-d);margin:0;padding:14px 20px 13px;background:linear-gradient(180deg,#fafbf8 0%,#f4f7ed 100%);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.review-title .rt-icon{width:26px;height:26px;border-radius:7px;background:rgba(0,166,80,.1);display:inline-flex;align-items:center;justify-content:center;color:var(--green-d);flex-shrink:0}
-.review-title .rt-icon svg{width:14px;height:14px}
-.review-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:6px 20px 14px}
-@media(max-width:600px){.review-grid{grid-template-columns:1fr}.review-title{padding:12px 16px}.review-grid{padding:6px 16px 12px}}
-.review-item{padding:11px 0;border-bottom:1px solid #f0f2eb;display:flex;flex-direction:column;gap:3px;min-width:0}
-.review-grid .review-item:nth-last-child(-n+2){border-bottom:none}
-.review-grid .review-item:nth-last-child(-n+2):not(:nth-last-child(2)){border-bottom:none}
-@media(max-width:600px){.review-grid .review-item:nth-last-child(1){border-bottom:none}.review-grid .review-item:nth-last-child(2){border-bottom:1px solid #f0f2eb}}
-.review-grid .review-item:nth-child(odd){padding-right:14px}
-.review-grid .review-item:nth-child(even){padding-left:14px;border-left:1px solid #f0f2eb}
-@media(max-width:600px){.review-grid .review-item:nth-child(even){padding-left:0;border-left:none}.review-grid .review-item:nth-child(odd){padding-right:0}}
-.review-item .rl{font-size:.62rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.6px;font-family:'Montserrat',sans-serif}
-.review-item .rv{font-size:.92rem;font-weight:600;color:var(--dark);word-break:break-word;line-height:1.35;font-family:'Open Sans',sans-serif}
-.review-item .rv.muted{color:var(--muted);font-weight:500;font-style:italic;font-size:.85rem}
-.review-docs-list{padding:6px 20px 16px}
-.review-doc{display:flex;align-items:center;gap:10px;padding:8px 12px;background:#fafbf8;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;font-size:.82rem;font-weight:600;color:var(--dark)}
-.review-doc:last-child{margin-bottom:0}
-.review-doc .rd-check{width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0;font-weight:800}
-@media(max-width:600px){.review-docs-list{padding:6px 16px 12px}}
+.prog-s.warn .sn{border-color:var(--red);color:var(--red)}
+.prog-s.done.warn .sn{background:var(--red);border-color:var(--red);color:#fff}
+.prog-s.done.warn .sn::before{content:'!'}
+.cf-hero{border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:14px;display:flex;align-items:center;gap:14px;background:#fff;border-left:4px solid var(--green)}
+.cf-hero.bad{border-left-color:var(--red);background:#FFF8F7}
+.cf-hero.attn{border-left-color:#F9A825;background:#FFFDF3}
+.cf-hero .cf-ic{width:42px;height:42px;flex-shrink:0;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--green);color:#fff;font-weight:800;font-size:1.1rem;font-family:'Montserrat',sans-serif}
+.cf-hero.bad .cf-ic{background:var(--red)}
+.cf-hero.attn .cf-ic{background:#F9A825}
+.cf-hero .cf-ic svg{width:22px;height:22px}
+.cf-hero .cf-tt{font-family:'Montserrat',sans-serif;font-weight:800;font-size:.9rem}
+.cf-hero .cf-ss{font-size:.76rem;color:var(--muted);line-height:1.45;margin-top:2px}
+.cf-issues{border:1px solid var(--border);border-radius:12px;background:#fff;margin-bottom:14px;overflow:hidden}
+.cf-issue{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #f0f2eb;font-size:.82rem}
+.cf-issue:last-child{border-bottom:none}
+.cf-issue .dot{width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0}
+.cf-issue.warn .dot{background:#F9A825}
+.cf-issue .tx{flex:1;min-width:0}
+.cf-issue .tx small{color:var(--muted);font-size:.7rem;display:block}
+.cf-link{background:none;border:1.5px solid var(--border);border-radius:6px;padding:4px 10px;font-family:'Montserrat',sans-serif;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--green-d);cursor:pointer;flex-shrink:0;transition:.2s}
+.cf-link:hover{border-color:var(--green);background:rgba(0,166,80,.06)}
+.cf-card{background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.cf-head{display:flex;align-items:center;gap:10px;padding:12px 16px;background:linear-gradient(180deg,#fafbf8 0%,#f4f7ed 100%);border-bottom:1px solid var(--border)}
+.cf-head .cf-hi{width:26px;height:26px;border-radius:7px;background:rgba(0,166,80,.1);display:inline-flex;align-items:center;justify-content:center;color:var(--green-d);flex-shrink:0}
+.cf-head .cf-hi svg{width:14px;height:14px}
+.cf-head .cf-ht{flex:1;font-family:'Montserrat',sans-serif;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--green-d)}
+.cf-head .cf-badge{font-size:.62rem;font-weight:800;font-family:'Montserrat',sans-serif;text-transform:uppercase;letter-spacing:.4px;padding:2px 8px;border-radius:20px;background:#FEE2E2;color:#B71C1C}
+.cf-head.ok .cf-badge{background:var(--green-l);color:var(--green-d)}
+.cf-rows{padding:2px 16px}
+.cf-row{display:grid;grid-template-columns:150px 1fr;gap:12px;padding:9px 0;border-bottom:1px solid #f0f2eb;align-items:baseline}
+.cf-row:last-child{border-bottom:none}
+.cf-row .cl{font-size:.64rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;font-family:'Montserrat',sans-serif}
+.cf-row .cv{font-size:.88rem;font-weight:600;color:var(--dark);word-break:break-word;min-width:0}
+.cf-row .cv.empty{color:#9AA194;font-weight:500;font-style:italic;font-size:.82rem}
+.cf-row .cv.miss{color:var(--red);font-weight:700;font-size:.82rem}
+.cf-doc{display:flex;align-items:center;gap:10px}
+.cf-doc .st{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;background:var(--green);color:#fff}
+.cf-doc .st svg{width:12px;height:12px}
+.cf-doc.miss .st{background:var(--red)}
+.cf-doc.opt .st{background:#CDD3C6}
+.cf-doc .nm{flex:1;min-width:0}
+.cf-doc .nm small{display:block;color:var(--muted);font-weight:500;font-size:.7rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cf-confirm{display:flex;gap:12px;align-items:flex-start;background:#FAFBF8;border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;margin-top:4px;cursor:pointer;transition:.2s}
+.cf-confirm:hover{border-color:var(--green)}
+.cf-confirm.on{border-color:var(--green);background:rgba(0,166,80,.05)}
+.cf-confirm input{width:20px;height:20px;accent-color:var(--green);flex-shrink:0;margin-top:2px;cursor:pointer}
+.cf-confirm span{font-size:.82rem;line-height:1.5}
+.cf-confirm.locked{opacity:.55;cursor:not-allowed}
+.cf-confirm.locked input{cursor:not-allowed}
+@media(max-width:600px){.cf-row{grid-template-columns:1fr;gap:2px}.cf-hero{padding:14px}}
 .success-screen{display:none;background:var(--card);border-radius:var(--radius);padding:48px 32px;text-align:center;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,.06);position:relative;overflow:hidden;margin-top:24px}
 .success-screen.show{display:block;animation:fadeUp .4s ease}
 .success-screen::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--green),var(--gold))}
@@ -303,12 +325,12 @@ body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);m
         <div class="fld full"><label>Nome do Solicitante <span class="req">*</span></label><input name="nome_solicitante" placeholder="Seu nome completo"><span class="emsg">Campo obrigatório</span></div>
         <div class="fld full"><label>E-mail do Solicitante <span class="req">*</span></label><input name="email_solicitante" type="email" placeholder="[email protected]"><span class="emsg">E-mail inválido</span></div>
       </div>
-      <div class="btns"><button type="button" class="btn btn2" onclick="prev()">← Voltar</button><button type="button" class="btn btn1" onclick="next()">Revisar Cadastro →</button></div>
+      <div class="btns"><button type="button" class="btn btn2" onclick="prev()">← Voltar</button><button type="button" class="btn btn1" onclick="next()">Ir para Conferência →</button></div>
     </div>
 
     <div class="sec" id="s6">
-      <div class="stitle"><span class="ic" style="background:#E8F5E9">✓</span>Revisar e Confirmar</div>
-      <p class="ssub">Confira todos os dados antes de enviar. Se precisar corrigir, clique em "Voltar e Editar".</p>
+      <div class="stitle"><span class="ic" style="background:#E8F5E9">✓</span>Conferência</div>
+      <p class="ssub">Confira tudo antes de enviar. Use "Editar" em qualquer bloco para corrigir.</p>
       <div id="reviewContent"></div>
       <div class="btns"><button type="button" class="btn btn2" onclick="prev()">← Voltar e Editar</button><button type="button" class="btn btns3" id="sbtn" onclick="enviar()">✓ Confirmar e Enviar</button></div>
     </div>
@@ -340,7 +362,7 @@ function showToast(msg,duration=4500){
 function setType(t){if(typeLocked)return;tipo=t;document.getElementById('tipoCadastro').value=t;document.querySelectorAll('.type-card').forEach(c=>c.classList.toggle('on',c.dataset.type===t))}
 
 function getStepsForType(t){if(t==='atualizacao_bancaria')return[1,2,3,4,5,7,6];if(t==='motorista')return[1,2,3,5,7,6];return[1,2,3,4,5,7,6]}
-function getStepLabel(s,t){if(s===1)return t==='atualizacao_bancaria'?'Identificação':'Dados';if(s===2)return'Contato';if(s===3)return'Endereço';if(s===4)return'Banco';if(s===5)return t==='atualizacao_bancaria'?'Comprovante':'Documentos';if(s===7)return'Solicitante';if(s===6)return'Revisão';return''}
+function getStepLabel(s,t){if(s===1)return t==='atualizacao_bancaria'?'Identificação':'Dados';if(s===2)return'Contato';if(s===3)return'Endereço';if(s===4)return'Banco';if(s===5)return t==='atualizacao_bancaria'?'Comprovante':'Documentos';if(s===7)return'Solicitante';if(s===6)return'Conferência';return''}
 
 function buildProgressBar(){
   const steps=getStepsForType(tipo);
@@ -367,7 +389,7 @@ function updateProgressBar(){
   if(bar)bar.style.setProperty('--prog-fill',fillPct+'%');
   document.querySelectorAll('.prog-s').forEach(e=>{
     const s=parseInt(e.dataset.step);
-    e.classList.remove('on','done');
+    e.classList.remove('on','done','warn');
     const idx=steps.indexOf(s);
     if(idx<curIdx)e.classList.add('done');
     if(idx===curIdx)e.classList.add('on');
@@ -498,12 +520,7 @@ function go(s){
     buildReview();
     const btnConfirm = document.getElementById('sbtn');
     if (btnConfirm) {
-      btnConfirm.disabled = true;
-      btnConfirm.innerHTML = 'Aguarde...';
-      setTimeout(() => {
-        btnConfirm.disabled = false;
-        btnConfirm.innerHTML = '✓ Confirmar e Enviar';
-      }, 900);
+      btnConfirm.innerHTML = '✓ Confirmar e Enviar';
     }
   }
   window.scrollTo({top:0,behavior:'smooth'});
@@ -601,61 +618,138 @@ const ICONS={
 function fmtDate(s){if(!s)return s;const m=String(s).match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?m[3]+'/'+m[2]+'/'+m[1]:s}
 function fmtVal(label,v){if(!v)return v;const l=String(label).toLowerCase();if(l.includes('data'))return fmtDate(v);return v}
 
+const CF_STEP_NAMES={1:'Dados',2:'Contato',3:'Endereço',4:'Dados bancários',5:'Documentos',7:'Solicitante'};
+let cfBlocking=0;
+
+function cfFieldLabel(name){
+  const f=document.querySelector('[name="'+name+'"]');
+  const l=f?.closest('.fld')?.querySelector('label');
+  return l?l.textContent.replace('*','').trim():name;
+}
+
+function cfDocs(){
+  const apenasB=document.getElementById('apenasBoleto').checked;
+  const isento=document.getElementById('ieIsento').checked;
+  const d=(name,label,req)=>({name,label,req});
+  if(tipo==='pj')return[d('comprovante_cnpj','Cartão CNPJ','must'),d('contrato_social','Contrato Social','must'),d('comprovante_bancario','Comprovante Bancário',apenasB?'opt':'must'),d('comprovante_ie','Comprovante de IE',isento?'opt':'should')];
+  if(tipo==='pf')return[d('documento_identidade','Documento com Foto','must'),d('comprovante_bancario_pf','Comprovante Bancário',apenasB?'opt':'must')];
+  if(tipo==='motorista')return[d('documento_identidade_mot','CNH / Documento com Foto','must'),d('comprovante_endereco_mot','Comprovante de Endereço','opt')];
+  return[d('comprovante_bancario_atu','Novo Comprovante Bancário','must')];
+}
+
+function cfSize(b){return b>=1048576?(b/1048576).toFixed(1).replace('.',',')+' MB':Math.max(1,Math.round(b/1024))+' KB'}
+
 function buildReview(){
+  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const f=new FormData(document.getElementById('frm'));
   const data={};
-  for(const[k,v]of f.entries()){if(v)data[k]=v}
+  for(const[k,v]of f.entries()){if(typeof v==='string'&&v.trim())data[k]=v.trim()}
   const apenasB=document.getElementById('apenasBoleto').checked;
   const ieIsento=document.getElementById('ieIsento').checked;
-  const blocks=[];
+  const steps=getStepsForType(tipo).filter(s=>s!==6);
+  const issues=[];
 
-  if(tipo==='pj')blocks.push({title:'Empresa',icon:ICONS.building,items:[['Razão Social',data.razao_social],['Nome Fantasia',data.nome_fantasia],['CNPJ',data.cnpj],['Inscrição Estadual',ieIsento?'ISENTO':data.inscricao_estadual],['Ramo de Atividade',data.ramo_atividade],['Produtos / Serviços',data.produtos_servicos]]});
-  else if(tipo==='pf')blocks.push({title:'Pessoa Física',icon:ICONS.user,items:[['Nome Completo',data.nome_completo],['CPF',data.cpf],['RG',data.rg],['Data de Nascimento',data.data_nascimento]]});
-  else if(tipo==='motorista')blocks.push({title:'Motorista',icon:ICONS.truck,items:[['Nome Completo',data.nome_completo_mot],['CPF',data.cpf_mot],['RG',data.rg_mot],['Data de Nascimento',data.data_nascimento_mot],['CNH Categoria',data.cnh_categoria],['ANTT / RNTRC',data.antt]]});
-  else blocks.push({title:'Atualização Bancária',icon:ICONS.refresh,items:[['Razão Social / Nome',data.razao_social_atu],['CNPJ / CPF',data.cnpj_cpf_atu]]});
+  // campos obrigatórios em branco, em qualquer etapa
+  const reqNames=new Set();
+  steps.forEach(s=>getRequired(s).forEach(name=>{
+    const el=document.querySelector('[name="'+name+'"]');
+    if(!el||el.closest('.hide'))return;
+    reqNames.add(name);
+    if(!el.value.trim())issues.push({level:'err',step:s,text:cfFieldLabel(name)+': preenchimento obrigatório'});
+  }));
 
-  blocks.push({title:'Contato',icon:ICONS.phone,items:[['Responsável',data.responsavel_nome],['Cargo',data.responsavel_cargo],['Telefone',data.telefone],['Celular',data.celular],['E-mail',data.email],['Website',data.website]]});
-  blocks.push({title:'Endereço',icon:ICONS.pin,items:[['CEP',data.cep],['Logradouro',((data.logradouro||'')+', '+(data.numero||'')).replace(/^,\s*|\s*,\s*$/g,'')],['Complemento',data.complemento],['Bairro',data.bairro],['Cidade / UF',((data.cidade||'')+' - '+(data.estado||'')).replace(/^-\s*|\s*-\s*$/g,'')]]});
-  blocks.push({title:'Solicitante',icon:ICONS.mail,items:[['Nome',data.nome_solicitante],['E-mail',data.email_solicitante]]});
+  // documentos
+  const docs=cfDocs().map(d=>{
+    const file=document.querySelector('[name="'+d.name+'"]')?.files[0]||null;
+    if(!file&&d.req==='must')issues.push({level:'err',step:5,text:d.label+': anexo obrigatório'});
+    if(!file&&d.req==='should')issues.push({level:'warn',step:5,text:d.label+': anexe, a menos que a IE seja isenta'});
+    return Object.assign({file},d);
+  });
 
-  if(tipo!=='motorista'){
-    if(apenasB&&tipo!=='atualizacao_bancaria'){
-      blocks.push({title:'Forma de Pagamento',icon:ICONS.invoice,items:[['Modalidade','Recebe apenas via boleto bancário']]});
-    } else {
-      blocks.push({title:'Dados Bancários',icon:ICONS.bank,items:[['Banco',data.banco],['Tipo de Conta',data.tipo_conta],['Agência',data.agencia],['Conta',data.conta],['Titular',data.titular_conta],['CPF / CNPJ Titular',data.cpf_cnpj_titular],['PIX',data.pix]]});
-    }
+  // titular da conta diferente do cadastro (a Premix não paga a terceiros)
+  const ref=(tipo==='pj'?data.cnpj:tipo==='pf'?data.cpf:tipo==='atualizacao_bancaria'?data.cnpj_cpf_atu:'')||'';
+  const tit=(data.cpf_cnpj_titular||'').replace(/\D/g,'');
+  const refD=ref.replace(/\D/g,'');
+  if(!apenasB&&tipo!=='motorista'&&tit&&refD){
+    const mesmo=(tit.length===14&&refD.length===14)?tit.slice(0,8)===refD.slice(0,8):tit===refD;
+    if(!mesmo)issues.push({level:'warn',step:4,text:'O CPF/CNPJ do titular é diferente do cadastro. A Premix não paga a terceiros.'});
   }
 
-  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const blocking=issues.filter(i=>i.level==='err');
+  cfBlocking=blocking.length;
+  const warns=issues.length-blocking.length;
+  const stepIssues={};
+  issues.forEach(i=>{(stepIssues[i.step]=stepIssues[i.step]||[]).push(i)});
 
-  let html='<div class="review-intro"><div class="ri-icon">'+ICONS.check+'</div><div class="ri-text"><div class="ri-title">Confira antes de enviar</div><div class="ri-sub">Revise todos os dados informados. Após enviar, ajustes só serão feitos via Núcleo Fiscal Premix.</div></div></div>';
+  // seções: [titulo, icone, etapa, itens[[rotulo, valor, nomeDoCampo?]]]
+  const sections=[];
+  if(tipo==='pj')sections.push(['Empresa',ICONS.building,1,[['Razão Social',data.razao_social,'razao_social'],['Nome Fantasia',data.nome_fantasia],['CNPJ',data.cnpj,'cnpj'],['Inscrição Estadual',ieIsento?'ISENTO':data.inscricao_estadual,'inscricao_estadual'],['Ramo de Atividade',data.ramo_atividade],['Produtos / Serviços',data.produtos_servicos]]]);
+  else if(tipo==='pf')sections.push(['Pessoa Física',ICONS.user,1,[['Nome Completo',data.nome_completo,'nome_completo'],['CPF',data.cpf,'cpf'],['RG',data.rg,'rg'],['Data de Nascimento',fmtDate(data.data_nascimento),'data_nascimento']]]);
+  else if(tipo==='motorista')sections.push(['Motorista',ICONS.truck,1,[['Nome Completo',data.nome_completo_mot,'nome_completo_mot'],['CPF',data.cpf_mot,'cpf_mot'],['RG',data.rg_mot,'rg_mot'],['Data de Nascimento',fmtDate(data.data_nascimento_mot),'data_nascimento_mot'],['CNH Categoria',data.cnh_categoria,'cnh_categoria'],['ANTT / RNTRC',data.antt,'antt']]]);
+  else sections.push(['Identificação',ICONS.refresh,1,[['Razão Social / Nome',data.razao_social_atu,'razao_social_atu'],['CNPJ / CPF',data.cnpj_cpf_atu,'cnpj_cpf_atu']]]);
 
-  blocks.forEach(b=>{
-    const valid=b.items.filter(([,v])=>v&&String(v).trim()&&String(v).trim()!==','&&String(v).trim()!=='-');
-    if(valid.length===0)return;
-    html+='<div class="review-box"><div class="review-title"><span class="rt-icon">'+b.icon+'</span>'+esc(b.title)+'</div><div class="review-grid">';
-    valid.forEach(([l,v])=>{html+='<div class="review-item"><div class="rl">'+esc(l)+'</div><div class="rv">'+esc(fmtVal(l,v))+'</div></div>'});
+  sections.push(['Contato',ICONS.phone,2,[['Responsável',data.responsavel_nome,'responsavel_nome'],['Cargo',data.responsavel_cargo],['Telefone',data.telefone],['Celular',data.celular,'celular'],['E-mail',data.email,'email'],['Website',data.website]]]);
+  sections.push(['Endereço',ICONS.pin,3,[['CEP',data.cep,'cep'],['Logradouro',data.logradouro,'logradouro'],['Número',data.numero,'numero'],['Complemento',data.complemento],['Bairro',data.bairro,'bairro'],['Cidade',data.cidade,'cidade'],['Estado',data.estado,'estado']]]);
+
+  if(tipo!=='motorista'){
+    if(apenasB&&tipo!=='atualizacao_bancaria')sections.push(['Forma de Pagamento',ICONS.invoice,4,[['Modalidade','Recebe apenas via boleto bancário']]]);
+    else sections.push(['Dados Bancários',ICONS.bank,4,[['Banco',data.banco,'banco'],['Tipo de Conta',data.tipo_conta?data.tipo_conta.charAt(0).toUpperCase()+data.tipo_conta.slice(1):'' ],['Agência',data.agencia,'agencia'],['Conta',data.conta,'conta'],['Titular',data.titular_conta,'titular_conta'],['CPF / CNPJ do Titular',data.cpf_cnpj_titular,'cpf_cnpj_titular'],['Chave PIX',data.pix]]]);
+  }
+  if(tipo!=='atualizacao_bancaria'&&data.condicoes_pagamento)sections.push(['Condições de Pagamento',ICONS.invoice,5,[['Condições',data.condicoes_pagamento]]]);
+  sections.push(['Solicitante',ICONS.mail,7,[['Nome',data.nome_solicitante,'nome_solicitante'],['E-mail',data.email_solicitante,'email_solicitante']]]);
+
+  // painel de resumo
+  const heroCls=blocking.length?'bad':warns?'attn':'';
+  const heroIc=blocking.length?'!':warns?'!':ICONS.check;
+  const heroTt=blocking.length?blocking.length+(blocking.length>1?' pendências impedem':' pendência impede')+' o envio':warns?'Quase lá — confira os avisos':'Tudo certo para enviar';
+  const heroSs=blocking.length?'Corrija os itens abaixo para liberar o envio.':warns?'Os avisos não impedem o envio, mas vale conferir antes de confirmar.':'Revise os dados abaixo. Após enviar, ajustes só serão feitos via Núcleo Fiscal Premix.';
+  let html='<div class="cf-hero '+heroCls+'"><div class="cf-ic">'+heroIc+'</div><div><div class="cf-tt">'+heroTt+'</div><div class="cf-ss">'+heroSs+'</div></div></div>';
+
+  if(issues.length){
+    html+='<div class="cf-issues">';
+    issues.forEach(i=>{html+='<div class="cf-issue '+(i.level==='warn'?'warn':'')+'"><span class="dot"></span><div class="tx">'+esc(i.text)+'<small>'+esc(CF_STEP_NAMES[i.step])+'</small></div><button type="button" class="cf-link" onclick="go('+i.step+')">'+(i.level==='warn'?'Conferir':'Corrigir')+'</button></div>'});
+    html+='</div>';
+  }
+
+  sections.forEach(([title,icon,step,items])=>{
+    const n=(stepIssues[step]||[]).filter(i=>i.level==='err').length;
+    html+='<div class="cf-card"><div class="cf-head'+(n?'':' ok')+'"><span class="cf-hi">'+icon+'</span><span class="cf-ht">'+esc(title)+'</span>'+(n?'<span class="cf-badge">'+n+' pendente'+(n>1?'s':'')+'</span>':'')+'<button type="button" class="cf-link" onclick="go('+step+')">Editar</button></div><div class="cf-rows">';
+    items.forEach(([l,v,name])=>{
+      const has=v&&String(v).trim();
+      const cls=has?'':(name&&reqNames.has(name)?' miss':' empty');
+      html+='<div class="cf-row"><div class="cl">'+esc(l)+'</div><div class="cv'+cls+'">'+(has?esc(v):(cls===' miss'?'Obrigatório — não informado':'Não informado'))+'</div></div>';
+    });
     html+='</div></div>';
   });
 
-  const docs=[];
-  if(document.querySelector('[name=comprovante_cnpj]')?.files[0])docs.push('Cartão CNPJ');
-  if(document.querySelector('[name=contrato_social]')?.files[0])docs.push('Contrato Social');
-  if(document.querySelector('[name=comprovante_bancario]')?.files[0])docs.push('Comprovante Bancário');
-  if(document.querySelector('[name=comprovante_bancario_pf]')?.files[0])docs.push('Comprovante Bancário');
-  if(document.querySelector('[name=comprovante_bancario_atu]')?.files[0])docs.push('Novo Comprovante Bancário');
-  if(document.querySelector('[name=documento_identidade]')?.files[0])docs.push('Documento com Foto');
-  if(document.querySelector('[name=documento_identidade_mot]')?.files[0])docs.push('CNH / Documento com Foto');
-  if(document.querySelector('[name=comprovante_endereco_mot]')?.files[0])docs.push('Comprovante de Endereço');
-  if(document.querySelector('[name=comprovante_ie]')?.files[0])docs.push('Comprovante de IE');
+  const dn=(stepIssues[5]||[]).filter(i=>i.level==='err').length;
+  html+='<div class="cf-card"><div class="cf-head'+(dn?'':' ok')+'"><span class="cf-hi">'+ICONS.doc+'</span><span class="cf-ht">Documentos</span>'+(dn?'<span class="cf-badge">'+dn+' pendente'+(dn>1?'s':'')+'</span>':'')+'<button type="button" class="cf-link" onclick="go(5)">Editar</button></div><div class="cf-rows">';
+  docs.forEach(d=>{
+    const cls=d.file?'':(d.req==='opt'?' opt':' miss');
+    const sub=d.file?esc(d.file.name)+' · '+cfSize(d.file.size):(d.req==='opt'?'Opcional — não anexado':'Não anexado');
+    html+='<div class="cf-row"><div class="cf-doc'+cls+'" style="grid-column:1/-1"><span class="st">'+(d.file?ICONS.check:d.req==='opt'?'–':'!')+'</span><div class="nm">'+esc(d.label)+'<small>'+sub+'</small></div></div></div>';
+  });
+  html+='</div></div>';
 
-  if(docs.length){
-    html+='<div class="review-box"><div class="review-title"><span class="rt-icon">'+ICONS.doc+'</span>Documentos Anexados</div><div class="review-docs-list">';
-    docs.forEach(d=>{html+='<div class="review-doc"><span class="rd-check">'+ICONS.check+'</span>'+esc(d)+'</div>'});
-    html+='</div></div>';
-  }
+  html+='<label class="cf-confirm" id="cfConfirm"><input type="checkbox" id="cfOk" onchange="updateSendBtn()"><span>Declaro que as informações e os documentos enviados são verdadeiros e que os dados bancários pertencem ao próprio fornecedor (ou à sua matriz).</span></label>';
 
   document.getElementById('reviewContent').innerHTML=html;
+
+  // reflete as pendências na trilha
+  document.querySelectorAll('.prog-s').forEach(e=>e.classList.toggle('warn',!!(stepIssues[parseInt(e.dataset.step)]||[]).some(i=>i.level==='err')));
+  updateSendBtn();
+}
+
+function updateSendBtn(){
+  const btn=document.getElementById('sbtn');
+  const ok=document.getElementById('cfOk');
+  if(!btn||!ok)return;
+  ok.disabled=cfBlocking>0;
+  if(cfBlocking>0)ok.checked=false;
+  const box=document.getElementById('cfConfirm');
+  box.classList.toggle('locked',cfBlocking>0);
+  box.classList.toggle('on',ok.checked);
+  btn.disabled=cfBlocking>0||!ok.checked;
 }
 
 async function uploadFile(file, folder) {
@@ -683,6 +777,7 @@ async function uploadFile(file, folder) {
 async function enviar() {
   const btn = document.getElementById('sbtn');
   if (!btn) return;
+  if (cfBlocking > 0 || !document.getElementById('cfOk')?.checked) return;
 
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> ENVIANDO...';
@@ -816,8 +911,8 @@ async function enviar() {
     showToast(err.message, 6000);
   } finally {
     if (btn) {
-      btn.disabled = false;
       btn.innerHTML = '✓ Confirmar e Enviar';
+      updateSendBtn();
     }
   }
 }
