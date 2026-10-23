@@ -242,7 +242,7 @@
     });
   }
   function ehPdf(f) { return /\.pdf$/i.test(f.name) && (!f.type || f.type === 'application/pdf'); }
-  function mb(n) { return (n / 1048576).toFixed(1).replace('.', ',') + ' MB'; }
+  function mb(n) { return n < 1048576 ? Math.max(1, Math.round(n / 1024)) + ' KB' : (n / 1048576).toFixed(1).replace('.', ',') + ' MB'; }
 
   function ehFrete() { return String($('tipo').value).indexOf('Frete') === 0; }
   function alternar() {

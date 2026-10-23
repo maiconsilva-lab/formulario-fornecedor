@@ -279,6 +279,7 @@ function reenviarPendentes_() {
 /* ===================== 4) Retorno: painel -> planilha ===================== */
 
 function sincronizarLancados_() {
+  if (!prop_('PAINEL_SEGREDO_LEITURA', true)) return 0;   // retorno por consulta é opcional: sem o segredo, esta etapa não roda
   var props = PropertiesService.getScriptProperties();
   var aba = abaLanc_();
   var ult = aba.getLastRow();
@@ -319,8 +320,9 @@ function rotina() {
   var trava = LockService.getScriptLock();
   if (!trava.tryLock(2000)) return;   // execução anterior ainda rodando
   try {
-    var reenviados = reenviarPendentes_();
-    var atualizados = sincronizarLancados_();
+    var reenviados = 0, atualizados = 0;
+    try { reenviados = reenviarPendentes_(); } catch (e) { console.warn('Reenvio ao painel falhou: ' + e); }
+    try { atualizados = sincronizarLancados_(); } catch (e) { console.warn('Retorno do painel falhou: ' + e); }
     console.log('Reenviados ao painel: ' + reenviados + ' · linhas atualizadas com o retorno do painel: ' + atualizados);
   } finally {
     trava.releaseLock();
