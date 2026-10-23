@@ -215,7 +215,9 @@
         msg('Envio cancelado. Os PDFs já foram guardados no Drive; avise o Núcleo Fiscal se precisar apagá-los.', 'info');
         b.disabled = false; return;
       }
-      msg('Documento ' + r.numero + ' enviado para lançamento. Obrigado!', 'ok');
+      msg(r.painel
+        ? '✓ Documento ' + r.numero + ' recebido. Já está na fila do Núcleo Fiscal para lançamento.'
+        : '✓ Documento ' + r.numero + ' guardado no Drive e na planilha. O painel está demorando a responder; ele entra na fila em instantes, sem você precisar reenviar.', r.painel ? 'ok' : 'info');
       $('f').querySelectorAll('input,select,textarea').forEach(function (e) { e.disabled = true; });
       $('outro').classList.remove('oculto'); b.classList.add('oculto');
     } catch (e) { msg(e.message, 'erro'); b.disabled = false; }
