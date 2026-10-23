@@ -24,9 +24,13 @@ var REENVIOS_POR_RODADA = 20;
 
 var TIPOS = ['Nota Fiscal - Matéria prima', 'Nota Fiscal - Produto Acabado', 'Produtos (Compras Indiretos)',
   'Serviços (Compras Indiretos)', 'Frete - Produto Acabado', 'Frete - Matéria Prima', 'Frete - Compras Indiretos'];
-var FILIAIS = ['Anápolis', 'Araguaina', 'Barra do Garças', 'Campo Grande', 'Centro de Pesquisa', 'Cuiabá', 'Estreito',
-  'Goiânia', 'Gurupi', 'Linhares', 'Londrina', 'Paraguay', 'Patrocínio Paulista', 'Presidente Prudente',
-  'Ribeirão Preto', 'Vilhena', 'Xinguara'];
+// [nº da filial no Protheus, nome]. O nome (sem o número) é o que vai para a planilha e para o painel.
+// Ordem da lista = ordem do número, do maior para o menor; "Paraguay" não tem número cadastrado e fica por último.
+var FILIAIS_NUM = [['37', 'Gurupi'], ['36', 'Barra do Garças'], ['35', 'Goiânia'], ['34', 'Cuiabá'], ['33', 'Anápolis'],
+  ['32', 'Xinguara'], ['26', 'Linhares'], ['17', 'Londrina'], ['16', 'Campo Grande'], ['15', 'Presidente Prudente'],
+  ['13', 'Vilhena'], ['12', 'Estreito'], ['11', 'Centro de Pesquisa'], ['08', 'Ribeirão Preto'], ['02', 'Araguaina'],
+  ['01', 'Patrocínio Paulista'], ['', 'Paraguay']];
+var FILIAIS = FILIAIS_NUM.map(function (f) { return f[1]; });
 
 // A..Q = as 17 colunas da base; R..T = apoio do script (ficam ocultas).
 var CABECALHO = ['Data Envio', 'Usuário Solicitante', 'Filial', 'Tipo Doc', 'Nº Documento', 'Venc. Doc.', 'Nº CT-e',
@@ -84,7 +88,7 @@ function doGet() {
   var t = HtmlService.createTemplateFromFile('Portal');
   t.pessoa = p;
   t.email = String(Session.getActiveUser().getEmail() || '');
-  t.config = { tipos: TIPOS, filiais: FILIAIS, maxMb: MAX_MB, maxTotalMb: MAX_TOTAL_MB, maxObs: MAX_OBS };
+  t.config = { tipos: TIPOS, filiais: FILIAIS_NUM, maxMb: MAX_MB, maxTotalMb: MAX_TOTAL_MB, maxObs: MAX_OBS };
   return t.evaluate()
     .setTitle('Lançamentos Fiscais · Premix')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')

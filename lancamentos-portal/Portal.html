@@ -4,46 +4,117 @@
   <base target="_top">
   <meta charset="utf-8">
   <style>
-    :root { --azul: #123d6b; --azul2: #1b5596; --laranja: #f15a24; --linha: #dde5ed; --fundo: #eef3f9; --campo: #f3f6fb; --txt: #14213a; --mudo: #6b7a90; }
+    /* Visual do painel Premix (módulo /lancamentos): azul-marinho #123d6b + laranja #f15a24 */
+    :root { --navy: #123d6b; --navy2: #1b5596; --navy3: #0c2d52; --laranja: #f15a24; --fundo: #f2f4f7; --linha: #e5e9f0; --linha2: #d5dce6;
+      --campo: #f3f6fb; --txt: #14213a; --txt2: #4a5872; --txt3: #6b7a90; --verde: #079455; --vermelho: #d92d20;
+      --sombra: 0 1px 2px rgba(18,38,70,.04), 0 2px 8px rgba(18,38,70,.05); --sombra2: 0 10px 30px rgba(18,38,70,.10), 0 2px 6px rgba(18,38,70,.05); }
     * { box-sizing: border-box; }
-    body { margin: 0; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--fundo); color: var(--txt); font-size: 14px; }
-    main { max-width: 1080px; margin: 0 auto; padding: 16px; }
-    .cartao { position: relative; background: #fff; border-radius: 16px; padding: 22px; box-shadow: 0 1px 2px rgba(16,36,74,.05), 0 6px 18px rgba(16,36,74,.07); }
-    .cartao::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 4px; border-radius: 16px 16px 0 0; background: var(--azul); }
-    .colunas { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; }
-    .col { padding: 0 20px; }
-    .col:first-child { padding-left: 0; }
-    .col:last-child { padding-right: 0; }
-    .col + .col { border-left: 1px solid var(--linha); }
-    @media (max-width: 860px) { .colunas { grid-template-columns: 1fr; } .col { padding: 0; } .col + .col { border-left: 0; border-top: 1px solid var(--linha); margin-top: 16px; padding-top: 4px; } }
-    label { display: block; font-size: 12.5px; font-weight: 700; margin: 12px 0 5px; }
-    label.azul { color: #2563eb; }
-    input, select, textarea { width: 100%; font: inherit; padding: 10px 12px; border: 1.5px solid transparent; border-radius: 10px; background: var(--campo); color: var(--txt); min-height: 42px; }
-    input:focus, select:focus, textarea:focus { outline: none; border-color: #9dbbe0; background: #fff; box-shadow: 0 0 0 3px rgba(27,85,150,.10); }
-    input.err, select.err, textarea.err, .arquivo.err { border-color: #f04438; background: #fffbfa; }
-    textarea { min-height: 150px; resize: vertical; }
-    .dupla { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .arquivo { border: 1.5px dashed #c9d6e8; border-radius: 10px; padding: 8px 10px; background: #f8fafd; }
-    .arquivo input { border: 0; padding: 0; background: transparent; min-height: 0; }
-    .arquivo em { display: block; font-style: normal; font-size: 11.5px; color: var(--mudo); margin-top: 3px; }
-    .contador { text-align: right; font-size: 11.5px; color: var(--mudo); margin-top: 4px; }
-    .dicas { margin-top: 18px; background: #f8fafd; border-left: 4px solid var(--laranja); border-radius: 8px; padding: 12px 14px; }
-    .dicas h3 { margin: 0 0 8px; font-size: 13px; }
-    .dicas ul { margin: 0; padding-left: 18px; color: #3b4a63; font-size: 12.5px; line-height: 1.7; }
-    button { width: 100%; margin-top: 16px; padding: 14px; font: inherit; font-weight: 800; letter-spacing: .3px; text-transform: uppercase; border: 0; border-radius: 10px; background: var(--azul); color: #fff; cursor: pointer; box-shadow: 0 6px 14px rgba(18,61,107,.25); }
-    button:disabled { opacity: .55; cursor: default; }
-    button.sec { background: #fff; color: var(--azul); border: 1px solid var(--azul); box-shadow: none; }
-    .msg { margin-top: 12px; padding: 10px 12px; border-radius: 10px; font-size: 13px; display: none; }
+    body { margin: 0; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--fundo); color: var(--txt); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+
+    /* Cabeçalho */
+    .topo { position: relative; display: flex; align-items: center; gap: 16px; padding: 0 24px; height: 64px; background: #fff; border-bottom: 1px solid var(--linha); }
+    .topo::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: linear-gradient(90deg, var(--navy) 0 68%, var(--laranja) 68% 100%); }
+    .marca { display: flex; align-items: center; gap: 14px; min-width: 0; }
+    .marca img { height: 30px; width: auto; display: block; }
+    .marca .div { width: 1px; height: 30px; background: var(--linha2); }
+    .marca h1 { margin: 0; font-size: 17px; letter-spacing: -.3px; line-height: 1.1; color: var(--navy); font-weight: 700; }
+    .eyebrow { font-size: 10.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--laranja); }
+    .usuario { margin-left: auto; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--txt2); min-width: 0; }
+    .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--navy); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 13px; flex-shrink: 0; }
+    .usuario .nome { font-weight: 600; color: var(--txt); line-height: 1.15; }
+    .usuario .mail { font-size: 11.5px; color: var(--txt3); }
+    .usuario .txt { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    @media (max-width: 600px) { .topo { padding: 0 14px; } .usuario .txt { display: none; } .marca h1 { font-size: 15px; } }
+    @media (max-width: 480px) { .eyebrow { display: none; } }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 22px 20px 40px; }
+    .titulo h2 { margin: 0; font-size: 20px; letter-spacing: -.4px; color: var(--navy); }
+    .titulo p { margin: 3px 0 18px; color: var(--txt2); font-size: 13.5px; }
+
+    .grade { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+    @media (max-width: 860px) { .grade { grid-template-columns: 1fr; } }
+    .cartao { background: #fff; border: 1px solid var(--linha); border-radius: 14px; box-shadow: var(--sombra); padding: 20px 22px; }
+    .cartao + .cartao { margin-top: 16px; }
+    .secao { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; font-size: 14px; font-weight: 700; color: var(--navy); }
+    .secao .n { width: 24px; height: 24px; border-radius: 50%; background: var(--navy); color: #fff; display: grid; place-items: center; font-size: 12px; }
+
+    label.rot { display: block; font-size: 12.5px; font-weight: 700; color: var(--txt2); margin: 0 0 5px; }
+    .campo { margin: 0; min-width: 0; }
+    .cartao .dupla { margin-bottom: 14px; }
+    .cartao .dupla:last-child { margin-bottom: 0; }
+    input[type=text], input[type=date], select, textarea { width: 100%; font: inherit; color: var(--txt); padding: 10px 12px; min-height: 44px; border: 1.5px solid transparent; border-radius: 10px; background: var(--campo); transition: border-color .15s, box-shadow .15s, background .15s; }
+    select { appearance: none; -webkit-appearance: none; cursor: pointer; padding-right: 36px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238792a6' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+    input:hover, select:hover, textarea:hover { background: #edf2f9; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #9dbbe0; background: #fff; box-shadow: 0 0 0 4px rgba(27,85,150,.10); }
+    .err { border-color: #f04438 !important; background: #fffbfa !important; }
+    .dupla { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 480px) { .dupla { grid-template-columns: 1fr; } }
+    textarea { min-height: 170px; resize: vertical; }
+    .contador { text-align: right; font-size: 11.5px; color: var(--txt3); margin-top: 4px; }
+
+    /* Sim / Não */
+    .seg { display: inline-flex; background: var(--campo); border-radius: 10px; padding: 3px; gap: 3px; }
+    .seg label { position: relative; margin: 0; }
+    .seg input { position: absolute; opacity: 0; pointer-events: none; }
+    .seg span { display: block; min-width: 76px; text-align: center; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 13px; color: var(--txt2); cursor: pointer; transition: .15s; }
+    .seg input:checked + span { background: var(--navy); color: #fff; box-shadow: 0 2px 6px rgba(18,61,107,.25); }
+    .seg input:focus-visible + span { box-shadow: 0 0 0 3px rgba(27,85,150,.25); }
+    .opcao { padding: 14px 0; border-top: 1px solid var(--linha); }
+    .opcao:first-of-type { border-top: 0; padding-top: 0; }
+    .opcao .cab { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .opcao .cab b { font-size: 13.5px; color: var(--txt); }
+    .opcao .cab small { display: block; color: var(--txt3); font-weight: 400; font-size: 12px; }
+    .opcao .corpo { margin-top: 12px; }
+    .oculto { display: none !important; }
+
+    /* Anexos */
+    .drop { position: relative; display: flex; align-items: center; gap: 12px; border: 1.5px dashed #c3d1e4; border-radius: 12px; padding: 14px 16px; background: #f8fafd; cursor: pointer; transition: .15s; }
+    .drop:hover { border-color: var(--navy); background: #eef4fb; }
+    .drop.ok { border-style: solid; border-color: #75e0a7; background: #e3f7ec; }
+    .drop.err { border-style: solid; }
+    .drop input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .drop .ico { width: 38px; height: 38px; border-radius: 10px; background: #fff; color: var(--navy); display: grid; place-items: center; box-shadow: 0 2px 6px rgba(18,38,70,.08); flex-shrink: 0; }
+    .drop.ok .ico { color: var(--verde); }
+    .drop svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .drop .t { min-width: 0; }
+    .drop .t b { display: block; font-size: 13px; color: var(--txt); }
+    .drop .t span { display: block; font-size: 12px; color: var(--txt3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .drop.ok .t span { color: #085d3a; font-weight: 600; }
+
+    /* Lateral */
+    .dicas { border-left: 4px solid var(--laranja); }
+    .dicas h3 { margin: 0 0 8px; font-size: 13.5px; color: var(--navy); }
+    .dicas ul { margin: 0; padding-left: 18px; color: var(--txt2); font-size: 12.5px; line-height: 1.75; }
+    button.enviar { width: 100%; margin-top: 16px; padding: 14px; min-height: 48px; font: inherit; font-weight: 800; font-size: 14px; letter-spacing: .3px; text-transform: uppercase; border: 0; border-radius: 12px; cursor: pointer; color: #fff; background: linear-gradient(135deg, var(--navy2) 0%, var(--navy) 55%, var(--navy3) 100%); box-shadow: 0 8px 18px rgba(18,61,107,.28); transition: .15s; }
+    button.enviar:hover { transform: translateY(-1px); }
+    button:disabled { opacity: .55; cursor: default; transform: none !important; }
+    button.sec { background: #fff; color: var(--navy); border: 1.5px solid var(--navy); box-shadow: none; }
+    .msg { margin-top: 12px; padding: 11px 13px; border-radius: 10px; font-size: 13px; display: none; }
     .msg.erro { display: block; background: #fef3f2; color: #b42318; border: 1px solid #fecdca; }
-    .msg.ok { display: block; background: #eaf6ef; color: #15603a; border: 1px solid #c3e6d1; }
-    .msg.info { display: block; background: #eef4fb; color: var(--azul); border: 1px solid #d3e2f3; }
-    .aviso h2 { margin: 0 0 6px; color: #b42318; font-size: 18px; }
-    .quem { font-size: 11.5px; color: var(--mudo); margin-top: 10px; text-align: center; }
-    .oculto { display: none; }
+    .msg.ok { display: block; background: #e3f7ec; color: #085d3a; border: 1px solid #b7e6cd; }
+    .msg.info { display: block; background: #eef4fb; color: var(--navy); border: 1px solid #d3e2f3; }
+    .aviso { max-width: 520px; margin: 40px auto; text-align: center; }
+    .aviso h2 { margin: 0 0 6px; color: var(--vermelho); font-size: 19px; }
   </style>
 </head>
 <body>
-<main>
+  <header class="topo">
+    <div class="marca">
+      <img src="https://painel-fornecedores-six.vercel.app/premix-logo.png" alt="Premix"
+           onerror="this.onerror=null;this.src='https://premix.com.br/wp-content/uploads/2023/06/Logotipo_Premix_Positivo_Com-Bandeira.png'">
+      <span class="div"></span>
+      <div><div class="eyebrow">Núcleo Fiscal · Premix</div><h1>Lançamentos Fiscais</h1></div>
+    </div>
+    <? if (pessoa) { ?>
+      <div class="usuario">
+        <div class="txt"><div class="nome"><?= pessoa.nome ?></div><div class="mail"><?= pessoa.email ?></div></div>
+        <div class="avatar"><?= String(pessoa.nome || '?').charAt(0).toUpperCase() ?></div>
+      </div>
+    <? } ?>
+  </header>
+
+  <main>
   <? if (!pessoa) { ?>
     <div class="cartao aviso">
       <h2>Acesso não autorizado</h2>
@@ -51,76 +122,106 @@
          Entre com a sua conta <b>@premix.com.br</b> ou peça a liberação ao Núcleo Fiscal.</p>
     </div>
   <? } else { ?>
-    <form id="f" class="cartao" autocomplete="off" novalidate>
-      <div class="colunas">
-        <div class="col">
-          <label for="filial">Filial</label>
-          <select id="filial"><option value="">Selecione a filial...</option><? config.filiais.forEach(function (x) { ?><option><?= x ?></option><? }); ?></select>
+    <div class="titulo">
+      <h2>Enviar documento para lançamento</h2>
+      <p>Anexe a nota, o frete e o boleto. Os arquivos vão para o Drive e o documento entra na fila do Núcleo Fiscal.</p>
+    </div>
 
-          <label for="tipo">Tipo do Documento</label>
-          <select id="tipo"><option value="">Selecione o tipo...</option><? config.tipos.forEach(function (x) { ?><option><?= x ?></option><? }); ?></select>
-
+    <form id="f" class="grade" autocomplete="off" novalidate>
+      <div>
+        <section class="cartao">
+          <h3 class="secao"><span class="n">1</span>Dados do documento</h3>
           <div class="dupla">
-            <div><label for="numero">Número do Documento</label><input id="numero" inputmode="numeric" placeholder="Ex: 000002050"></div>
-            <div><label for="venc">Venc. Documento</label><input id="venc" type="date"></div>
-          </div>
-
-          <label class="azul" for="arqNf">Anexar Documento Principal (PDF)</label>
-          <div class="arquivo" id="boxNf"><input id="arqNf" type="file" accept=".pdf,application/pdf"></div>
-
-          <label for="boleto">Possui Boleto vinculado?</label>
-          <select id="boleto"><option value="nao">Não</option><option value="sim">Sim</option></select>
-          <div id="blocoBoleto" class="oculto">
-            <label class="azul" for="arqBoleto">Anexar Boleto (PDF)</label>
-            <div class="arquivo" id="boxBoleto"><input id="arqBoleto" type="file" accept=".pdf,application/pdf"></div>
-          </div>
-        </div>
-
-        <div class="col">
-          <div id="blocoFreteSel">
-            <label for="frete">Possui Frete (CT-e)?</label>
-            <select id="frete"><option value="nao">Não</option><option value="sim">Sim</option></select>
-          </div>
-          <div id="blocoFrete" class="oculto">
-            <div class="dupla">
-              <div><label for="numCte">Nº do CT-e</label><input id="numCte" inputmode="numeric" placeholder="Ex: 000001234"></div>
-              <div><label for="vencCte">Venc. CT-e</label><input id="vencCte" type="date"></div>
+            <div class="campo">
+              <label class="rot" for="filial">Filial</label>
+              <select id="filial"><option value="">Selecione a filial...</option><? config.filiais.forEach(function (x) { ?><option value="<?= x[1] ?>"><?= (x[0] ? x[0] + ' · ' : '') + x[1] ?></option><? }); ?></select>
             </div>
-            <label class="azul" for="arqCte">Anexar CT-e (PDF)</label>
-            <div class="arquivo" id="boxCte"><input id="arqCte" type="file" accept=".pdf,application/pdf"></div>
+            <div class="campo">
+              <label class="rot" for="tipo">Tipo do documento</label>
+              <select id="tipo"><option value="">Selecione o tipo...</option><? config.tipos.forEach(function (x) { ?><option><?= x ?></option><? }); ?></select>
+            </div>
+          </div>
+          <div class="dupla">
+            <div class="campo"><label class="rot" for="numero">Número do documento</label><input id="numero" type="text" inputmode="numeric" placeholder="Ex: 000002050"></div>
+            <div class="campo"><label class="rot" for="venc">Vencimento</label><input id="venc" type="date"></div>
+          </div>
+        </section>
+
+        <section class="cartao">
+          <h3 class="secao"><span class="n">2</span>Anexos</h3>
+
+          <div class="opcao">
+            <label class="rot">Documento principal <span style="color:var(--laranja)">*</span></label>
+            <label class="drop" id="boxNf">
+              <span class="ico"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg></span>
+              <span class="t"><b>Anexar PDF</b><span id="nomeNf">Clique ou arraste o arquivo aqui</span></span>
+              <input id="arqNf" type="file" accept=".pdf,application/pdf">
+            </label>
           </div>
 
-          <div class="dicas">
-            <h3>💡 Dicas importantes</h3>
-            <ul>
-              <li>O PDF deve ser legível (original).</li>
-              <li>Envie os documentos imediatamente após o recebimento.</li>
-              <li>Para parcelas, considere a 1ª data no vencimento.</li>
-              <li>Cada PDF até <?= config.maxMb ?> MB (somados, até <?= config.maxTotalMb ?> MB).</li>
-            </ul>
+          <div class="opcao" id="opcaoFrete">
+            <div class="cab">
+              <div><b>Possui frete (CT-e)?</b><small>O CT-e vira um documento próprio, vinculado à nota</small></div>
+              <div class="seg"><label><input type="radio" name="frete" value="nao" checked><span>Não</span></label><label><input type="radio" name="frete" value="sim"><span>Sim</span></label></div>
+            </div>
+            <div class="corpo oculto" id="blocoFrete">
+              <div class="dupla">
+                <div class="campo"><label class="rot" for="numCte">Nº do CT-e</label><input id="numCte" type="text" inputmode="numeric" placeholder="Ex: 000001234"></div>
+                <div class="campo"><label class="rot" for="vencCte">Venc. do CT-e</label><input id="vencCte" type="date"></div>
+              </div>
+              <label class="drop" id="boxCte">
+                <span class="ico"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg></span>
+                <span class="t"><b>Anexar CT-e (PDF)</b><span id="nomeCte">Clique ou arraste o arquivo aqui</span></span>
+                <input id="arqCte" type="file" accept=".pdf,application/pdf">
+              </label>
+            </div>
           </div>
-        </div>
 
-        <div class="col">
-          <label for="obs">Observações e Comentários</label>
+          <div class="opcao">
+            <div class="cab">
+              <div><b>Possui boleto vinculado?</b><small>Envie o PDF do boleto junto com o documento</small></div>
+              <div class="seg"><label><input type="radio" name="boleto" value="nao" checked><span>Não</span></label><label><input type="radio" name="boleto" value="sim"><span>Sim</span></label></div>
+            </div>
+            <div class="corpo oculto" id="blocoBoleto">
+              <label class="drop" id="boxBoleto">
+                <span class="ico"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg></span>
+                <span class="t"><b>Anexar boleto (PDF)</b><span id="nomeBoleto">Clique ou arraste o arquivo aqui</span></span>
+                <input id="arqBoleto" type="file" accept=".pdf,application/pdf">
+              </label>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <aside>
+        <section class="cartao">
+          <h3 class="secao"><span class="n">3</span>Observações</h3>
           <textarea id="obs" maxlength="<?= config.maxObs ?>" placeholder="Registre alinhamentos com áreas ou gestores e qualquer informação que o time Fiscal precise saber (ex.: exceções, rateio, situações atípicas ou solicitação de prioridade). Assim, o documento chega completo para lançamento."></textarea>
           <div class="contador"><span id="qtd">0</span> / <?= config.maxObs ?> caracteres</div>
-
-          <button id="enviar" type="submit">Enviar para lançamento</button>
-          <button id="outro" class="sec oculto" type="button">Enviar outro documento</button>
+          <button id="enviar" class="enviar" type="submit">Enviar para lançamento</button>
+          <button id="outro" class="enviar sec oculto" type="button">Enviar outro documento</button>
           <div id="msg" class="msg" role="status" aria-live="polite"></div>
-          <div class="quem">Enviando como <?= pessoa.nome ?> (<?= pessoa.email ?>)</div>
-        </div>
-      </div>
+        </section>
+        <section class="cartao dicas">
+          <h3>💡 Dicas importantes</h3>
+          <ul>
+            <li>O PDF deve ser legível (original).</li>
+            <li>Envie os documentos imediatamente após o recebimento.</li>
+            <li>Para parcelas, considere a 1ª data no vencimento.</li>
+            <li>Cada PDF até <?= config.maxMb ?> MB (somados, até <?= config.maxTotalMb ?> MB).</li>
+          </ul>
+        </section>
+      </aside>
     </form>
   <? } ?>
-</main>
+  </main>
 
 <? if (pessoa) { ?>
 <script>
   var MAX = <?= config.maxMb ?> * 1048576;
   var MAX_TOTAL = <?= config.maxTotalMb ?> * 1048576;
   var $ = function (id) { return document.getElementById(id); };
+  var radio = function (nome) { return document.querySelector('input[name="' + nome + '"]:checked').value; };
   var guardado = null;   // links já enviados ao Drive: se o usuário confirmar um duplicado, não sobe os PDFs de novo
 
   function msg(t, c) { var m = $('msg'); m.className = 'msg ' + c; m.textContent = t; }
@@ -141,18 +242,26 @@
     });
   }
   function ehPdf(f) { return /\.pdf$/i.test(f.name) && (!f.type || f.type === 'application/pdf'); }
+  function mb(n) { return (n / 1048576).toFixed(1).replace('.', ',') + ' MB'; }
 
   function ehFrete() { return String($('tipo').value).indexOf('Frete') === 0; }
   function alternar() {
-    $('blocoBoleto').classList.toggle('oculto', $('boleto').value !== 'sim');
-    $('blocoFreteSel').classList.toggle('oculto', ehFrete());     // o próprio documento já é o frete
-    $('blocoFrete').classList.toggle('oculto', ehFrete() || $('frete').value !== 'sim');
+    $('opcaoFrete').classList.toggle('oculto', ehFrete());            // o próprio documento já é o frete
+    $('blocoFrete').classList.toggle('oculto', ehFrete() || radio('frete') !== 'sim');
+    $('blocoBoleto').classList.toggle('oculto', radio('boleto') !== 'sim');
   }
+  document.querySelectorAll('input[type=radio]').forEach(function (r) { r.addEventListener('change', alternar); });
   $('tipo').addEventListener('change', alternar);
-  $('boleto').addEventListener('change', alternar);
-  $('frete').addEventListener('change', alternar);
   $('obs').addEventListener('input', function () { $('qtd').textContent = this.value.length; });
   ['numero', 'numCte'].forEach(function (id) { $(id).addEventListener('input', function () { this.value = this.value.replace(/\D/g, ''); }); });
+
+  [['arqNf', 'boxNf', 'nomeNf'], ['arqCte', 'boxCte', 'nomeCte'], ['arqBoleto', 'boxBoleto', 'nomeBoleto']].forEach(function (c) {
+    $(c[0]).addEventListener('change', function () {
+      var f = this.files[0];
+      $(c[1]).classList.toggle('ok', !!f); marcar($(c[1]), false);
+      $(c[2]).textContent = f ? '✓ ' + f.name + ' · ' + mb(f.size) : 'Clique ou arraste o arquivo aqui';
+    });
+  });
 
   function validar() {
     var erros = [], total = 0;
@@ -161,25 +270,25 @@
     cobrar(!$('tipo').value, $('tipo'), 'o tipo do documento');
     cobrar(!$('numero').value, $('numero'), 'o número do documento');
     cobrar(!$('venc').value, $('venc'), 'o vencimento');
-    var pdf = function (id, box, rotulo, obrigatorio) {
+    var pdf = function (id, box, rotulo) {
       var f = arquivo(id);
-      if (!f) { cobrar(obrigatorio, $(box), rotulo); return; }
+      if (!f) { cobrar(true, $(box), 'anexe ' + rotulo); return; }
       if (!ehPdf(f)) { cobrar(true, $(box), rotulo + ' (somente PDF)'); return; }
       if (f.size > MAX) { cobrar(true, $(box), rotulo + ' (passa de ' + (MAX / 1048576) + ' MB)'); return; }
       total += f.size; marcar($(box), false);
     };
-    pdf('arqNf', 'boxNf', 'o documento principal', true);
-    if ($('boleto').value === 'sim') pdf('arqBoleto', 'boxBoleto', 'o boleto', true);
-    if (!ehFrete() && $('frete').value === 'sim') {
+    pdf('arqNf', 'boxNf', 'o documento principal');
+    if (radio('boleto') === 'sim') pdf('arqBoleto', 'boxBoleto', 'o boleto');
+    if (!ehFrete() && radio('frete') === 'sim') {
       cobrar(!$('numCte').value, $('numCte'), 'o número do CT-e');
       cobrar(!$('vencCte').value, $('vencCte'), 'o vencimento do CT-e');
-      pdf('arqCte', 'boxCte', 'o CT-e', true);
+      pdf('arqCte', 'boxCte', 'o CT-e');
     }
     if (total > MAX_TOTAL) erros.push('os PDFs somados passam de ' + (MAX_TOTAL / 1048576) + ' MB');
     return erros;
   }
 
-  async function subir(papel, id, base, quem) {
+  async function subir(papel, id, base) {
     var f = arquivo(id);
     if (!f) return { link: '', md5: '' };
     msg('Enviando ' + f.name + '…', 'info');
@@ -195,7 +304,7 @@
         guardado = null;
       }
       var base = { filial: $('filial').value, numero: $('numero').value };
-      var quer = { boleto: $('boleto').value === 'sim', frete: !ehFrete() && $('frete').value === 'sim' };
+      var quer = { boleto: radio('boleto') === 'sim', frete: !ehFrete() && radio('frete') === 'sim' };
       if (!guardado) {
         var nf = await subir('nf', 'arqNf', base);
         var cte = quer.frete ? await subir('frete', 'arqCte', base) : { link: '', md5: '' };
