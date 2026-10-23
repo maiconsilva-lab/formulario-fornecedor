@@ -4,8 +4,8 @@
  *  1) Formulário (app da Web, incorporado no Google Sites): recebe os dados e os PDFs.
  *  2) PDFs  -> Drive da Premix, pasta AAAA-MM / Filial. Nada vai para o Supabase.
  *  3) Dados -> uma linha na planilha-base (aba "Lancamentos") e um POST no painel (/api/lancamentos/ingest).
- *  4) Retorno: a cada 5 min o script pergunta ao painel o que foi lançado e grava na mesma linha
- *     Status, Responsável (quem lançou), Data Lançto e Nível de prioridade.
+ *  4) Retorno: quando o painel lança, pendencia ou cancela, ELE mesmo grava na linha (Status, Responsável,
+ *     Data Lançto, Nível), na hora, com a conta de serviço. O script não participa dessa volta.
  *
  * Quem preenche o formulário não precisa de acesso à planilha nem à pasta: quem grava é o script.
  * Instalação passo a passo: LEIAME.md
@@ -224,7 +224,7 @@ function achaLinhaPorId_(aba, id) {
 
 /* ===================== 3) Painel (envio) ===================== */
 
-function painel_(metodo, caminho, corpo, segredoProp) {
+function painel_(metodo, caminho, corpo, segredoProp) {   // segredoProp: nome da propriedade com o segredo
   var url = prop_('PAINEL_URL').replace(/\/+$/, '');
   var op = { method: metodo, headers: { 'x-lanc-secret': prop_(segredoProp) }, muteHttpExceptions: true };
   if (corpo) { op.contentType = 'application/json'; op.payload = JSON.stringify(corpo); }
@@ -276,54 +276,15 @@ function reenviarPendentes_() {
   return feitos;
 }
 
-/* ===================== 4) Retorno: painel -> planilha ===================== */
-
-function sincronizarLancados_() {
-  if (!prop_('PAINEL_SEGREDO_LEITURA', true)) return 0;   // retorno por consulta é opcional: sem o segredo, esta etapa não roda
-  var props = PropertiesService.getScriptProperties();
-  var aba = abaLanc_();
-  var ult = aba.getLastRow();
-  var atualizados = 0;
-  for (var rodada = 0; rodada < 10; rodada++) {   // até 5.000 itens por execução
-    var desde = props.getProperty('CURSOR_LANCADOS') || '';
-    var r = painel_('get', '/api/lancamentos/lancados?limite=500' + (desde ? '&desde=' + encodeURIComponent(desde) : ''), null, 'PAINEL_SEGREDO_LEITURA');
-    if (r.codigo !== 200) { console.warn('Painel (lançados): ' + r.codigo + ' ' + r.texto); return atualizados; }
-    var itens = r.json.itens || [];
-    if (!itens.length) return atualizados;
-    if (ult < 2) { props.setProperty('CURSOR_LANCADOS', r.json.proximo); return atualizados; }
-
-    var ids = aba.getRange(2, COL.ID, ult - 1, 1).getValues().map(function (x) { return String(x[0]); });
-    itens.forEach(function (it) {
-      var i = ids.indexOf(Math.floor(new Date(it.recebido_em).getTime() / 1000) + '|' + it.filial);
-      if (i < 0) return;                         // documento que não veio por este portal
-      var linha = i + 2;
-      if (it.documento_pai_id) {                 // CT-e que veio junto com a NF
-        aba.getRange(linha, COL.STATUS_FRETE).setValue(it.status || '');
-      } else {
-        var lancado = it.status === 'Lançado';
-        aba.getRange(linha, COL.STATUS_DOC).setValue(it.status || '');
-        aba.getRange(linha, COL.RESPONSAVEL).setValue(lancado ? (it.lancado_por || '') : '');
-        aba.getRange(linha, COL.DATA_LANC).setNumberFormat('@').setValue(lancado && it.lancado_em ? Utilities.formatDate(new Date(it.lancado_em), FUSO, 'dd/MM/yyyy') : '');
-        aba.getRange(linha, COL.NIVEL).setValue(it.nivel || '');
-      }
-      atualizados++;
-    });
-    props.setProperty('CURSOR_LANCADOS', r.json.proximo);   // só avança depois de gravar
-    if (itens.length < 500) break;
-  }
-  return atualizados;
-}
-
-/* ===================== Rotina (gatilho de 5 min) ===================== */
+/* ===================== Rotina (gatilho de 5 min): reenvia ao painel o que não chegou ===================== */
 
 function rotina() {
   var trava = LockService.getScriptLock();
   if (!trava.tryLock(2000)) return;   // execução anterior ainda rodando
   try {
-    var reenviados = 0, atualizados = 0;
-    try { reenviados = reenviarPendentes_(); } catch (e) { console.warn('Reenvio ao painel falhou: ' + e); }
-    try { atualizados = sincronizarLancados_(); } catch (e) { console.warn('Retorno do painel falhou: ' + e); }
-    console.log('Reenviados ao painel: ' + reenviados + ' · linhas atualizadas com o retorno do painel: ' + atualizados);
+    console.log('Reenviados ao painel: ' + reenviarPendentes_());
+  } catch (e) {
+    console.warn('Reenvio ao painel falhou: ' + e);
   } finally {
     trava.releaseLock();
   }
@@ -352,10 +313,13 @@ function configurar() {
   console.log('Planilha pronta.');
 }
 
+/* Teste sem gravar nada: o painel confere o segredo antes de olhar o corpo. 400 = segredo certo. */
 function testarPainel() {
-  var r = painel_('get', '/api/lancamentos/lancados?limite=1', null, 'PAINEL_SEGREDO_LEITURA');
-  if (r.codigo === 200) console.log('Painel respondeu OK (leitura).');
-  else console.warn('Falhou (' + r.codigo + '): ' + r.texto + ' — confira PAINEL_URL e PAINEL_SEGREDO_LEITURA e se o painel já tem a rota /lancados.');
+  var r = painel_('post', '/api/lancamentos/ingest', {}, 'PAINEL_SEGREDO_ENVIO');
+  if (r.codigo === 400) console.log('Painel OK: o segredo está certo e as conexões estão ligadas.');
+  else if (r.codigo === 401) console.warn('Segredo recusado (401): PAINEL_SEGREDO_ENVIO diferente do LANC_INGEST_SECRET da Vercel (ou falta redeploy).');
+  else if (r.codigo === 503) console.warn('Conexões pausadas no painel (conexoes_pausadas = 1).');
+  else console.warn('Resposta inesperada (' + r.codigo + '): ' + r.texto + ' — confira PAINEL_URL.');
 }
 
 function instalarGatilho() {
