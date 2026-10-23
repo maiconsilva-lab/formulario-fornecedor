@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <style>
+    :root { --azul: #123d6b; --azul2: #1b5596; --laranja: #f15a24; --linha: #dde5ed; --fundo: #eef3f9; --campo: #f3f6fb; --txt: #14213a; --mudo: #6b7a90; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--fundo); color: var(--txt); font-size: 14px; }
+    main { max-width: 1080px; margin: 0 auto; padding: 16px; }
+    .cartao { position: relative; background: #fff; border-radius: 16px; padding: 22px; box-shadow: 0 1px 2px rgba(16,36,74,.05), 0 6px 18px rgba(16,36,74,.07); }
+    .cartao::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 4px; border-radius: 16px 16px 0 0; background: var(--azul); }
+    .colunas { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; }
+    .col { padding: 0 20px; }
+    .col:first-child { padding-left: 0; }
+    .col:last-child { padding-right: 0; }
+    .col + .col { border-left: 1px solid var(--linha); }
+    @media (max-width: 860px) { .colunas { grid-template-columns: 1fr; } .col { padding: 0; } .col + .col { border-left: 0; border-top: 1px solid var(--linha); margin-top: 16px; padding-top: 4px; } }
+    label { display: block; font-size: 12.5px; font-weight: 700; margin: 12px 0 5px; }
+    label.azul { color: #2563eb; }
+    input, select, textarea { width: 100%; font: inherit; padding: 10px 12px; border: 1.5px solid transparent; border-radius: 10px; background: var(--campo); color: var(--txt); min-height: 42px; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #9dbbe0; background: #fff; box-shadow: 0 0 0 3px rgba(27,85,150,.10); }
+    input.err, select.err, textarea.err, .arquivo.err { border-color: #f04438; background: #fffbfa; }
+    textarea { min-height: 150px; resize: vertical; }
+    .dupla { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .arquivo { border: 1.5px dashed #c9d6e8; border-radius: 10px; padding: 8px 10px; background: #f8fafd; }
+    .arquivo input { border: 0; padding: 0; background: transparent; min-height: 0; }
+    .arquivo em { display: block; font-style: normal; font-size: 11.5px; color: var(--mudo); margin-top: 3px; }
+    .contador { text-align: right; font-size: 11.5px; color: var(--mudo); margin-top: 4px; }
+    .dicas { margin-top: 18px; background: #f8fafd; border-left: 4px solid var(--laranja); border-radius: 8px; padding: 12px 14px; }
+    .dicas h3 { margin: 0 0 8px; font-size: 13px; }
+    .dicas ul { margin: 0; padding-left: 18px; color: #3b4a63; font-size: 12.5px; line-height: 1.7; }
+    button { width: 100%; margin-top: 16px; padding: 14px; font: inherit; font-weight: 800; letter-spacing: .3px; text-transform: uppercase; border: 0; border-radius: 10px; background: var(--azul); color: #fff; cursor: pointer; box-shadow: 0 6px 14px rgba(18,61,107,.25); }
+    button:disabled { opacity: .55; cursor: default; }
+    button.sec { background: #fff; color: var(--azul); border: 1px solid var(--azul); box-shadow: none; }
+    .msg { margin-top: 12px; padding: 10px 12px; border-radius: 10px; font-size: 13px; display: none; }
+    .msg.erro { display: block; background: #fef3f2; color: #b42318; border: 1px solid #fecdca; }
+    .msg.ok { display: block; background: #eaf6ef; color: #15603a; border: 1px solid #c3e6d1; }
+    .msg.info { display: block; background: #eef4fb; color: var(--azul); border: 1px solid #d3e2f3; }
+    .aviso h2 { margin: 0 0 6px; color: #b42318; font-size: 18px; }
+    .quem { font-size: 11.5px; color: var(--mudo); margin-top: 10px; text-align: center; }
+    .oculto { display: none; }
+  </style>
+</head>
+<body>
+<main>
+  <? if (!pessoa) { ?>
+    <div class="cartao aviso">
+      <h2>Acesso não autorizado</h2>
+      <p>O e-mail <b><?= email || '(não identificado)' ?></b> não pode enviar documentos por aqui.
+         Entre com a sua conta <b>@premix.com.br</b> ou peça a liberação ao Núcleo Fiscal.</p>
+    </div>
+  <? } else { ?>
+    <form id="f" class="cartao" autocomplete="off" novalidate>
+      <div class="colunas">
+        <div class="col">
+          <label for="filial">Filial</label>
+          <select id="filial"><option value="">Selecione a filial...</option><? config.filiais.forEach(function (x) { ?><option><?= x ?></option><? }); ?></select>
+
+          <label for="tipo">Tipo do Documento</label>
+          <select id="tipo"><option value="">Selecione o tipo...</option><? config.tipos.forEach(function (x) { ?><option><?= x ?></option><? }); ?></select>
+
+          <div class="dupla">
+            <div><label for="numero">Número do Documento</label><input id="numero" inputmode="numeric" placeholder="Ex: 000002050"></div>
+            <div><label for="venc">Venc. Documento</label><input id="venc" type="date"></div>
+          </div>
+
+          <label class="azul" for="arqNf">Anexar Documento Principal (PDF)</label>
+          <div class="arquivo" id="boxNf"><input id="arqNf" type="file" accept=".pdf,application/pdf"></div>
+
+          <label for="boleto">Possui Boleto vinculado?</label>
+          <select id="boleto"><option value="nao">Não</option><option value="sim">Sim</option></select>
+          <div id="blocoBoleto" class="oculto">
+            <label class="azul" for="arqBoleto">Anexar Boleto (PDF)</label>
+            <div class="arquivo" id="boxBoleto"><input id="arqBoleto" type="file" accept=".pdf,application/pdf"></div>
+          </div>
+        </div>
+
+        <div class="col">
+          <div id="blocoFreteSel">
+            <label for="frete">Possui Frete (CT-e)?</label>
+            <select id="frete"><option value="nao">Não</option><option value="sim">Sim</option></select>
+          </div>
+          <div id="blocoFrete" class="oculto">
+            <div class="dupla">
+              <div><label for="numCte">Nº do CT-e</label><input id="numCte" inputmode="numeric" placeholder="Ex: 000001234"></div>
+              <div><label for="vencCte">Venc. CT-e</label><input id="vencCte" type="date"></div>
+            </div>
+            <label class="azul" for="arqCte">Anexar CT-e (PDF)</label>
+            <div class="arquivo" id="boxCte"><input id="arqCte" type="file" accept=".pdf,application/pdf"></div>
+          </div>
+
+          <div class="dicas">
+            <h3>💡 Dicas importantes</h3>
+            <ul>
+              <li>O PDF deve ser legível (original).</li>
+              <li>Envie os documentos imediatamente após o recebimento.</li>
+              <li>Para parcelas, considere a 1ª data no vencimento.</li>
+              <li>Cada PDF até <?= config.maxMb ?> MB (somados, até <?= config.maxTotalMb ?> MB).</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col">
+          <label for="obs">Observações e Comentários</label>
+          <textarea id="obs" maxlength="<?= config.maxObs ?>" placeholder="Registre alinhamentos com áreas ou gestores e qualquer informação que o time Fiscal precise saber (ex.: exceções, rateio, situações atípicas ou solicitação de prioridade). Assim, o documento chega completo para lançamento."></textarea>
+          <div class="contador"><span id="qtd">0</span> / <?= config.maxObs ?> caracteres</div>
+
+          <button id="enviar" type="submit">Enviar para lançamento</button>
+          <button id="outro" class="sec oculto" type="button">Enviar outro documento</button>
+          <div id="msg" class="msg" role="status" aria-live="polite"></div>
+          <div class="quem">Enviando como <?= pessoa.nome ?> (<?= pessoa.email ?>)</div>
+        </div>
+      </div>
+    </form>
+  <? } ?>
+</main>
+
+<? if (pessoa) { ?>
+<script>
+  var MAX = <?= config.maxMb ?> * 1048576;
+  var MAX_TOTAL = <?= config.maxTotalMb ?> * 1048576;
+  var $ = function (id) { return document.getElementById(id); };
+  var guardado = null;   // links já enviados ao Drive: se o usuário confirmar um duplicado, não sobe os PDFs de novo
+
+  function msg(t, c) { var m = $('msg'); m.className = 'msg ' + c; m.textContent = t; }
+  function marcar(el, erro) { el.classList.toggle('err', !!erro); }
+  function arquivo(id) { return $(id).files[0] || null; }
+
+  function lerBase64(file) {
+    return new Promise(function (res, rej) {
+      var r = new FileReader();
+      r.onload = function () { res(String(r.result).split(',')[1]); };
+      r.onerror = function () { rej(new Error('Não consegui ler o arquivo ' + file.name)); };
+      r.readAsDataURL(file);
+    });
+  }
+  function chamar(fn, arg) {
+    return new Promise(function (res, rej) {
+      google.script.run.withSuccessHandler(res).withFailureHandler(function (e) { rej(new Error(e && e.message ? e.message : String(e))); })[fn](arg);
+    });
+  }
+  function ehPdf(f) { return /\.pdf$/i.test(f.name) && (!f.type || f.type === 'application/pdf'); }
+
+  function ehFrete() { return String($('tipo').value).indexOf('Frete') === 0; }
+  function alternar() {
+    $('blocoBoleto').classList.toggle('oculto', $('boleto').value !== 'sim');
+    $('blocoFreteSel').classList.toggle('oculto', ehFrete());     // o próprio documento já é o frete
+    $('blocoFrete').classList.toggle('oculto', ehFrete() || $('frete').value !== 'sim');
+  }
+  $('tipo').addEventListener('change', alternar);
+  $('boleto').addEventListener('change', alternar);
+  $('frete').addEventListener('change', alternar);
+  $('obs').addEventListener('input', function () { $('qtd').textContent = this.value.length; });
+  ['numero', 'numCte'].forEach(function (id) { $(id).addEventListener('input', function () { this.value = this.value.replace(/\D/g, ''); }); });
+
+  function validar() {
+    var erros = [], total = 0;
+    var cobrar = function (cond, el, texto) { marcar(el, cond); if (cond) erros.push(texto); };
+    cobrar(!$('filial').value, $('filial'), 'a filial');
+    cobrar(!$('tipo').value, $('tipo'), 'o tipo do documento');
+    cobrar(!$('numero').value, $('numero'), 'o número do documento');
+    cobrar(!$('venc').value, $('venc'), 'o vencimento');
+    var pdf = function (id, box, rotulo, obrigatorio) {
+      var f = arquivo(id);
+      if (!f) { cobrar(obrigatorio, $(box), rotulo); return; }
+      if (!ehPdf(f)) { cobrar(true, $(box), rotulo + ' (somente PDF)'); return; }
+      if (f.size > MAX) { cobrar(true, $(box), rotulo + ' (passa de ' + (MAX / 1048576) + ' MB)'); return; }
+      total += f.size; marcar($(box), false);
+    };
+    pdf('arqNf', 'boxNf', 'o documento principal', true);
+    if ($('boleto').value === 'sim') pdf('arqBoleto', 'boxBoleto', 'o boleto', true);
+    if (!ehFrete() && $('frete').value === 'sim') {
+      cobrar(!$('numCte').value, $('numCte'), 'o número do CT-e');
+      cobrar(!$('vencCte').value, $('vencCte'), 'o vencimento do CT-e');
+      pdf('arqCte', 'boxCte', 'o CT-e', true);
+    }
+    if (total > MAX_TOTAL) erros.push('os PDFs somados passam de ' + (MAX_TOTAL / 1048576) + ' MB');
+    return erros;
+  }
+
+  async function subir(papel, id, base, quem) {
+    var f = arquivo(id);
+    if (!f) return { link: '', md5: '' };
+    msg('Enviando ' + f.name + '…', 'info');
+    return chamar('enviarArquivo', { papel: papel, nome: f.name, base64: await lerBase64(f), filial: base.filial, numero: base.numero });
+  }
+
+  async function enviar(forcar) {
+    var b = $('enviar'); b.disabled = true;
+    try {
+      if (!forcar) {
+        var erros = validar();
+        if (erros.length) throw new Error('Confira: ' + erros.join(', ') + '.');
+        guardado = null;
+      }
+      var base = { filial: $('filial').value, numero: $('numero').value };
+      var quer = { boleto: $('boleto').value === 'sim', frete: !ehFrete() && $('frete').value === 'sim' };
+      if (!guardado) {
+        var nf = await subir('nf', 'arqNf', base);
+        var cte = quer.frete ? await subir('frete', 'arqCte', base) : { link: '', md5: '' };
+        var bol = quer.boleto ? await subir('boleto', 'arqBoleto', base) : { link: '', md5: '' };
+        guardado = { nf: nf, cte: cte, bol: bol };
+      }
+      msg('Registrando…', 'info');
+      var r = await chamar('registrarEnvio', {
+        filial: base.filial, tipo: $('tipo').value, numero: base.numero, vencimento: $('venc').value,
+        observacoes: $('obs').value, possuiBoleto: quer.boleto, possuiFrete: quer.frete,
+        numCte: $('numCte').value, vencimentoCte: $('vencCte').value,
+        linkNf: guardado.nf.link, md5Nf: guardado.nf.md5, linkFrete: guardado.cte.link, md5Cte: guardado.cte.md5,
+        linkBoleto: guardado.bol.link, forcar: !!forcar
+      });
+      if (r.duplicado) {
+        if (confirm(r.mensagem)) return enviar(true);
+        msg('Envio cancelado. Os PDFs já foram guardados no Drive; avise o Núcleo Fiscal se precisar apagá-los.', 'info');
+        b.disabled = false; return;
+      }
+      msg('Documento ' + r.numero + ' enviado para lançamento. Obrigado!', 'ok');
+      $('f').querySelectorAll('input,select,textarea').forEach(function (e) { e.disabled = true; });
+      $('outro').classList.remove('oculto'); b.classList.add('oculto');
+    } catch (e) { msg(e.message, 'erro'); b.disabled = false; }
+  }
+  $('f').addEventListener('submit', function (ev) { ev.preventDefault(); enviar(false); });
+  $('outro').addEventListener('click', function () { location.reload(); });
+  alternar();
+</script>
+<? } ?>
+</body>
+</html>
