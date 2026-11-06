@@ -25,13 +25,18 @@ const DIAG = `<script>(function(){var erros=[];function mostrar(){var d=document
 /* O código da tela (650 KB) NÃO vai dentro da página HTML: o Apps Script o entregava incompleto.
    A página é só uma casca; este carregador busca o código em pedaços por google.script.run e o executa. */
 const LOADER = `<script>(function(){function falhar(m){if(window.pmxErro)window.pmxErro(m);}
-google.script.run.withFailureHandler(function(e){falhar("Nao foi possivel buscar a tela: "+(e&&e.message||e));}).withSuccessHandler(function(info){
+function nomes(){var o=google.script.run.withSuccessHandler(function(){}),l=[];for(var k in o)if(typeof o[k]==="function")l.push(k);return l.join(", ");}
+function chamar(nome,arg,ok,fail){var r=google.script.run.withSuccessHandler(ok).withFailureHandler(fail);
+if(typeof r[nome]==="function")r[nome](arg);
+else if(typeof r.api==="function")r.api({__painel:nome==="painelInfo"?"info":"parte",i:arg});
+else fail(new Error("O servidor nao expos as funcoes necessarias. Disponiveis: "+nomes()));}
+chamar("painelInfo",0,function(info){
 var partes=new Array(info.n),faltam=info.n;
-function pedir(i,t){google.script.run.withSuccessHandler(function(x){partes[i]=x;if(--faltam===0)montar();}).withFailureHandler(function(e){if(t<2)pedir(i,t+1);else falhar("Falha ao baixar o pedaco "+(i+1)+" de "+info.n+": "+(e&&e.message||e));}).painelParte(i);}
+function pedir(i,t){chamar("painelParte",i,function(x){partes[i]=x;if(--faltam===0)montar();},function(e){if(t<2)pedir(i,t+1);else falhar("Falha ao baixar o pedaco "+(i+1)+" de "+info.n+": "+(e&&e.message||e));});}
 function montar(){var s=partes.join("");if(s.length!==info.len){falhar("Tela incompleta: chegaram "+s.length+" de "+info.len+" caracteres.");return;}
 var k=s.indexOf(String.fromCharCode(1));var st=document.createElement("style");st.textContent=s.slice(0,k);document.head.appendChild(st);
 var sc=document.createElement("script");sc.text=s.slice(k+1);document.head.appendChild(sc);}
-for(var i=0;i<info.n;i++)pedir(i,0);}).painelInfo();})();</script>`;
+for(var i=0;i<info.n;i++)pedir(i,0);},function(e){falhar("Nao foi possivel buscar a tela: "+(e&&e.message||e)+" | funcoes do servidor visiveis: "+nomes());});})();</script>`;
 const CASCA = `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -73,7 +78,11 @@ function __ehInterno() {
 /* A tela é entregue em pedaços (a casca HTML a busca por google.script.run). Só para contas da organização. */
 function painelInfo() { if (!__ehInterno()) throw new Error('Acesso restrito.'); var p = __painelPayload(); return { len: p.length, n: Math.ceil(p.length / ${CH}) }; }
 function painelParte(i) { if (!__ehInterno()) throw new Error('Acesso restrito.'); return __painelPayload().substr(Number(i) * ${CH}, ${CH}); }
-${Object.entries(s.FUNCOES).map(([f, a]) => `function ${f}(${a}) { return __pmx().${f}(${a}); }`).join('\n')}
+function api(req) {
+  if (req && req.__painel) return req.__painel === 'info' ? painelInfo() : painelParte(req.i);
+  return __pmx().api(req);
+}
+${Object.entries(s.FUNCOES).filter(([f]) => f !== 'api').map(([f, a]) => `function ${f}(${a}) { return __pmx().${f}(${a}); }`).join('\n')}
 ${Object.entries(s.GATILHOS).map(([f, q]) => `function ${f}() { return __pmx().gatilho('${q}'); }`).join('\n')}
 `);
 for (const f of perfil.publicas.map((x) => ({ fornecedor: 'Fornecedor.html', produtos: 'Produtos.html' })[x])) fs.copyFileSync(path.join(RAIZ, 'paginas', f), path.join(gas, f));
