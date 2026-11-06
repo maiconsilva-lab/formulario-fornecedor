@@ -26,6 +26,17 @@ class Faixa {
     }
     return out;
   }
+  getDisplayValues() { return this.getValues().map((l) => l.map((v) => (v === '' || v === null || v === undefined ? '' : String(v)))); }
+  createTextFinder(txt) {
+    const self = this; const alvo = String(txt);
+    return { matchEntireCell() { return this; }, findNext() {
+      const vals = self.getValues();
+      for (let i = 0; i < vals.length; i++) for (let j = 0; j < vals[i].length; j++) if (String(vals[i][j]) === alvo) return new Faixa(self.sh, self.r + i, self.c + j, 1, 1);
+      return null;
+    } };
+  }
+  offset(dr, dc, nr, nc) { return new Faixa(this.sh, this.r + dr, this.c + dc, nr || this.nr, nc || this.nc); }
+  getRow() { return this.r; }
   getValue() { return this.getValues()[0][0]; }
   setValues(vals) {
     if (vals.length !== this.nr || vals.some((l) => l.length !== this.nc)) throw new Error(`setValues: tamanho ${vals.length}x${vals[0]?.length} ≠ ${this.nr}x${this.nc}`);
@@ -34,7 +45,7 @@ class Faixa {
       while (this.sh.dados.length <= r) this.sh.dados.push([]);
       l.forEach((v, j) => {
         (this.sh.brutos = this.sh.brutos || []).push(v);
-        const cv = celula(v);
+        const cv = (typeof v === 'string' && this.sh.texto && this.sh.texto.has((this.r + i) + ',' + (this.c + j))) ? v : celula(v);
         if (typeof cv === 'string' && cv.length > 50000) throw new Error('Célula com mais de 50000 caracteres');
         this.sh.dados[r][this.c - 1 + j] = cv;
       });
@@ -45,7 +56,11 @@ class Faixa {
   clearContent() { for (let i = 0; i < this.nr; i++) for (let j = 0; j < this.nc; j++) { const l = this.sh.dados[this.r - 1 + i]; if (l) l[this.c - 1 + j] = ''; } return this; }
   setFontWeight() { return this; }
   setBackground() { return this; }
-  setNumberFormat() { return this; }
+  setFontColor() { return this; }
+  setNumberFormat(f) {
+    if (f === '@') { this.sh.texto = this.sh.texto || new Set(); for (let i = 0; i < this.nr; i++) for (let j = 0; j < this.nc; j++) this.sh.texto.add((this.r + i) + ',' + (this.c + j)); }
+    return this;
+  }
 }
 
 class Aba {
@@ -61,6 +76,7 @@ class Aba {
   deleteRow(r) { this.dados.splice(r - 1, 1); }
   deleteRows(r, n) { this.dados.splice(r - 1, n); }
   setFrozenRows() {}
+  hideColumns() {}
   protect() { return { setDescription() { return this; }, removeEditors() { return this; }, getEditors: () => [], setWarningOnly() {} }; }
   clear() { this.dados = []; }
 }
@@ -115,7 +131,11 @@ export function criarGasFalso({ props = {} } = {}) {
     Charset: { UTF_8: 'UTF_8' },
     newBlob: (dados, tipo, nome) => blob(typeof dados === 'string' ? Buffer.from(dados) : buf(dados), tipo, nome),
     sleep() {},
-    formatDate: (d, tz, f) => d.toISOString(),
+    formatDate: (d, tz, f) => {
+      const t = new Date(d.getTime() - 3 * 3600e3); const iso = t.toISOString();
+      const p = { yyyy: iso.slice(0, 4), MM: iso.slice(5, 7), M: String(Number(iso.slice(5, 7))), dd: iso.slice(8, 10), HH: iso.slice(11, 13), mm: iso.slice(14, 16), ss: iso.slice(17, 19) };
+      return f.replace(/yyyy|MM|M|dd|HH|mm|ss/g, (k) => p[k]);
+    },
   };
   function blob(b, tipo = 'application/octet-stream', nome = 'arquivo') {
     return {
@@ -144,13 +164,14 @@ export function criarGasFalso({ props = {} } = {}) {
     return {
       getId: () => id, getName: () => a.blob.getName(), getUrl: () => `https://drive.google.com/file/d/${id}/view`,
       getBlob: () => a.blob, getMimeType: () => a.blob.getContentType(), getSize: () => a.blob.getBytes().length,
-      moveTo(destino) { a.pai = destino.getId(); return this; }, setTrashed() { delete arquivos[id]; },
+      setSharing() {}, moveTo(destino) { a.pai = destino.getId(); return this; }, setTrashed() { delete arquivos[id]; },
     };
   }
   const DriveApp = {
     getFolderById: (id) => { if (!pastas[id]) pastas[id] = { id, nome: id, filhos: [] }; return pasta(id); },
     getFileById: (id) => { if (planilhas[id]) return { moveTo() { return this; }, getId: () => id }; if (!arquivos[id]) throw new Error('Arquivo não encontrado'); return arquivo(id); },
     getRootFolder: () => pasta('raiz'),
+    Access: { DOMAIN_WITH_LINK: 'DOMAIN_WITH_LINK' }, Permission: { VIEW: 'VIEW' },
   };
 
   const chamadasHttp = [];

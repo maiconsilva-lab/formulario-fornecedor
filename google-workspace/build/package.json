@@ -5,7 +5,7 @@
   "scripts": {
     "build": "node build.mjs",
     "build:completo": "node build.mjs --perfil completo",
-    "test": "node build.mjs && node testes/db.test.mjs && node testes/setup.test.mjs && node testes/lancamentos.test.mjs && node testes/sincronizacao.test.mjs && node testes/leitura-pdf.test.mjs && node testes/sandbox.test.mjs",
+    "test": "node build.mjs && node testes/db.test.mjs && node testes/setup.test.mjs && node testes/lancamentos.test.mjs && node testes/sincronizacao.test.mjs && node testes/leitura-pdf.test.mjs && node testes/sandbox.test.mjs && node testes/portal.test.mjs",
     "test:completo": "node build.mjs --perfil completo && GAS_DIR=gas-completo node testes/setup.test.mjs && GAS_DIR=gas-completo node testes/servidor.test.mjs && GAS_DIR=gas-completo node testes/publico.test.mjs && GAS_DIR=gas-completo node testes/navegador.test.mjs"
   },
   "dependencies": {

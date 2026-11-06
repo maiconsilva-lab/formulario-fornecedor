@@ -85,6 +85,18 @@ A configuração `fonte_planilha` e `sync_planilha` vem junto com a cópia da ta
 
 **Imagens da tela de login** (opcional): envie `painel-fornecedores/public/login/*` para a pasta *Imagens do painel*, mantendo a subpasta `login`. O logo vem do site da Premix.
 
+## Portal de Lançamentos (script de envio das filiais)
+
+A pasta `portal/` tem o `Codigo.gs` do Portal com duas alterações, testadas junto com o painel novo:
+
+1. **Pastas e nomes no Drive:** `Filial / 2026-10 Outubro / 06` e o arquivo `Patrocínio Paulista NF 000012345.pdf`
+   (NF, NFS, CTE ou BOLETO; número com 9 dígitos; repetido no mesmo dia ganha ` (2)`). A tabela de siglas fica no começo do script.
+2. **Chamada ao painel:** se `PAINEL_URL` for um endereço do Apps Script (`script.google.com`), a rota e o segredo vão na URL
+   (o Apps Script não recebe cabeçalhos); se for a Vercel, nada muda. Na troca basta mudar `PAINEL_URL` e `PAINEL_SEGREDO_ENVIO`.
+
+Na página do Portal (`Portal.html`) duas linhas passam a enviar também o tipo e o número do CT-e junto de cada PDF (ver o passo a passo).
+`Codigo.original.gs` é o código de antes, para voltar atrás se precisar.
+
 ## Dia da troca (roteiro)
 
 Teste primeiro com a cópia de hoje, sem mexer em nada do sistema atual. Quando for trocar:
