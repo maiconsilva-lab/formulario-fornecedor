@@ -51,8 +51,6 @@ await p2.addInitScript(() => {
   const mk = (fail) => ({ withSuccessHandler() { return mk(fail); }, withFailureHandler(f) { return mk(f); }, painelInfo() { if (fail) fail(new Error('falha-de-teste-no-painelInfo')); } });
   window.google = { script: { run: mk(null) } };
 });
-  window.google = { script: { run: { withFailureHandler: falha } } };
-});
 await p2.route('http://x.test/', (r) => r.fulfill({ contentType: 'text/html', body: html }));
 await p2.goto('http://x.test/'); await p2.waitForTimeout(800);
 const diag = await p2.evaluate(() => (document.getElementById('pmx-diag') || {}).textContent || '');
