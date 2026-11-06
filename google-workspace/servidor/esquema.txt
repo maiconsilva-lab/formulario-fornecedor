@@ -1,0 +1,51 @@
+# tabela|chave primária|únicos (;)|coluna:tipo=padrão ...
+# tipos: t texto, u uuid, i inteiro, n numérico, b booleano, j json, ts data/hora, d data, ta lista de textos
+# padrões: @uuid @now @seq @now+10m @now+30d @hex16 @hex24 @mes @hoje ou valor literal
+acessos_universais|id|codigo_acesso|id:u=@uuid nome:t codigo_acesso:t criado_em:ts=@now
+auditoria|id||id:i=@seq created_at:ts=@now ator_nome:t ator_email:t acao:t tipo_cadastro:t cadastro_id:u detalhes:j ip:t user_agent:t
+chat_messages|id||id:u=@uuid session_id:u remetente_id:u remetente_nome:t texto:t criado_em:ts=@now expira_em:ts=@now+10m
+chat_sessions|id|channel_token|id:u=@uuid channel_token:t=@hex16 criado_por:t participantes:j=[] ativo:b=true criado_em:ts=@now expira_em:ts desativado_em:ts
+ctr_acessos|id|chave|id:i=@seq chave:t titulo:t usuario:t campos:j=[] senha_cifrada:t origem:t=manual criado_em:ts=@now atualizado_em:ts=@now atualizado_por:t
+ctr_codigos|id|chave|id:i=@seq chave:t nome:t codigo:t grupo:t grupo_fabricas:t atualizado_em:ts=@now
+ctr_config|chave||chave:t valor:t
+ctr_contas|id|chave|id:i=@seq setor:t chave:t rotulo:t local:t identificador:t contrato_numero:t contrato_chave:t filial:t codigo:t valor_fixo:n meses:j={} extra:j={} ano_ref:i atualizado_em:ts=@now aba:t linha:i
+ctr_contratos|id|chave|id:i=@seq chave:t numero:t fornecedor:t cnpj:t filial:t tipo:t cod_fornecedor:t loja:t responsavel:t objeto:t local:t categoria:t status:t observacao:t rateio:t data_inicio:d data_fim:d valor_contrato:n valor_usado:n saldo:n saldo_pct:n lancado:n meses:j={} extra:j={} na_planilha:b=true origem_linha:i acompanhamento:t acompanhamento_nota:t acompanhamento_por:t acompanhamento_em:ts criado_em:ts=@now atualizado_em:ts=@now origem:t=planilha ano_ref:i criado_por:t segue_protheus:b=false
+ctr_historico|id||id:i=@seq acao:t detalhe:t usuario:t em:ts=@now
+ctr_medicoes|id|conta_chave,ano,mes,seq|id:i=@seq conta_chave:t setor:t contrato_numero:t ano:i mes:i pedido:t valor:n por:t em:ts=@now nota:t seq:i=1
+ctr_protheus|contrato_chave||contrato_chave:t filial:t numero:t valor:n saldo:n data_inicio:d data_final:d situacao:t revisao:t revisoes:i pendente:j lido_em:ts=@now
+ctr_vigencias|id||id:i=@seq contrato_chave:t numero:t data_inicio:d data_fim:d valor:n saldo:n status:t motivo:t substituido_em:ts=@now
+dashboard_commodities|id||id:i=1 boi_gordo:n boi_gordo_var:n soja:n soja_var:n milho:n milho_var:n referencia_data:t atualizado_por:t atualizado_em:ts=@now
+dashboard_meta|id||id:i=1 mes_referencia:t=@mes meta_valor:n=0 carregado_valor:n=0 atualizado_por:t atualizado_em:ts=@now
+desbloqueios|id||id:u=@uuid created_at:ts=@now updated_at:ts=@now nome_solicitante:t email_solicitante:t codigo_produto:t nome_produto:t status:t=pendente atribuido_para:t finalizado_por:t data_finalizacao:ts motivo_rejeicao:t observacoes_internas:t solicitacao_id:u motivo:t
+filiais|codigo||codigo:t descricao:t responsavel:t gestor:t diretoria:t codigo_acesso:t grupo_acesso:t nome_exibicao:t
+filial_atividade|filial||filial:t ultimo_acesso:ts acessos_hoje:i=0 dia_contagem:d total_acessos:i=0
+fornecedores|id||id:u=@uuid created_at:ts=@now updated_at:ts=@now status:t=pendente observacoes_internas:t razao_social:t nome_fantasia:t cnpj:t inscricao_estadual:t ramo_atividade:t responsavel_nome:t responsavel_cargo:t telefone:t celular:t email:t website:t cep:t logradouro:t numero:t complemento:t bairro:t cidade:t estado:t banco:t agencia:t conta:t tipo_conta:t pix:t titular_conta:t cpf_cnpj_titular:t comprovante_cnpj_url:t comprovante_bancario_url:t produtos_servicos:t condicoes_pagamento:t tipo_cadastro:t=pj atribuido_para:t finalizado_por:t data_finalizacao:ts cpf:t rg:t nome_completo:t antt:t cnh_categoria:t documento_identidade_url:t contrato_social_url:t inscricao_estadual_isento:b=false motivo_devolucao:t comprovante_ie_url:t comprovante_endereco_url:t apenas_boleto:b=false codigo_fornecedor:t nome_solicitante:t email_solicitante:t data_nascimento:d devolvido_em:ts devolvido_por:t campos_a_corrigir:j arquivos_drive:j pasta_drive_url:t
+kanban_tarefas|id||id:u=@uuid created_at:ts=@now updated_at:ts=@now titulo:t descricao:t criado_por:t atribuido_para:t status:t=backlog prioridade:t=media prazo:d ordem:i=0 checklist:j=[] comentarios:j=[]
+lanc_ajustes|id||id:i=@seq documento_id:i num_doc:t status:t=Não Iniciado aberto_em:ts=@now filial:t cod_fornecedor:t fornecedor:t dt_emissao:d dt_venc_pedido:d dt_venc_nf:d resp_fiscal:t resp_suprimentos:t concluido_em:ts tratativa:t atualizado_em:ts=@now atualizado_por:t
+lanc_config|chave||chave:t valor:t descricao:t
+lanc_documentos|id||id:i=@seq origem:t=portal recebido_em:ts=@now enviado_por:t filial:t tipo:t num_doc:t vencimento:d observacoes:t link_nf:t link_frete:t link_boleto:t status:t=Lançar motivo_pendencia:t registros:t lancado_em:ts lancado_por:t em_atendimento_por:t em_atendimento_desde:ts atualizado_em:ts=@now atualizado_por:t planilha_linha:i inconsistencias:ta arquivo_md5:t chave_acesso:t documento_pai_id:i cnpj_emitente:t valor_bruto:n valor_liquido:n valor_boleto:n venc_boleto:d linha_digitavel:t lido_em:ts leitura_status:t leitura_tentativas:i=0
+lanc_fretes|id||id:i=@seq documento_id:i num_nfe:t num_cte:t status:t=Não Iniciado aberto_em:ts=@now filial:t cod_fornecedor:t transportador:t vlr_tabela:n vlr_cte:n resp_fiscal:t resp_suprimentos:t concluido_em:ts motivo:t observacoes:t atualizado_em:ts=@now atualizado_por:t
+lanc_historico|id||id:i=@seq documento_id:i acao:t de_status:t para_status:t detalhe:t usuario:t criado_em:ts=@now
+lanc_pessoas_alias|apelido||apelido:t nome:t
+lanc_transferencias|id||id:i=@seq data:d=@hoje solicitante:t notas:t origem:t destino:t responsavel:t status:t=Pendente observacoes:t concluido_em:ts criado_em:ts=@now criado_por:t atualizado_em:ts=@now atualizado_por:t
+logs_atividade|id||id:u=@uuid created_at:ts=@now usuario_nome:t usuario_email:t acao:t entidade:t entidade_id:u detalhes:t
+monitor_xml|id||id:i=@seq sla:i descricao_filial:t filial:t status:t tipo_nota:t chave:t data_emissao:d documento:t serie:t fornecedor:t loja:t nome_fornecedor:t produto_xml:t descricao_xml:t produto_protheus:t descricao_protheus:t quantidade:n valor_unitario:n valor_total:n sla_categoria:t atualizado_em:ts=@now transportadora_vencimento:d transportadora_dias_pagto:i transportadora_nome_base:t transportadora_usuario_validador:t transportadora_dt_validacao:d
+nota_observacoes|id||id:i=@seq chave:t criado_em:ts=@now autor:t status:t previsao_entrega:d observacao:t
+pre_notas|id||id:i=@seq filial:t numero:t serie:t fornecedor:t loja:t nome_fornecedor:t data_emissao:d data_digitacao:d estado:t valor_mercadoria:n valor_bruto:n tipo_nota:t status:t atualizado_em:ts=@now sla:i sla_categoria:t usuario_inclusao:t data_inclusao:d usuario_alteracao:t data_alteracao:d
+preferencias_usuario|id|user_email|id:u=@uuid user_email:t tema:t=premix_claro cor_primaria:t=#00A650 wallpaper:t wallpaper_opacidade:i=8 densidade:t=normal sidebar_colapsada:b=false created_at:ts=@now updated_at:ts=@now cursor_preset:t=padrao
+produtos|id||id:i=@seq created_at:ts=@now solicitacao_id:u nome_solicitante:t email_solicitante:t status:t=pendente finalidade:t ncm:t unidade_medida:t principais_marcas:t imagem_url:t codigo_protheus:t descricao:t motivo_devolucao:t atribuido_para:t finalizado_por:t data_finalizacao:ts
+rate_limits|chave||chave:t contador:i=1 inicio:ts=@now
+recepcao_demandas|id|sheet_row|id:i=@seq sheet_row:i row_hash:t data:ts usuario:t filial:t tipo:t num_doc:t vencimento:d observacoes:t status_sheet:t link_nf:t link_frete:t link_boleto:t responsavel:t dt_lancamento:d dt_recepcao:ts sla_lancamento:n dias_vencimento:n nivel_prioridade:t motivo_atraso:t registros:t synced_at:ts=@now
+recepcao_estado|id|sheet_row|id:i=@seq sheet_row:i status:t aguardando_motivo:t aguardando_ref:t revisar_em:d resolvido_em:ts=@now resolvido_por:t observacao:t updated_at:ts=@now
+sefaz_verificacao|chave||chave:t verificado:b=false verificado_em:ts verificado_por:t criado_em:ts=@now
+sync_lock|job||job:t locked_at:ts=@now expires_at:ts
+system_health|job||job:t last_run_at:ts status:t=desconhecido detalhes:j updated_at:ts=@now
+tokens_correcao|id|token|id:u=@uuid token:t=@hex24 created_at:ts=@now expira_em:ts=@now+30d usado_em:ts tipo_cadastro:t cadastro_id:u gerado_por:t motivo:t campos_a_corrigir:j
+trilha_conferencia_dias|dia_ini,dia_fim||dia_ini:d dia_fim:d resumo:j sincronizado_em:ts=@now sincronizado_por:t
+trilha_conferencia_revisados|dia,doc_k||dia:t doc_k:t por:t em:ts=@now
+trilha_conferencia_ultima|id||id:i=1 dados:j sincronizado_em:ts=@now sincronizado_por:t
+trilha_leitura_pedidos|chave||chave:t file_id:t cte:b=false tentativas:i=0 ultimo_erro:t criado_em:ts=@now texto:t ia_tentativas:i=0 ia_em:ts
+trilha_leituras|chave||chave:t dados:j lido_em:ts=@now
+trilha_progresso|id||id:i=@seq usuario_id:t usuario_nome:t modulo:t=treino acertos:i total:i criado_em:ts=@now
+trilha_se2|id||id:i=1 titulos:j meta:j={} importado_em:ts=@now importado_por:t
+usuarios_painel|id|email|id:u=@uuid nome:t email:t senha_hash:t ativo:b=true created_at:ts=@now cargo:t=analista role:t=user primeiro_login:b=true telefone:t last_seen_at:ts session_epoch:i=0

@@ -1,0 +1,2 @@
+Gerado do painel-fornecedores @ ccc1339
+81 rotas de API · servidor 2576 KB em 6 partes · painel 3614 KB
