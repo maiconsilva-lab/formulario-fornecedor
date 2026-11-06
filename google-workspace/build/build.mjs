@@ -5,6 +5,7 @@ import path from 'node:path';
 import { construirServidor } from './servidor.mjs';
 import { construirCliente } from './cliente.mjs';
 import { perfil as obterPerfil } from './perfis.mjs';
+import { emitirPartes, juntar } from './partes.mjs';
 
 const AQUI = path.dirname(new URL(import.meta.url).pathname);
 const RAIZ = path.resolve(AQUI, '..');
@@ -18,12 +19,25 @@ const gas = path.join(RAIZ, nomePerfil === 'lancamentos' ? 'gas' : 'gas-' + nome
 fs.rmSync(gas, { recursive: true, force: true });
 fs.mkdirSync(gas, { recursive: true });
 
-const s = await construirServidor({ painel, perfil, saida: path.join(gas, 'Servidor.js') });
-const c = await construirCliente({ painel, perfil, saida: path.join(gas, 'Painel.html') });
+const s = await construirServidor({ painel, perfil });
+const c = await construirCliente({ painel, perfil });
+const nServidor = emitirPartes(s.envolto, '__PMX', 'Servidor', gas);
+const nPainel = emitirPartes(c.html, '__PAINEL', 'Painel', gas);
+fs.writeFileSync(path.join(gas, 'Funcoes.js'), `/* GERADO AUTOMATICAMENTE por google-workspace/build — não edite à mão.
+   Funções que o Apps Script chama. O servidor está nos arquivos Servidor-NN.js e a tela nos Painel-NN.js. */
+var __PMX_CARREGADO = null;
+function __pmx() {
+  if (!__PMX_CARREGADO) __PMX_CARREGADO = (0, eval)(${juntar('__PMX', nServidor)});
+  return __PMX_CARREGADO;
+}
+function __painelHtml() { return ${juntar('__PAINEL', nPainel)}; }
+${Object.entries(s.FUNCOES).map(([f, a]) => `function ${f}(${a}) { return __pmx().${f}(${a}); }`).join('\n')}
+${Object.entries(s.GATILHOS).map(([f, q]) => `function ${f}() { return __pmx().gatilho('${q}'); }`).join('\n')}
+`);
 for (const f of perfil.publicas.map((x) => ({ fornecedor: 'Fornecedor.html', produtos: 'Produtos.html' })[x])) fs.copyFileSync(path.join(RAIZ, 'paginas', f), path.join(gas, f));
 for (const f of ['appsscript.json', 'Setup.js']) fs.copyFileSync(path.join(RAIZ, 'estatico', f), path.join(gas, f));
 fs.copyFileSync(path.join(RAIZ, '.claspignore'), path.join(gas, '.claspignore'));
 let commit = 'desconhecido';
 try { commit = (await import('node:child_process')).execSync('git -C ' + JSON.stringify(painel) + ' rev-parse --short HEAD').toString().trim(); } catch { /* sem git */ }
-fs.writeFileSync(path.join(gas, 'VERSAO.txt'), `Perfil: ${nomePerfil} — ${perfil.descricao}\nGerado do painel-fornecedores @ ${commit}\n${s.rotas} rotas de API · servidor ${(s.bytes / 1024).toFixed(0)} KB em ${s.partes} partes · painel ${(c.bytes / 1024).toFixed(0)} KB\n`);
+fs.writeFileSync(path.join(gas, 'VERSAO.txt'), `Perfil: ${nomePerfil} — ${perfil.descricao}\nGerado do painel-fornecedores @ ${commit}\n${s.rotas} rotas de API · servidor ${(s.bytes / 1024).toFixed(0)} KB em ${nServidor} arquivos · painel ${(c.bytes / 1024).toFixed(0)} KB em ${nPainel} arquivos\n`);
 console.log(fs.readFileSync(path.join(gas, 'VERSAO.txt'), 'utf8'));

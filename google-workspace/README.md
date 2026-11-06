@@ -25,12 +25,18 @@ google-workspace/
   cliente/    roteador interno, ponte com o servidor, imagens
   estatico/   appsscript.json (permissões) e Setup.js (instalação/migração)
   build/      empacotador, perfis e testes
-  gas/        SAÍDA do perfil "lancamentos": é isto que vai para o Apps Script (já gerada)
+  gas/        SAÍDA do perfil "lancamentos": é isto que vai para o Apps Script (já gerada; Servidor-NN e Painel-NN são texto em linhas curtas, próprio para colar)
 ```
 
 ## Instalação
 
 ### 1. Enviar os arquivos
+
+**Opção A, colando no editor (não precisa instalar nada).** Em <https://script.google.com> (conta `@premix.com.br`) → **Novo projeto**. Para cada arquivo `.js` de `gas/`: clique em **+ → Script**, dê o mesmo nome (sem a extensão) e cole o conteúdo, apagando o que já existir. São 9 arquivos:
+`Funcoes`, `Setup`, `Servidor-01` a `Servidor-05` e `Painel-01`, `Painel-02`.
+Depois, em **Configurações do projeto**, marque *Mostrar o arquivo de manifesto "appsscript.json"*, volte ao editor e substitua o conteúdo de `appsscript.json` pelo do arquivo de `gas/`.
+
+**Opção B, com `clasp` (precisa de Node.js):**
 ```bash
 npm i -g @google/clasp
 clasp login                       # com a conta @premix que será a "dona" do sistema
@@ -102,7 +108,7 @@ O perfil Lançamentos cobre: Portal enviando documentos (inclusive NF com CT-e, 
 ## O que só dá para saber no Google de verdade
 
 - **Velocidade:** cada ação lê/grava planilhas, então espere de 1 a 3 s (contra décimos de segundo hoje). Ao lançar, o espelhamento na planilha-base acontece na mesma execução e soma 1 a 2 s.
-- **Tamanho:** a tela tem 0,6 MB e o servidor 1,9 MB (4 arquivos). Bem menor que o pacote completo, mas ainda convém confirmar que o `clasp push` e a abertura aceitam.
+- **Tamanho:** a tela tem 0,6 MB e o servidor 1,9 MB (7 arquivos de até 460 KB). Bem menor que o pacote completo, mas ainda convém confirmar que o `clasp push` e a abertura aceitam.
 - **PDF na tela:** usa a pré-visualização do Drive; precisa de a pessoa estar logada na conta da Premix no navegador, como hoje.
 - **OCR de PDF escaneado:** usa o serviço avançado *Drive* (já no manifesto); pode ser preciso ativar a *Drive API* no projeto do Google Cloud ligado ao script.
 - **Cotas:** execução de até 6 min, gatilhos de tempo e `UrlFetch`. Com a equipe atual deve sobrar; vale acompanhar na primeira semana.

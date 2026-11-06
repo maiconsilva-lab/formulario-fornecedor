@@ -1,11 +1,11 @@
 /* GERADO AUTOMATICAMENTE por google-workspace/build — não edite à mão.
-   O servidor (rotas de API do painel-fornecedores + camada de dados em Planilhas)
-   está nos arquivos Servidor-parte-NN.js; aqui ficam as funções que o Apps Script chama. */
+   Funções que o Apps Script chama. O servidor está nos arquivos Servidor-NN.js e a tela nos Painel-NN.js. */
 var __PMX_CARREGADO = null;
 function __pmx() {
-  if (!__PMX_CARREGADO) __PMX_CARREGADO = (0, eval)(__PMX_PARTE_1 + __PMX_PARTE_2 + __PMX_PARTE_3 + __PMX_PARTE_4);
+  if (!__PMX_CARREGADO) __PMX_CARREGADO = (0, eval)(__PMX_P1() + __PMX_P2() + __PMX_P3() + __PMX_P4() + __PMX_P5());
   return __PMX_CARREGADO;
 }
+function __painelHtml() { return __PAINEL_P1() + __PAINEL_P2(); }
 function api(req) { return __pmx().api(req); }
 function doGet(e) { return __pmx().doGet(e); }
 function doPost(e) { return __pmx().doPost(e); }

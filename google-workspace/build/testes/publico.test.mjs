@@ -16,7 +16,7 @@ const S = gas.globais.Session;
 S.getActiveUser = () => ({ getEmail: () => '' });
 ok(ctx.api({ metodo: 'GET', caminho: '/api/auth/session' }).status === 401, 'anônimo não alcança a API do painel');
 ok(ctx.lerImagem('login/leite.jpg') === null, 'anônimo não lê imagens do painel');
-const pag = (p) => ctx.doGet({ parameter: p ? { pagina: p } : {} }).conteudo;
+const pag = (p) => { const c = ctx.doGet({ parameter: p ? { pagina: p } : {} }).conteudo; return c.startsWith('<!DOCTYPE') ? 'Painel' : c; };
 ok(pag(null) === 'Fornecedor' && pag('painel') === 'Fornecedor', 'anônimo só recebe o formulário de fornecedor');
 ok(pag('produtos') === 'Produtos', 'anônimo pode abrir o formulário de produtos');
 S.getActiveUser = () => ({ getEmail: () => 'ana@premix.com.br' });

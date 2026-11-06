@@ -12,7 +12,7 @@ const TITULOS = {
 };
 const ARQUIVO = { '/': 'app/page.js', '/pendencias': 'app/pendencias/page.js', '/contratos': 'app/contratos/page.js', '/lancamentos': 'app/lancamentos/page.js', '/lancamentos/envios': 'app/lancamentos/envios/page.js', '/trilha': 'app/trilha/page.js' };
 
-export async function construirCliente({ painel, saida, perfil, minificar = true }) {
+export async function construirCliente({ painel, perfil, minificar = true }) {
   const paginasJs = `export const INICIAL = ${JSON.stringify(perfil.inicial)};
 export const ESCONDER = ${JSON.stringify(perfil.esconderLinks)};
 export const PAGINAS = {
@@ -74,7 +74,5 @@ ${perfil.paginas.map((r) => `  ${JSON.stringify(r)}: { carregar: () => import(${
 <script>${scriptSeguro}</script>
 </body>
 </html>`;
-  fs.mkdirSync(path.dirname(saida), { recursive: true });
-  fs.writeFileSync(saida, html);
-  return { bytes: html.length, metafile: r.metafile, avisos: r.warnings };
+  return { html, bytes: html.length, metafile: r.metafile, avisos: r.warnings };
 }

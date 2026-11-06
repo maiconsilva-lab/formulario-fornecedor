@@ -24,7 +24,7 @@ function listarRotas(painel) {
   }));
 }
 
-export async function construirServidor({ painel, saida, perfil, minificar = true }) {
+export async function construirServidor({ painel, perfil, minificar = true }) {
   const rotas = listarRotas(painel).filter((r) => !perfil.rotasApi || perfil.rotasApi.some((pre) => r.padrao.slice('/api/'.length).startsWith(pre)));
   const virtual = rotas.map((r, i) => `import * as r${i} from ${JSON.stringify(r.arquivo)};`).join('\n') +
     `\nexport const ROTAS = [${rotas.map((r, i) => `{ padrao: ${JSON.stringify(r.padrao)}, mod: r${i} }`).join(',\n')}];\n`;
@@ -90,30 +90,5 @@ ${codigo}
   return __PMX_INTERNO;
 })();
 PMX;`;
-  // O código vai em partes de até ~500 KB (cada arquivo do Apps Script tem limite de tamanho)
-  // e é carregado uma vez por execução, na primeira chamada.
-  const TAM = 500000;
-  const partes = [];
-  for (let i = 0; i < envolto.length; i += TAM) partes.push(envolto.slice(i, i + TAM));
-  const dir = path.dirname(saida);
-  fs.mkdirSync(dir, { recursive: true });
-  for (const f of fs.readdirSync(dir)) if (/^Servidor(-parte-\d+)?\.js$/.test(f)) fs.unlinkSync(path.join(dir, f));
-  partes.forEach((p, i) => {
-    fs.writeFileSync(path.join(dir, `Servidor-parte-${String(i + 1).padStart(2, '0')}.js`),
-      `/* GERADO AUTOMATICAMENTE — parte ${i + 1} de ${partes.length} do servidor. Não edite. */\nvar __PMX_PARTE_${i + 1} = ${JSON.stringify(p)};\n`);
-  });
-  const nomesPartes = partes.map((_, i) => `__PMX_PARTE_${i + 1}`).join(' + ');
-  const principal = `/* GERADO AUTOMATICAMENTE por google-workspace/build — não edite à mão.
-   O servidor (rotas de API do painel-fornecedores + camada de dados em Planilhas)
-   está nos arquivos Servidor-parte-NN.js; aqui ficam as funções que o Apps Script chama. */
-var __PMX_CARREGADO = null;
-function __pmx() {
-  if (!__PMX_CARREGADO) __PMX_CARREGADO = (0, eval)(${nomesPartes});
-  return __PMX_CARREGADO;
-}
-${Object.entries(FUNCOES).map(([f, a]) => `function ${f}(${a}) { return __pmx().${f}(${a}); }`).join('\n')}
-${Object.entries(GATILHOS).map(([f, q]) => `function ${f}() { return __pmx().gatilho('${q}'); }`).join('\n')}
-`;
-  fs.writeFileSync(saida, principal);
-  return { bytes: envolto.length, partes: partes.length, rotas: rotas.length, metafile: r.metafile, avisos: r.warnings };
+  return { envolto, FUNCOES, GATILHOS, bytes: envolto.length, rotas: rotas.length, metafile: r.metafile, avisos: r.warnings };
 }

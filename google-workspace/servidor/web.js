@@ -28,7 +28,9 @@ export function paginaHtml(e) {
       .setTitle('Premix').addMetaTag('viewport', 'width=device-width, initial-scale=1');
   }
   const p = PAGINAS[chave];
-  return HtmlService.createHtmlOutputFromFile(p.arquivo)
+  // O painel vem em partes de texto (Painel-NN.js), as demais telas são arquivos .html.
+  const saida = chave === 'painel' && typeof __painelHtml === 'function' ? HtmlService.createHtmlOutput(__painelHtml()) : HtmlService.createHtmlOutputFromFile(p.arquivo);
+  return saida
     .setTitle(p.titulo)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);

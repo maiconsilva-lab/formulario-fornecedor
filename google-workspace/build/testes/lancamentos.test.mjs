@@ -105,7 +105,7 @@ await pagina.addInitScript(() => {
     api(req) { window.__api(req).then(ok, falha); }, lerImagem() { Promise.resolve(null).then(ok); } });
   window.google = { script: { run: mk(() => {}, () => {}), url: { getLocation: (f) => f({ parameter: {} }) } } };
 });
-const html = fs.readFileSync(new URL('../../' + process.env.GAS_DIR + '/Painel.html', import.meta.url), 'utf8');
+const html = ctx.__painelHtml();
 await pagina.route('http://lanc.test/', (r) => r.fulfill({ contentType: 'text/html', body: html }));
 await pagina.goto('http://lanc.test/');
 await pagina.waitForSelector('input[type=email]', { timeout: 20000 });
