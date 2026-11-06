@@ -36,7 +36,7 @@ await pagina.addInitScript(() => {
   const mk = (ok, falha) => new Proxy({}, { get: (_, nome) => nome === 'withSuccessHandler' ? (f) => mk(f, falha) : nome === 'withFailureHandler' ? (f) => mk(ok, f) : (a) => window.__chamar(nome, a).then(ok, falha) });
   window.google = { script: { run: mk(() => {}, () => {}) } };
 });
-for (const [arq, rota] of [['Fornecedor', 'f'], ['Produtos', 'p']]) await pagina.route(`http://pub.test/${rota}`, (r) => r.fulfill({ contentType: 'text/html', body: fs.readFileSync(new URL(`../../gas/${arq}.html`, import.meta.url), 'utf8') }));
+for (const [arq, rota] of [['Fornecedor', 'f'], ['Produtos', 'p']]) await pagina.route(`http://pub.test/${rota}`, (r) => r.fulfill({ contentType: 'text/html', body: fs.readFileSync(new URL(`../../${process.env.GAS_DIR || 'gas'}/${arq}.html`, import.meta.url), 'utf8') }));
 
 await pagina.goto('http://pub.test/f');
 await pagina.click('#startBtn');

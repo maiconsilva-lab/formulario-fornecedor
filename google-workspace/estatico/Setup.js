@@ -3,7 +3,7 @@
  *
  *   1. configurar()          cria as 3 planilhas, as pastas do Drive e os segredos
  *   2. migrarTudo()          copia as tabelas do Supabase (rode de novo até dizer "Concluído")
- *   3. migrarArquivos()      copia os comprovantes do bucket para o Drive (idem)
+ *   3. migrarArquivos()      (só na versão completa) copia os comprovantes do bucket para o Drive
  *   4. instalarGatilhos()    agenda a rotina de Lançamentos (a cada 10 min)
  *
  * Antes do passo 1, em Configurações do projeto → Propriedades do script, crie:
@@ -41,7 +41,8 @@ function configurar() {
     p.setProperty(chave, f.getId());
     return f;
   }
-  subpasta('Fornecedores', 'PASTA_FORNECEDORES');
+  var tabelas = __pmx().__tabelas || [];
+  if (tabelas.indexOf('fornecedores') >= 0) subpasta('Fornecedores', 'PASTA_FORNECEDORES');
   subpasta('Imagens do painel', 'PASTA_IMAGENS');
 
   [['CADASTROS', 'Premix — Cadastros (banco de dados)'],
@@ -61,7 +62,7 @@ function configurar() {
   });
   // As senhas dos "acessos" de Contratos estão cifradas com CTR_CHAVE; se ela não existia na Vercel,
   // a chave era derivada da service_role do Supabase. Mantém a mesma para as senhas migradas continuarem legíveis.
-  if (!p.getProperty('CTR_CHAVE')) {
+  if (tabelas.indexOf('ctr_acessos') >= 0 && !p.getProperty('CTR_CHAVE')) {
     var antiga = p.getProperty('SUPABASE_SERVICE_KEY');
     if (antiga) p.setProperty('CTR_CHAVE', antiga);
     else Logger.log('ATENÇÃO: defina CTR_CHAVE (a mesma da Vercel) antes de migrar, senão as senhas dos acessos de Contratos não poderão ser lidas.');
@@ -130,11 +131,32 @@ function migrarTudo() {
   Logger.log(pendentes.length ? 'Faltam: ' + pendentes.join(', ') + ' — rode migrarTudo() de novo.' : 'Concluído.');
 }
 
+/**
+ * CÓPIA FINAL no dia da troca: apaga o que já está nas planilhas e importa tudo de novo do Supabase.
+ * Destrói os dados das planilhas — use só ANTES de as pessoas começarem a usar a versão Google.
+ * Para evitar acidentes, exige a propriedade do script CONFIRMA_REIMPORTAR = SIM (ela é apagada ao final).
+ * Passos no dia: pause o painel antigo (lanc_config.conexoes_pausadas = 1) → defina a propriedade → rode
+ * reimportarTudo() → rode migrarTudo() até "Concluído" → troque a LANC_URL do Portal.
+ */
+function reimportarTudo() {
+  if (props_().getProperty('CONFIRMA_REIMPORTAR') !== 'SIM') throw new Error('Defina a propriedade CONFIRMA_REIMPORTAR = SIM para confirmar que as planilhas podem ser apagadas.');
+  var tabelas = __pmx().__tabelas || [];
+  var apagadas = [];
+  tabelas.forEach(function (t) {
+    if (NAO_MIGRAR_.indexOf(t) >= 0) return;
+    var n = __pmx().limparTabela(t);
+    if (n) apagadas.push(t + ': ' + n);
+  });
+  props_().deleteProperty('CONFIRMA_REIMPORTAR');
+  Logger.log('Tabelas esvaziadas: ' + (apagadas.join(' | ') || 'nenhuma tinha dados') + '. Agora rode migrarTudo().');
+}
+
 /** Copia os comprovantes do bucket para o Drive e troca os links nas linhas dos fornecedores. */
 var COLUNAS_URL_ = ['comprovante_cnpj_url', 'contrato_social_url', 'comprovante_bancario_url',
   'comprovante_ie_url', 'documento_identidade_url', 'comprovante_endereco_url'];
 
 function migrarArquivos() {
+  if ((__pmx().__tabelas || []).indexOf('fornecedores') < 0) { Logger.log('Esta versão não inclui cadastro de fornecedores: nada a migrar.'); return; }
   var inicio = Date.now();
   var base = exigir_('SUPABASE_URL');
   var raiz = DriveApp.getFolderById(exigir_('PASTA_FORNECEDORES'));

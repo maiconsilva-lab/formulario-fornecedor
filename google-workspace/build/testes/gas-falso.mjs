@@ -130,7 +130,7 @@ export function criarGasFalso({ props = {} } = {}) {
     return {
       getId: () => p.id, getName: () => p.nome, getUrl: () => 'https://drive.google.com/drive/folders/' + p.id,
       createFolder(nome) { const nid = 'pasta' + ++n; pastas[nid] = { id: nid, nome, filhos: [], pai: p.id }; return pasta(nid); },
-      createFile(b) { const fid = 'arq' + ++n; arquivos[fid] = { id: fid, blob: b, pai: p.id }; return arquivo(fid); },
+      createFile(b) { const fid = 'arq' + String(++n).padStart(20, '0'); arquivos[fid] = { id: fid, blob: b, pai: p.id }; return arquivo(fid); },
       getFiles() { const lista = Object.values(arquivos).filter((a) => a.pai === p.id); let i = 0; return { hasNext: () => i < lista.length, next: () => arquivo(lista[i++].id) }; },
       getFolders() { const lista = Object.values(pastas).filter((x) => x.pai === p.id); let i = 0; return { hasNext: () => i < lista.length, next: () => pasta(lista[i++].id) }; },
       getFoldersByName(nome) { const l = Object.values(pastas).filter((x) => x.pai === p.id && x.nome === nome); let i = 0; return { hasNext: () => i < l.length, next: () => pasta(l[i++].id) }; },

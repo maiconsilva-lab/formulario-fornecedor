@@ -10,27 +10,22 @@ import UxEnhancers from '@painel/components/feedback/UxEnhancers';
 import CommandPalette from '@painel/components/feedback/CommandPalette';
 import { instalar as instalarFetch } from './servidor.js';
 import { instalar as instalarImagens } from './imagens.js';
-import { iniciar, aoMudar, loc, interceptarLinks } from './roteador.js';
+import { iniciar, aoMudar, loc, interceptarLinks, configurar } from './roteador.js';
 import { garantir as garantirArmazenamento } from './shims/armazenamento.js';
 
 garantirArmazenamento();
 
-const PAGINAS = {
-  '/': { carregar: () => import('@painel/app/page.js'), titulo: 'Premix — Central de Cadastros' },
-  '/pendencias': { carregar: () => import('@painel/app/pendencias/page.js'), titulo: 'Premix - Núcleo Fiscal' },
-  '/contratos': { carregar: () => import('@painel/app/contratos/page.js'), titulo: 'Premix - Contratos' },
-  '/lancamentos': { carregar: () => import('@painel/app/lancamentos/page.js'), titulo: 'Premix - Lançamentos Fiscais' },
-  '/lancamentos/envios': { carregar: () => import('@painel/app/lancamentos/envios/page.js'), titulo: 'Premix - Acompanhamento de envios' },
-  '/trilha': { carregar: () => import('@painel/app/trilha/page.js'), titulo: 'Premix - Trilha Fiscal' },
-};
+import { PAGINAS, INICIAL } from 'virtual:paginas';
 
+configurar((r) => !!PAGINAS[r], INICIAL);
 window.__pmxLoc = loc;
+window.__pmxTemRota = (h) => !!PAGINAS[String(h).split(/[?#]/)[0].replace(/\/+$/, '') || '/'];
 instalarFetch();
 instalarImagens();
 interceptarLinks();
 
 function Pagina({ rota }) {
-  const def = PAGINAS[rota] || PAGINAS['/'];
+  const def = PAGINAS[rota] || PAGINAS[INICIAL];
   const [Comp, setComp] = React.useState(null);
   React.useEffect(() => {
     let vivo = true;
@@ -63,7 +58,8 @@ function App() {
 
 function subir(parametros) {
   const p = parametros || {};
-  const pathname = p.p ? (p.p.startsWith('/') ? p.p : '/' + p.p) : '/';
+  let pathname = p.p ? (p.p.startsWith('/') ? p.p : '/' + p.p) : INICIAL;
+  if (!PAGINAS[pathname]) pathname = INICIAL;
   const busca = new URLSearchParams();
   for (const [k, v] of Object.entries(p)) if (k !== 'p' && k !== 'pagina') busca.set(k, Array.isArray(v) ? v[0] : v);
   iniciar({ pathname, search: busca.toString() ? '?' + busca.toString() : '' });

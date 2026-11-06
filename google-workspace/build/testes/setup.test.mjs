@@ -11,7 +11,7 @@ const S = gas.globais.Session; S.getEffectiveUser = () => ({ getEmail: () => 'do
 const orig = gas.globais.SpreadsheetApp.create;
 gas.globais.SpreadsheetApp.create = (n) => { const ss = orig(n); ss.getSheets().forEach((sh) => { sh.protect = () => ({ setDescription() { return this; }, removeEditors() { return this; }, getEditors: () => [], canDomainEdit: () => true, setDomainEdit() {} }); }); const ins = ss.insertSheet.bind(ss); ss.insertSheet = (x) => { const sh = ins(x); sh.protect = () => ({ setDescription() { return this; }, removeEditors() { return this; }, getEditors: () => [], canDomainEdit: () => true, setDomainEdit() {} }); return sh; }; return ss; };
 const ctx = vm.createContext({ ...gas.globais, console });
-const dir = new URL('../../gas/', import.meta.url);
+const dir = new URL('../../' + (process.env.GAS_DIR || 'gas') + '/', import.meta.url);
 for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.js')).sort()) vm.runInContext(fs.readFileSync(new URL(f, dir), 'utf8'), ctx, { filename: f });
 
 const F = gas.globais.UrlFetchApp;
@@ -23,15 +23,19 @@ F.respostas = [
   { url: 'https://x.supabase.co/rest/v1/', corpo: [] },
   { url: 'https://x.supabase.co/storage/v1/object/authenticated/comprovantes/cnpj/1.pdf', tipo: 'application/pdf', corpo: '%PDF-1.4 conteudo' },
 ];
+ctx.PMX = vm.runInContext('__pmx()', ctx);
+const T = ctx.PMX.__tabelas;
+const comForn = T.includes('fornecedores'), comCtr = T.includes('ctr_contratos');
 let ok = 0; const t = (n, fn) => { try { fn(); ok++; } catch (e) { console.error('FALHOU:', n, '\n ', e.stack); process.exitCode = 1; } };
 
 t('configurar cria planilhas, pastas e segredos', () => {
   ctx.configurar();
   const p = gas.propriedades;
-  for (const k of ['PLANILHA_CADASTROS', 'PLANILHA_OPERACAO', 'PLANILHA_HISTORICO', 'PASTA_FORNECEDORES', 'PASTA_IMAGENS', 'SESSION_SECRET', 'CRON_SECRET', 'LANC_INGEST_SECRET']) assert.ok(p[k], k);
+  for (const k of ['PLANILHA_CADASTROS', 'PLANILHA_OPERACAO', 'PLANILHA_HISTORICO', ...(comForn ? ['PASTA_FORNECEDORES'] : []), 'PASTA_IMAGENS', 'SESSION_SECRET', 'CRON_SECRET', 'LANC_INGEST_SECRET']) assert.ok(p[k], k);
   const ab = (q) => gas.planilhas[p['PLANILHA_' + q]].getSheets().map((s) => s.getName());
-  assert.ok(ab('CADASTROS').includes('fornecedores') && ab('CADASTROS').includes('usuarios_painel'));
-  assert.ok(ab('OPERACAO').includes('ctr_contratos') && ab('OPERACAO').includes('lanc_documentos'));
+  assert.ok((!comForn || ab('CADASTROS').includes('fornecedores')) && ab('CADASTROS').includes('usuarios_painel'));
+  assert.ok((!comCtr || ab('OPERACAO').includes('ctr_contratos')) && ab('OPERACAO').includes('lanc_documentos'));
+  assert.equal(ab('OPERACAO').includes('ctr_contratos'), comCtr, 'só as tabelas do perfil viram abas');
   assert.ok(ab('HISTORICO').includes('auditoria') && !ab('HISTORICO').includes('Página1'));
   assert.ok(!ab('OPERACAO').includes('lanc_fila'), 'visões não viram abas');
 });
@@ -41,11 +45,11 @@ t('migrarTudo copia tabelas (com paginação) e ignora colunas desconhecidas', (
   const db = ctx.PMX.createClient();
   const q = (p) => ctx.PMX.agora(p);
   assert.equal(q(db.from('auditoria').select('id', { count: 'exact', head: true })).count, 1001);
-  assert.equal(q(db.from('fornecedores').select('razao_social').single()).data.razao_social, 'Alfa');
+  if (comForn) assert.equal(q(db.from('fornecedores').select('razao_social').single()).data.razao_social, 'Alfa');
   assert.equal(q(db.from('usuarios_painel').select('role').single()).data.role, 'admin');
 });
 t('migrarTudo não duplica', () => { ctx.migrarTudo(); const db = ctx.PMX.createClient(); assert.equal(ctx.PMX.agora(db.from('auditoria').select('id', { count: 'exact', head: true })).count, 1001); });
-t('migrarArquivos leva o PDF para o Drive e troca o link', () => {
+if (comForn) t('migrarArquivos leva o PDF para o Drive e troca o link', () => {
   ctx.migrarArquivos();
   const db = ctx.PMX.createClient();
   const f = ctx.PMX.agora(db.from('fornecedores').select('*').single()).data;
@@ -54,7 +58,20 @@ t('migrarArquivos leva o PDF para o Drive e troca o link', () => {
   assert.equal(f.arquivos_drive.length, 1);
   assert.equal(Object.keys(gas.arquivos).length, 1);
 });
-t('migrarArquivos é repetível (não refaz)', () => { ctx.migrarArquivos(); assert.equal(Object.keys(gas.arquivos).length, 1); });
+if (comForn) t('migrarArquivos é repetível (não refaz)', () => { ctx.migrarArquivos(); assert.equal(Object.keys(gas.arquivos).length, 1); });
+t('reimportarTudo exige confirmação e refaz a cópia', () => {
+  assert.throws(() => ctx.reimportarTudo(), /CONFIRMA_REIMPORTAR/);
+  const db = ctx.PMX.createClient(); const q = (p) => ctx.PMX.agora(p);
+  q(db.from('usuarios_painel').insert({ nome: 'Lixo', email: 'lixo@premix.com.br', senha_hash: 'x' }));
+  gas.propriedades.CONFIRMA_REIMPORTAR = 'SIM';
+  ctx.reimportarTudo();
+  assert.ok(!gas.propriedades.CONFIRMA_REIMPORTAR, 'a confirmação é consumida');
+  assert.equal(q(db.from('usuarios_painel').select('id', { count: 'exact', head: true })).count, 0);
+  ctx.migrarTudo();
+  const u = q(db.from('usuarios_painel').select('email')).data;
+  assert.deepEqual(u.map((x) => x.email), ['ana@premix.com.br']);
+  assert.equal(q(db.from('auditoria').select('id', { count: 'exact', head: true })).count, 1001);
+});
 t('instalarGatilhos', () => ctx.instalarGatilhos());
 t('diagnostico', () => ctx.diagnostico());
 console.log(`setup: ${ok} testes ok`);

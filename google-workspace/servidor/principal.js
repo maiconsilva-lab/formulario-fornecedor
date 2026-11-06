@@ -48,7 +48,7 @@ function json(status, dados) {
 }
 
 /** Executa uma rota do painel. `req` = { metodo, caminho, consulta, cabecalhos, corpo, cookies }. */
-export function executar(req) {
+export function executar(req, opcoes = {}) {
   carregarEnv();
   limparTemporizadores();
   const metodo = String(req.metodo || 'GET').toUpperCase();
@@ -72,7 +72,8 @@ export function executar(req) {
   try {
     const resp = resolverAgora(Promessa.resolve().then(() => fn(requisicao, contexto)));
     const saida = resp && typeof resp.serializar === 'function' ? resp.serializar() : json(500, { error: 'A rota não devolveu resposta.' });
-    for (const t of tarefasDepois()) {
+    // Chamadas externas (Portal) não esperam a leitura dos PDFs: o gatilho de 10 min e a abertura do documento a fazem.
+    for (const t of (opcoes.semDepois ? (tarefasDepois(), []) : tarefasDepois())) {
       try { resolverAgora(Promessa.resolve().then(() => (typeof t === 'function' ? t() : t))); } catch (e) { console.error('[after]', e && e.stack || e); }
     }
     return saida;

@@ -1,2 +1,3 @@
+Perfil: lancamentos — Só o módulo Lançamentos (fila, detalhe, relatórios, envios das filiais)
 Gerado do painel-fornecedores @ ccc1339
-81 rotas de API · servidor 2576 KB em 6 partes · painel 3614 KB
+28 rotas de API · servidor 1874 KB em 4 partes · painel 635 KB

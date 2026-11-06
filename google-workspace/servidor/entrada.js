@@ -4,7 +4,7 @@ import { paginaHtml, doPostExterno, executarGatilho, usuarioInterno } from './we
 import { salvarFornecedor, salvarProduto } from './formularios.js';
 import { lerImagem as lerImagemInterna } from './imagens.js';
 import { ESQUEMA } from './db/esquema.js';
-import { carregar, comTrava, anexar } from './db/armazem.js';
+import { carregar, comTrava, anexar, remover } from './db/armazem.js';
 import { montarNova, createClient } from './db/consulta.js';
 
 const NEGADO = { status: 401, headers: { 'content-type': 'application/json' }, corpo: JSON.stringify({ error: 'Acesso restrito a contas da organização.' }), base64: false, cookies: [] };
@@ -19,9 +19,10 @@ export { resolverAgora as agora } from './shims/promessa.js';
 
 /* ── Instalação e migração ── */
 const VISOES = ['lanc_fila', 'lanc_fretes_v', 'lanc_ajustes_v'];
-export const TABELAS = Object.keys(ESQUEMA).filter((n) => !VISOES.includes(n));
+const _p = typeof __PERFIL__ === 'undefined' ? { tabelas: null } : __PERFIL__;
+export const TABELAS = Object.keys(ESQUEMA).filter((n) => !VISOES.includes(n) && (!_p.tabelas || _p.tabelas.includes(n)));
 
-export function esquema() { return ESQUEMA; }
+export function esquema() { return Object.fromEntries(TABELAS.map((n) => [n, ESQUEMA[n]])); }
 export function prepararAbas() { TABELAS.forEach((n) => carregar(n)); return TABELAS.length; }
 
 /** Importa linhas numa tabela vazia (não mexe se já houver dados). Devolve quantas entraram; negativo = já tinha dados. */
@@ -42,3 +43,9 @@ export function importarTabela(nome, linhas) {
 }
 
 export { TABELAS as __tabelas };
+
+/** Esvazia uma tabela (mantém o cabeçalho). Só usado pela reimportação final, antes da troca de sistema. */
+export function limparTabela(nome) {
+  if (!ESQUEMA[nome]) throw new Error('Tabela desconhecida: ' + nome);
+  return comTrava(() => { const t = carregar(nome); const n = t.linhas.length; remover(nome, t.linhas.slice()); return n; });
+}

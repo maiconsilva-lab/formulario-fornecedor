@@ -1,107 +1,115 @@
-# Premix no Google Workspace (Apps Script + Planilhas + Drive)
+# Lançamentos Fiscais no Google Workspace (Apps Script + Planilhas + Drive)
 
-O painel inteiro (Visão Geral, Fila Protheus, Cadastros, Gestão de Tarefas, Pendências Fiscais, Lançamentos, Contratos, Trilha) e os formulários públicos (fornecedor, produtos) rodando num único projeto do Google Apps Script, com os dados em 3 planilhas e os documentos no Drive compartilhado. **Supabase e Vercel continuam funcionando como estão**: nada aqui os altera. A migração é uma cópia.
+O módulo **Lançamentos** do painel (fila, pendências, consulta, report, NF Transferência, Tabela de Fretes, Cond. Pagto e a "Visão das filiais") rodando num único projeto do Google Apps Script, com os dados em 3 planilhas. Os PDFs continuam onde já estão, no Drive da Premix. **Supabase e Vercel não são alterados**: o que existe aqui é uma cópia que pode rodar em paralelo até você decidir a troca.
 
-## Como foi feito
+Os demais módulos (Cadastros, Pendências Fiscais, Contratos, Trilha e os formulários públicos) ficam para depois. O pacote completo continua disponível: `node build.mjs --perfil completo`.
 
-O código das telas e das 81 rotas de API continua sendo o do repositório `painel-fornecedores`, sem alterações. O `build/` o empacota para o Apps Script:
+## Como funciona
 
-| Antes | Agora |
+O código das telas e das rotas de API é o do repositório `painel-fornecedores`, sem alterações. O `build/` o empacota para o Apps Script, cortando o que Lançamentos não usa (28 das 81 rotas, 635 KB de tela em vez de 3,6 MB).
+
+| Hoje | No Google |
 |---|---|
-| 50 tabelas no Supabase | 3 planilhas: **Cadastros**, **Operação**, **Histórico** (uma aba por tabela, mesmas colunas) |
-| Consultas `supabase.from(...)` | Mesmo código, executado por `servidor/db/*` sobre as planilhas (filtros, `or`, `in`, `upsert`, views e as 10 funções SQL reescritas em JS) |
-| Bucket `comprovantes` | Uma pasta por fornecedor no Drive compartilhado |
-| Rotas `/api/*` na Vercel | `google.script.run.api(...)`, mesma resposta e mesmos cookies de sessão |
-| Login próprio (e-mail/senha, bcrypt) | O mesmo, mais uma trava: só contas `@premix.com.br` alcançam o painel |
-| Crons da Vercel / pg_cron | Gatilho de 10 em 10 min do Apps Script |
+| 18 tabelas do módulo no Supabase | 3 planilhas: **Cadastros**, **Operação**, **Histórico** (uma aba por tabela, mesmas colunas) |
+| `supabase.from(...)` e funções SQL | O mesmo código, rodando sobre as planilhas (filtros, views, relatórios e travas reescritos em JS) |
+| Rotas `/api/*` na Vercel | `google.script.run`, mesma resposta e mesma sessão |
+| Portal de Lançamentos → Vercel | Portal → URL pública do app (mesmo corpo, segredo na URL) |
+| `pg_cron` a cada 10 min | Gatilho de tempo do Apps Script, a cada 10 min |
+| Conta de serviço lendo Planilhas/Drive | A conta dona do script (a mesma que hoje roda a "ponte do Drive") |
+
+Quem usa: contas `@premix.com.br` (checado no servidor). Quem não é da Premix só vê uma mensagem de acesso restrito. A tela "Visão das filiais" mantém o código de 6 dígitos de cada filial.
 
 ```
 google-workspace/
-  servidor/    camada de dados em planilhas, shims (Next, crypto, fetch, googleapis), formulários públicos
-  cliente/     roteador interno, ponte com o servidor, imagens
-  paginas/     Fornecedor.html, Produtos.html (formulários públicos)
-  estatico/    appsscript.json (permissões) e Setup.js (instalação/migração)
-  build/       empacotador e testes
-  gas/         SAÍDA — é isto que vai para o Apps Script (já gerada e versionada)
+  servidor/   camada de dados em planilhas + substitutos de Next/Node/googleapis
+  cliente/    roteador interno, ponte com o servidor, imagens
+  estatico/   appsscript.json (permissões) e Setup.js (instalação/migração)
+  build/      empacotador, perfis e testes
+  gas/        SAÍDA do perfil "lancamentos": é isto que vai para o Apps Script (já gerada)
 ```
 
 ## Instalação
 
 ### 1. Enviar os arquivos
-Os arquivos têm vários MB (o painel tem 3,6 MB), então o envio é pela ferramenta `clasp`:
-
 ```bash
 npm i -g @google/clasp
 clasp login                       # com a conta @premix que será a "dona" do sistema
 cd google-workspace/gas
-clasp create --type standalone --title "Premix — Central"
+clasp create --type standalone --title "Premix — Lançamentos"
 clasp push --force
 ```
-
 Para regenerar `gas/` depois de mudanças no painel: `cd build && npm i && node build.mjs <caminho do painel-fornecedores>`.
 
 ### 2. Propriedades do script
-No editor: **Configurações do projeto → Propriedades do script**:
+Editor do Apps Script → **Configurações do projeto → Propriedades do script**:
 
 | Propriedade | Valor |
 |---|---|
-| `PASTA_RAIZ` | id da pasta do Drive compartilhado onde ficará tudo |
+| `PASTA_RAIZ` | id da pasta do Drive compartilhado onde ficarão as planilhas |
 | `DOMINIO_PERMITIDO` | `premix.com.br` |
-| `CTR_CHAVE` | o mesmo valor da variável `CTR_CHAVE` da Vercel, se ela existir |
-| `SUPABASE_URL` | `https://frudrwxdygfticgcwigv.supabase.co` (só para migrar) |
-| `SUPABASE_SERVICE_KEY` | chave `service_role` (só para migrar) |
+| `SUPABASE_URL` | `https://frudrwxdygfticgcwigv.supabase.co` (só para copiar os dados) |
+| `SUPABASE_SERVICE_KEY` | chave `service_role` (só para copiar os dados) |
 
-### 3. Rodar, nesta ordem, pelo editor
-1. `configurar()`: cria as 3 planilhas, as pastas e os segredos. Pode repetir.
-2. `migrarTudo()`: copia as tabelas. Repita até aparecer *Concluído*. Não duplica.
-3. `migrarArquivos()`: copia os comprovantes para o Drive e troca os links. Repita até *Concluído*.
-4. `instalarGatilhos()`: agenda a rotina de Lançamentos.
-5. `diagnostico()`: lista o que ainda falta.
+Integrações com planilhas e Drive (use a conta dona do script, que precisa ter acesso a elas):
 
-Depois de migrar, **apague `SUPABASE_SERVICE_KEY`**.
+| Propriedade | Para quê |
+|---|---|
+| `LANC_SYNC_SHEET_ID` | planilha com a aba `Demandas_Sync` (a variável `GOOGLE_SHEET_ID`/`LANC_SYNC_SHEET_ID` de hoje) |
+| `LANC_BASE_SHEET_ID` | planilha-base do Portal: o painel grava nela Status, Responsável e Data Lançto na hora |
+| `PONTE_PLANILHA_ID` | planilha de recepção (aba `Demandas`), se usar a leitura "ponte" |
+| `PONTE_PASTAS_PERMITIDAS` | opcional: restringe de quais pastas do Drive o sistema lê PDFs |
 
-### 4. Publicar (duas implantações do mesmo projeto)
-**Implantar → Nova implantação → App da Web**, **Executar como: Eu**. O acesso é definido por implantação:
+A configuração `fonte_planilha` e `sync_planilha` vem junto com a cópia da tabela `lanc_config`, então o comportamento atual (hoje: `sync`, sincronização automática desligada) é mantido.
 
-- **"Painel"**: acesso *Qualquer pessoa da Premix*. É a URL interna e vai no Google Sites.
-- **"Público"**: acesso *Qualquer pessoa*. É a URL que os fornecedores usam e a que o Portal de Lançamentos chama.
+### 3. Rodar pelo editor, nesta ordem
+1. `configurar()`: cria as 3 planilhas, a pasta de imagens e os segredos. Pode repetir.
+2. `migrarTudo()`: copia as 18 tabelas. Repita até aparecer *Concluído*.
+3. `instalarGatilhos()`: agenda a rotina (sincronização + leitura dos PDFs) a cada 10 minutos.
+4. `diagnostico()`: lista o que ainda falta.
 
-Mesmo na implantação pública, visitantes anônimos só recebem os formulários: a API, as imagens e o painel exigem uma conta Google do domínio (checada no servidor).
+### 4. Publicar
+**Implantar → Nova implantação → App da Web**, **Executar como: Eu**. O acesso é por implantação, então crie duas do mesmo projeto:
 
-Endereços (`<URL>` = a da implantação):
-- Painel: `<URL>` (ou `<URL>?p=/pendencias`, `?p=/contratos`, `?p=/lancamentos`, `?p=/trilha`)
-- Formulário de fornecedor: `<URL>?pagina=fornecedor`
-- Formulário de produtos: `<URL>?pagina=produtos`
-
-**Google Sites:** Inserir → Incorporar → colar a URL da implantação correspondente.
-
-### 5. Integrações opcionais
-Use os mesmos nomes das variáveis do painel, como propriedades do script: `LANC_SYNC_SHEET_ID`, `LANC_BASE_SHEET_ID`, `CTR_PLANILHA_ID`, `GOOGLE_SHEET_ID`, `TRILHA_*`, `GEMINI_API_KEY`, `EMAILJS_*`, etc. As planilhas lidas por elas precisam estar acessíveis à conta dona do script (que agora faz o papel da conta de serviço). A "ponte do Drive" passou a rodar dentro do próprio sistema: `PONTE_PLANILHA_ID` (planilha de recepção) e, se quiser restringir, `PONTE_PASTAS_PERMITIDAS`.
+- **"Painel"**: acesso *Qualquer pessoa da Premix*. É a URL que as analistas usam (e que pode ir no Google Sites).
+- **"Público"**: acesso *Qualquer pessoa*. É a URL que o Portal de Lançamentos chama. Visitantes anônimos só recebem a mensagem de acesso restrito; a API exige conta da organização.
 
 **Portal de Lançamentos:** troque a `LANC_URL` do script dele por
-`<URL pública>?rota=lancamentos/ingest&segredo=<valor de LANC_INGEST_SECRET>`.
-O Apps Script não repassa cabeçalhos, por isso o segredo vai na URL.
+`<URL pública>?rota=lancamentos/ingest&segredo=<valor de LANC_INGEST_SECRET>`
+(o valor está nas Propriedades do script; o Apps Script não repassa cabeçalhos, por isso o segredo vai na URL).
 
-**Imagens do painel** (fotos da tela de login e telas dos POPs da Trilha): envie a pasta `public/` do `painel-fornecedores` para a pasta *Imagens do painel* que o `configurar()` criou. O logo vem do site da Premix.
+**Imagens da tela de login** (opcional): envie `painel-fornecedores/public/login/*` para a pasta *Imagens do painel*, mantendo a subpasta `login`. O logo vem do site da Premix.
+
+## Dia da troca (roteiro)
+
+Teste primeiro com a cópia de hoje, sem mexer em nada do sistema atual. Quando for trocar:
+
+1. Pause o painel antigo (no Supabase, `lanc_config.conexoes_pausadas = 1`) para ninguém lançar nada durante a cópia.
+2. Propriedade `CONFIRMA_REIMPORTAR = SIM` → rode `reimportarTudo()` (apaga as planilhas) → rode `migrarTudo()` até *Concluído*.
+3. Troque a `LANC_URL` do Portal.
+4. Avise as analistas da nova URL. A tela pede o login de novo (mesmo e-mail e senha de hoje).
+5. Depois de confirmado, **apague `SUPABASE_SERVICE_KEY`** das propriedades.
+
+Para voltar atrás, basta repor a `LANC_URL` antiga e despausar o painel antigo (os lançamentos feitos na versão Google ficariam só nas planilhas).
 
 ## Testes
 
 ```bash
-cd build && npm i && npm test   # precisa do Playwright instalado
+cd build && npm i && npm test           # perfil Lançamentos (precisa do Playwright)
+npm run test:completo                   # painel inteiro
 ```
-Cobre: camada de dados (filtros, views, funções SQL, tipos), servidor empacotado (login, sessão, listas, edição), instalação e migração, formulários públicos, controle de acesso, e o painel real num Chromium (login e as 4 telas).
+O perfil Lançamentos cobre: Portal enviando documentos (inclusive NF com CT-e, duplicidade e segredo errado), fila e ordem de prioridade, detalhe, lançar/pendenciar/cancelar com as travas, busca, relatório, NF Transferência, Tabela de Fretes (com diferença calculada), visão das filiais com código, leitura de PDF (chave de acesso, valores, CNPJ e boleto), sincronização com a planilha, espelhamento de volta, instalação, cópia e reimportação, e as telas num Chromium real.
 
-## O que ainda não foi validado (só dá para saber no Google de verdade)
+## O que só dá para saber no Google de verdade
 
-- **Limites do Apps Script.** O painel gera 3,6 MB de HTML e o servidor 2,6 MB (em 6 arquivos). É grande para o Apps Script; se o envio ou a abertura falhar, o próximo passo é dividir por módulo.
-- **Velocidade.** Cada chamada lê as planilhas: espere 1 a 3 s por ação, contra décimos de segundo no Supabase. O cliente já junta chamadas repetidas e guarda algumas por poucos segundos.
-- **Cota diária de execução** (6 min por execução; limites de gravação). Com ~7 usuários deve sobrar; com muitos acessos simultâneos pode enfileirar.
-- **Cookies/armazenamento no iframe.** Se o navegador bloquear `localStorage` no iframe, o painel usa memória e pede o login de novo ao recarregar.
-- **Downloads de CSV/Excel** dentro do iframe do Apps Script/Sites.
-- **Leitura de PDF/OCR** (Lançamentos): a leitura de texto de PDF foi testada; o OCR usa o Drive e precisa do serviço avançado *Drive* (já no manifesto).
+- **Velocidade:** cada ação lê/grava planilhas, então espere de 1 a 3 s (contra décimos de segundo hoje). Ao lançar, o espelhamento na planilha-base acontece na mesma execução e soma 1 a 2 s.
+- **Tamanho:** a tela tem 0,6 MB e o servidor 1,9 MB (4 arquivos). Bem menor que o pacote completo, mas ainda convém confirmar que o `clasp push` e a abertura aceitam.
+- **PDF na tela:** usa a pré-visualização do Drive; precisa de a pessoa estar logada na conta da Premix no navegador, como hoje.
+- **OCR de PDF escaneado:** usa o serviço avançado *Drive* (já no manifesto); pode ser preciso ativar a *Drive API* no projeto do Google Cloud ligado ao script.
+- **Cotas:** execução de até 6 min, gatilhos de tempo e `UrlFetch`. Com a equipe atual deve sobrar; vale acompanhar na primeira semana.
+- **Cookies/armazenamento no iframe:** se o navegador bloquear, a tela guarda o login só em memória (pede de novo ao recarregar).
 
-## Fora do escopo / lacunas já existentes
+## Lacunas
 
-- **Correção de cadastro devolvido.** O painel gera links `…/corrigir?token=…` para o fornecedor corrigir; essa página **não existe** neste repositório nem na Vercel hoje. Os tokens são gravados (aba `tokens_correcao`), mas falta a tela de correção.
-- Dados de `rate_limits`, `sync_lock` e chat (efêmeros) não são migrados.
+- Dados efêmeros (`rate_limits`, `sync_lock`, chat) não são copiados.
 - A tabela `lanc_fila` e as visões `lanc_*_v` não viram abas: são calculadas na hora.
+- O Portal de Lançamentos, por ser outro script, só precisa da troca de URL; ele não foi alterado.

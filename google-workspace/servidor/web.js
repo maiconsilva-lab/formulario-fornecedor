@@ -11,7 +11,8 @@ export function usuarioInterno() {
   return !dom || email.endsWith('@' + dom);
 }
 
-const PUBLICAS = ['fornecedor', 'produtos'];
+const _perfil = typeof __PERFIL__ === 'undefined' ? { publicas: ['fornecedor', 'produtos'] } : __PERFIL__;
+const PUBLICAS = _perfil.publicas;
 const PAGINAS = {
   painel: { arquivo: 'Painel', titulo: 'Premix — Central de Cadastros' },
   fornecedor: { arquivo: 'Fornecedor', titulo: 'Cadastro de Fornecedor — Premix' },
@@ -19,8 +20,13 @@ const PAGINAS = {
 };
 
 export function paginaHtml(e) {
-  const pedida = (e.parameter && e.parameter.pagina) || (usuarioInterno() ? 'painel' : 'fornecedor');
-  const chave = PAGINAS[pedida] && (PUBLICAS.includes(pedida) || usuarioInterno()) ? pedida : 'fornecedor';
+  const interno = usuarioInterno();
+  const pedida = (e.parameter && e.parameter.pagina) || (interno ? 'painel' : PUBLICAS[0]);
+  let chave = PAGINAS[pedida] && (PUBLICAS.includes(pedida) || interno) ? pedida : (interno ? 'painel' : PUBLICAS[0]);
+  if (!chave) {
+    return HtmlService.createHtmlOutput('<p style="font-family:sans-serif;padding:40px;color:#444">Acesso restrito a contas da organização. Entre com seu e-mail da Premix e tente novamente.</p>')
+      .setTitle('Premix').addMetaTag('viewport', 'width=device-width, initial-scale=1');
+  }
   const p = PAGINAS[chave];
   return HtmlService.createHtmlOutputFromFile(p.arquivo)
     .setTitle(p.titulo)
@@ -44,7 +50,7 @@ export function doPostExterno(e) {
       metodo: 'POST', caminho: '/api/' + rota,
       cabecalhos: { 'x-lanc-secret': segredo, 'content-type': 'application/json' },
       corpo: JSON.stringify(dados),
-    });
+    }, { semDepois: true });
     return saida(r.corpo ? JSON.parse(r.corpo) : { status: r.status });
   } catch (err) {
     return saida({ error: String(err && err.message || err) });

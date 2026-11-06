@@ -29,7 +29,7 @@ await pagina.addInitScript(() => {
   });
   window.google = { script: { run: mk(() => {}, () => {}), url: { getLocation: (f) => f({ parameter: {} }) } } };
 });
-const html = fs.readFileSync(new URL('../../gas/Painel.html', import.meta.url), 'utf8');
+const html = fs.readFileSync(new URL('../../' + (process.env.GAS_DIR || 'gas') + '/Painel.html', import.meta.url), 'utf8');
 await pagina.route('http://painel.test/', (r) => r.fulfill({ contentType: 'text/html', body: html }));
 await pagina.goto('http://painel.test/');
 const ok = (c, m) => { if (!c) { console.error('FALHOU:', m); process.exitCode = 1; } else console.log('ok -', m); };

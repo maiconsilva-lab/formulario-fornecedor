@@ -6,7 +6,19 @@ import path from 'node:path';
 const AQUI = path.dirname(new URL(import.meta.url).pathname);
 const CLI = path.resolve(AQUI, '../cliente');
 
-export async function construirCliente({ painel, saida, minificar = true }) {
+const TITULOS = {
+  '/': 'Premix — Central de Cadastros', '/pendencias': 'Premix - Núcleo Fiscal', '/contratos': 'Premix - Contratos',
+  '/lancamentos': 'Premix - Lançamentos Fiscais', '/lancamentos/envios': 'Premix - Acompanhamento de envios', '/trilha': 'Premix - Trilha Fiscal',
+};
+const ARQUIVO = { '/': 'app/page.js', '/pendencias': 'app/pendencias/page.js', '/contratos': 'app/contratos/page.js', '/lancamentos': 'app/lancamentos/page.js', '/lancamentos/envios': 'app/lancamentos/envios/page.js', '/trilha': 'app/trilha/page.js' };
+
+export async function construirCliente({ painel, saida, perfil, minificar = true }) {
+  const paginasJs = `export const INICIAL = ${JSON.stringify(perfil.inicial)};
+export const ESCONDER = ${JSON.stringify(perfil.esconderLinks)};
+export const PAGINAS = {
+${perfil.paginas.map((r) => `  ${JSON.stringify(r)}: { carregar: () => import(${JSON.stringify('@painel/' + ARQUIVO[r])}), titulo: ${JSON.stringify(TITULOS[r])} },`).join('\n')}
+};
+`;
   const plugin = {
     name: 'premix-cliente',
     setup(b) {
@@ -15,12 +27,16 @@ export async function construirCliente({ painel, saida, minificar = true }) {
         for (const c of [alvo, alvo + '.js', path.join(alvo, 'index.js')]) if (fs.existsSync(c) && fs.statSync(c).isFile()) return { path: c };
         return { path: alvo };
       });
+      b.onResolve({ filter: /^virtual:paginas$/ }, () => ({ path: 'paginas', namespace: 'virtual' }));
+      b.onLoad({ filter: /.*/, namespace: 'virtual' }, () => ({ contents: paginasJs, resolveDir: painel, loader: 'js' }));
       b.onResolve({ filter: /^next\/dynamic$/ }, () => ({ path: path.join(CLI, 'shims/next-dynamic.js') }));
       // window.location.{pathname,search,href} → roteador interno (a URL real do iframe não serve).
       b.onLoad({ filter: /\.js$/ }, (a) => {
         if (!a.path.startsWith(painel) || a.path.includes('node_modules')) return undefined;
         let src = fs.readFileSync(a.path, 'utf8');
-        if (!/window\.location\.(pathname|search|href)/.test(src)) return undefined;
+        const eCmd = a.path.endsWith('components/feedback/CommandPalette.js');
+        if (!eCmd && !/window\.location\.(pathname|search|href)/.test(src)) return undefined;
+        if (eCmd) src = src.replace('if (!aqui) itens.push(', 'if (!aqui && window.__pmxTemRota(r.href)) itens.push(');
         src = src.replace(/window\.location\.(pathname|search|href)/g, 'window.__pmxLoc.$1');
         return { contents: src, loader: 'jsx', resolveDir: path.dirname(a.path) };
       });
@@ -51,7 +67,7 @@ export async function construirCliente({ painel, saida, minificar = true }) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>${css}</style>
+<style>${css}${perfil.esconderLinks.map((h) => `a[href="${h}"]`).join(',')}${perfil.esconderLinks.length ? '{display:none!important}' : ''}</style>
 </head>
 <body>
 <div id="raiz"></div>

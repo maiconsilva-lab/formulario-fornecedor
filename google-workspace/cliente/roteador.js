@@ -3,6 +3,8 @@
 const ouvintes = new Set();
 const estado = { pathname: '/', search: '' };
 
+let valida = () => true; let padrao = '/';
+export function configurar(fnValida, rotaPadrao) { valida = fnValida; padrao = rotaPadrao; }
 export function iniciar(inicial) {
   estado.pathname = inicial.pathname || '/';
   estado.search = inicial.search || '';
@@ -10,7 +12,8 @@ export function iniciar(inicial) {
 export function aoMudar(fn) { ouvintes.add(fn); return () => ouvintes.delete(fn); }
 export function ir(href) {
   const u = new URL(href, 'https://x.local' + estado.pathname);
-  estado.pathname = u.pathname.replace(/\/+$/, '') || '/';
+  const destino = u.pathname.replace(/\/+$/, '') || '/';
+  estado.pathname = valida(destino) ? destino : padrao;
   estado.search = u.search;
   try { history.replaceState(null, '', u.hash || '#'); } catch { /* sandbox */ }
   window.scrollTo(0, 0);

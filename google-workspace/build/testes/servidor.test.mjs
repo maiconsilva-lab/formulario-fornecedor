@@ -14,7 +14,7 @@ export function montar() {
   const gas = criarGasFalso({ props: { SESSION_SECRET: 'segredo-de-teste-com-32-bytes-ou-mais!!' } });
   for (const q of ['cadastros', 'operacao', 'historico']) gas.propriedades['PLANILHA_' + q.toUpperCase()] = gas.globais.SpreadsheetApp.create(q).getId();
   const ctx = vm.createContext({ ...gas.globais, console });
-  const dir = new URL('../../gas/', import.meta.url);
+  const dir = new URL('../../' + (process.env.GAS_DIR || 'gas') + '/', import.meta.url);
   for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.js')).sort()) vm.runInContext(fs.readFileSync(new URL(f, dir), 'utf8'), ctx, { filename: f });
   ctx.PMX = vm.runInContext('__pmx()', ctx);
   const jar = {};

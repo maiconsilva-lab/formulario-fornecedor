@@ -24,8 +24,8 @@ function listarRotas(painel) {
   }));
 }
 
-export async function construirServidor({ painel, saida, minificar = true }) {
-  const rotas = listarRotas(painel);
+export async function construirServidor({ painel, saida, perfil, minificar = true }) {
+  const rotas = listarRotas(painel).filter((r) => !perfil.rotasApi || perfil.rotasApi.some((pre) => r.padrao.slice('/api/'.length).startsWith(pre)));
   const virtual = rotas.map((r, i) => `import * as r${i} from ${JSON.stringify(r.arquivo)};`).join('\n') +
     `\nexport const ROTAS = [${rotas.map((r, i) => `{ padrao: ${JSON.stringify(r.padrao)}, mod: r${i} }`).join(',\n')}];\n`;
 
@@ -68,6 +68,7 @@ export async function construirServidor({ painel, saida, minificar = true }) {
     loader: { '.js': 'jsx', '.txt': 'text' },
     nodePaths: [path.join(painel, 'node_modules'), path.join(AQUI, 'node_modules')],
     plugins: [plugin],
+    define: { __PERFIL__: JSON.stringify({ nome: perfil.nome, tabelas: perfil.tabelas, publicas: perfil.publicas }) },
     minify: minificar,
     legalComments: 'none',
     write: false,
@@ -79,7 +80,7 @@ export async function construirServidor({ painel, saida, minificar = true }) {
    Contém as rotas de API do painel-fornecedores e a camada de dados em Planilhas. */\n`;
   const FUNCOES = {
     api: 'req', doGet: 'e', doPost: 'e', salvarFornecedor: 'payload', salvarProduto: 'payload', lerImagem: 'caminho',
-    prepararAbas: '', importarTabela: 'nome, linhas', esquema: '',
+    prepararAbas: '', importarTabela: 'nome, linhas', esquema: '', limparTabela: 'nome',
   };
   const GATILHOS = { gatilhoLancamentos: 'lancamentos', gatilhoPendencias: 'pendencias' };
   const envolto = `var PMX = (function () {

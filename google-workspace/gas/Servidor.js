@@ -3,7 +3,7 @@
    está nos arquivos Servidor-parte-NN.js; aqui ficam as funções que o Apps Script chama. */
 var __PMX_CARREGADO = null;
 function __pmx() {
-  if (!__PMX_CARREGADO) __PMX_CARREGADO = (0, eval)(__PMX_PARTE_1 + __PMX_PARTE_2 + __PMX_PARTE_3 + __PMX_PARTE_4 + __PMX_PARTE_5 + __PMX_PARTE_6);
+  if (!__PMX_CARREGADO) __PMX_CARREGADO = (0, eval)(__PMX_PARTE_1 + __PMX_PARTE_2 + __PMX_PARTE_3 + __PMX_PARTE_4);
   return __PMX_CARREGADO;
 }
 function api(req) { return __pmx().api(req); }
@@ -15,5 +15,6 @@ function lerImagem(caminho) { return __pmx().lerImagem(caminho); }
 function prepararAbas() { return __pmx().prepararAbas(); }
 function importarTabela(nome, linhas) { return __pmx().importarTabela(nome, linhas); }
 function esquema() { return __pmx().esquema(); }
+function limparTabela(nome) { return __pmx().limparTabela(nome); }
 function gatilhoLancamentos() { return __pmx().gatilho('lancamentos'); }
 function gatilhoPendencias() { return __pmx().gatilho('pendencias'); }
