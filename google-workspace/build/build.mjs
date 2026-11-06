@@ -21,9 +21,39 @@ fs.mkdirSync(gas, { recursive: true });
 
 const s = await construirServidor({ painel, perfil });
 const c = await construirCliente({ painel, perfil });
-const DIAG = `<script>(function(){var erros=[];function mostrar(){var d=document.getElementById("pmx-diag");if(!d){d=document.createElement("pre");d.id="pmx-diag";d.style.cssText="position:fixed;left:8px;right:8px;bottom:8px;max-height:45vh;overflow:auto;margin:0;padding:10px;background:#fff3f3;color:#7a1010;border:1px solid #e0a0a0;border-radius:8px;font:12px/1.4 monospace;white-space:pre-wrap;z-index:2147483647";if(document.body)document.body.appendChild(d);}d.textContent="Erro ao carregar a tela (copie este texto e envie ao suporte):\\n"+erros.join("\\n");}window.addEventListener("error",function(e){erros.push((e.message||"erro")+(e.lineno?" (linha "+e.lineno+", coluna "+e.colno+")":""));mostrar();});window.addEventListener("unhandledrejection",function(e){erros.push("promessa: "+((e.reason&&e.reason.message)||e.reason));mostrar();});setTimeout(function(){var r=document.getElementById("raiz");if(r&&!r.firstChild){erros.push("A tela nao iniciou em 10 segundos.");mostrar();}},10000);})();</script>`;
+const DIAG = `<script>(function(){var erros=[];function mostrar(){var d=document.getElementById("pmx-diag");if(!d){d=document.createElement("pre");d.id="pmx-diag";d.style.cssText="position:fixed;left:8px;right:8px;bottom:8px;max-height:45vh;overflow:auto;margin:0;padding:10px;background:#fff3f3;color:#7a1010;border:1px solid #e0a0a0;border-radius:8px;font:12px/1.4 monospace;white-space:pre-wrap;z-index:2147483647";if(document.body)document.body.appendChild(d);}d.textContent="Erro ao carregar a tela (copie este texto e envie ao suporte):\\n"+erros.join("\\n");}window.pmxErro=function(m){erros.push(String(m));mostrar();};window.addEventListener("error",function(e){erros.push((e.message||"erro")+(e.lineno?" (linha "+e.lineno+", coluna "+e.colno+")":""));mostrar();});window.addEventListener("unhandledrejection",function(e){erros.push("promessa: "+((e.reason&&e.reason.message)||e.reason));mostrar();});setTimeout(function(){var r=document.getElementById("raiz");if(r&&r.getAttribute("data-pronto")!=="1"){erros.push("A tela nao iniciou em 40 segundos.");mostrar();}},40000);})();</script>`;
+/* O código da tela (650 KB) NÃO vai dentro da página HTML: o Apps Script o entregava incompleto.
+   A página é só uma casca; este carregador busca o código em pedaços por google.script.run e o executa. */
+const LOADER = `<script>(function(){function falhar(m){if(window.pmxErro)window.pmxErro(m);}
+google.script.run.withFailureHandler(function(e){falhar("Nao foi possivel buscar a tela: "+(e&&e.message||e));}).withSuccessHandler(function(info){
+var partes=new Array(info.n),faltam=info.n;
+function pedir(i,t){google.script.run.withSuccessHandler(function(x){partes[i]=x;if(--faltam===0)montar();}).withFailureHandler(function(e){if(t<2)pedir(i,t+1);else falhar("Falha ao baixar o pedaco "+(i+1)+" de "+info.n+": "+(e&&e.message||e));}).painelParte(i);}
+function montar(){var s=partes.join("");if(s.length!==info.len){falhar("Tela incompleta: chegaram "+s.length+" de "+info.len+" caracteres.");return;}
+var k=s.indexOf(String.fromCharCode(1));var st=document.createElement("style");st.textContent=s.slice(0,k);document.head.appendChild(st);
+var sc=document.createElement("script");sc.text=s.slice(k+1);document.head.appendChild(sc);}
+for(var i=0;i<info.n;i++)pedir(i,0);}).painelInfo();})();</script>`;
+const CASCA = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+${DIAG}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="robots" content="noindex, nofollow">
+<base target="_top">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body style="margin:0;background:#eef1f8">
+<div id="raiz"><div style="font-family:sans-serif;color:#5b6b85;padding:40px">Carregando…</div></div>
+${LOADER}
+</body>
+</html>`;
 const nServidor = emitirPartes(s.envolto, '__PMX', 'Servidor', gas);
-const nPainel = emitirPartes(c.html, '__PAINEL', 'Painel', gas);
+const CORTE = String.fromCharCode(1);
+const CH = 200000;
+const nPainel = emitirPartes(c.css + CORTE + c.js, '__PAINEL', 'Painel', gas);
 fs.writeFileSync(path.join(gas, 'Funcoes.js'), `/* GERADO AUTOMATICAMENTE por google-workspace/build — não edite à mão.
    Funções que o Apps Script chama. O servidor está nos arquivos Servidor-NN.js e a tela nos Painel-NN.js. */
 var __PMX_CARREGADO = null;
@@ -31,8 +61,18 @@ function __pmx() {
   if (!__PMX_CARREGADO) __PMX_CARREGADO = (0, eval)(${juntar('__PMX', nServidor)});
   return __PMX_CARREGADO;
 }
-var __PMX_DIAG = ${JSON.stringify(DIAG)};
-function __painelHtml() { return (${juntar('__PAINEL', nPainel)}).replace('<head>', function () { return '<head>' + __PMX_DIAG; }); }
+var __PMX_CASCA = ${JSON.stringify(CASCA)};
+function __painelHtml() { return __PMX_CASCA; }
+function __painelPayload() { return ${juntar('__PAINEL', nPainel)}; }
+function __ehInterno() {
+  var e = String(Session.getActiveUser().getEmail() || '').toLowerCase();
+  if (!e) return false;
+  var d = String(PropertiesService.getScriptProperties().getProperty('DOMINIO_PERMITIDO') || '').toLowerCase().replace(/^@/, '');
+  return !d || e.slice(-(d.length + 1)) === '@' + d;
+}
+/* A tela é entregue em pedaços (a casca HTML a busca por google.script.run). Só para contas da organização. */
+function painelInfo() { if (!__ehInterno()) throw new Error('Acesso restrito.'); var p = __painelPayload(); return { len: p.length, n: Math.ceil(p.length / ${CH}) }; }
+function painelParte(i) { if (!__ehInterno()) throw new Error('Acesso restrito.'); return __painelPayload().substr(Number(i) * ${CH}, ${CH}); }
 ${Object.entries(s.FUNCOES).map(([f, a]) => `function ${f}(${a}) { return __pmx().${f}(${a}); }`).join('\n')}
 ${Object.entries(s.GATILHOS).map(([f, q]) => `function ${f}() { return __pmx().gatilho('${q}'); }`).join('\n')}
 `);

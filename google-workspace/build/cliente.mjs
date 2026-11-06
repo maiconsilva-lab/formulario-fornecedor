@@ -55,24 +55,7 @@ ${perfil.paginas.map((r) => `  ${JSON.stringify(r)}: { carregar: () => import(${
   });
   const js = r.outputFiles.find((f) => f.path.endsWith('.js')).text;
   const css = (r.outputFiles.find((f) => f.path.endsWith('.css')) || { text: '' }).text;
-  const scriptSeguro = js.replace(/<\/script/gi, '<\\/script').replace(/<!--/g, '<\\!--');
-  const html = `<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="robots" content="noindex, nofollow">
-<base target="_top">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>${css}${perfil.esconderLinks.map((h) => `a[href="${h}"]`).join(',')}${perfil.esconderLinks.length ? '{display:none!important}' : ''}</style>
-</head>
-<body>
-<div id="raiz"></div>
-<script>${scriptSeguro}</script>
-</body>
-</html>`;
-  return { html, bytes: html.length, metafile: r.metafile, avisos: r.warnings };
+  // O estilo extra esconde os links para módulos que não estão neste pacote.
+  const cssFinal = css + perfil.esconderLinks.map((h) => `a[href="${h}"]`).join(',') + (perfil.esconderLinks.length ? '{display:none!important}' : '');
+  return { css: cssFinal, js, bytes: cssFinal.length + js.length, metafile: r.metafile, avisos: r.warnings };
 }

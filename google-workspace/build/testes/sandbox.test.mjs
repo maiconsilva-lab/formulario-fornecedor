@@ -16,11 +16,10 @@ const pagina = await navegador.newPage({ viewport: { width: 1300, height: 800 } 
 const erros = [];
 pagina.on('pageerror', (e) => erros.push(e.message));
 pagina.on('console', (m) => { if (m.type() === 'error') erros.push('console: ' + m.text().slice(0, 160)); });
-await pagina.exposeFunction('__api', (req) => JSON.parse(JSON.stringify(ctx.PMX.api(req))));
+await pagina.exposeFunction('__chamar', (nome, arg) => { const f = nome === 'api' ? (a) => ctx.PMX.api(a) : nome === 'lerImagem' ? () => null : (a) => ctx[nome](a); const r = f(arg); return JSON.parse(JSON.stringify(r === undefined ? null : r)); });
 await pagina.route(/fonts\.|premix\.com\.br/, (r) => r.abort());
 await pagina.addInitScript(() => {
-  const mk = (ok, falha) => ({ withSuccessHandler(f) { return mk(f, falha); }, withFailureHandler(f) { return mk(ok, f); },
-    api(req) { window.__api(req).then(ok, falha); }, lerImagem() { Promise.resolve(null).then(ok); } });
+  const mk = (ok, falha) => new Proxy({}, { get: (_, nome) => nome === 'withSuccessHandler' ? (f) => mk(f, falha) : nome === 'withFailureHandler' ? (f) => mk(ok, f) : (a) => window.__chamar(nome, a).then(ok, falha) });
   window.google = { script: { run: mk(() => {}, () => {}), url: { getLocation: (f) => f({ parameter: {} }) } } };
 });
 const html = ctx.__painelHtml();
@@ -47,12 +46,15 @@ console.log('erros:', [...new Set(erros)].slice(0, 6));
 await navegador.close();
 process.exitCode = falhou ? 1 : 0;
 
-// ── se a tela falhar, o erro aparece escrito (em vez de página em branco)
+// ── se a busca da tela falhar, o erro aparece escrito (em vez de página em branco)
 const nav2 = await chromium.launch(); const p2 = await nav2.newPage();
-await p2.addInitScript(() => { window.google = { script: { run: {}, url: { getLocation() { throw new Error('falha-de-teste-no-getLocation'); } } } }; });
+await p2.addInitScript(() => {
+  const falha = (f) => ({ withSuccessHandler: () => ({ painelInfo() { f(new Error('falha-de-teste-no-painelInfo')); } }) });
+  window.google = { script: { run: { withFailureHandler: falha } } };
+});
 await p2.route('http://x.test/', (r) => r.fulfill({ contentType: 'text/html', body: html }));
 await p2.goto('http://x.test/'); await p2.waitForTimeout(800);
 const diag = await p2.evaluate(() => (document.getElementById('pmx-diag') || {}).textContent || '');
-ok(/falha-de-teste-no-getLocation/.test(diag), 'erro de inicialização aparece escrito na tela: ' + diag.slice(0, 120).replace(/\n/g, ' '));
+ok(/falha-de-teste-no-painelInfo/.test(diag), 'erro de inicialização aparece escrito na tela: ' + diag.slice(0, 120).replace(/\n/g, ' '));
 await nav2.close();
 process.exitCode = falhou ? 1 : 0;

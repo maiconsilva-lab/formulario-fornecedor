@@ -20,13 +20,10 @@ const pagina = await navegador.newPage({ viewport: { width: 1440, height: 900 } 
 const erros = []; const chamadas = [];
 pagina.on('pageerror', (e) => erros.push('pageerror: ' + e.message));
 pagina.on('console', (m) => { if (m.type() === 'error') erros.push('console: ' + m.text().slice(0, 200)); });
-await pagina.exposeFunction('__api', (req) => { chamadas.push(req.metodo + ' ' + req.caminho); return JSON.parse(JSON.stringify(ctx.PMX.api(req))); });
+await pagina.exposeFunction('__chamar', (nome, arg) => { const f = nome === 'api' ? (a) => ctx.PMX.api(a) : nome === 'lerImagem' ? () => null : (a) => ctx[nome](a); const r = f(arg); return JSON.parse(JSON.stringify(r === undefined ? null : r)); });
 await pagina.route(/fonts\.(googleapis|gstatic)\.com|premix\.com\.br/, (r) => r.abort());
 await pagina.addInitScript(() => {
-  const mk = (ok, falha) => ({
-    withSuccessHandler(f) { return mk(f, falha); }, withFailureHandler(f) { return mk(ok, f); },
-    api(req) { window.__api(req).then(ok, falha); }, lerImagem(c) { Promise.resolve(null).then(ok); },
-  });
+  const mk = (ok, falha) => new Proxy({}, { get: (_, nome) => nome === 'withSuccessHandler' ? (f) => mk(f, falha) : nome === 'withFailureHandler' ? (f) => mk(ok, f) : (a) => window.__chamar(nome, a).then(ok, falha) });
   window.google = { script: { run: mk(() => {}, () => {}), url: { getLocation: (f) => f({ parameter: {} }) } } };
 });
 const html = ctx.__painelHtml();
