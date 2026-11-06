@@ -59,6 +59,22 @@ await nav2.close();
 process.exitCode = falhou ? 1 : 0;
 
 // ── se o Google não expuser painelInfo/painelParte, a tela usa a função api (caminho alternativo)
+// ── o aviso de "tela não iniciou" NÃO pode aparecer quando a tela abriu normalmente
+const navOk = await chromium.launch(); const pOk = await navOk.newPage();
+await pOk.exposeFunction('__chamar', (nome, arg) => { const f = nome === 'api' ? (a) => ctx.PMX.api(a) : nome === 'lerImagem' ? () => null : (a) => ctx[nome](a); const r = f(arg); return JSON.parse(JSON.stringify(r === undefined ? null : r)); });
+await pOk.route(/fonts\.|premix\.com\.br/, (r) => r.abort());
+await pOk.addInitScript(() => {
+  window.__PMX_TEMPO = 1500;
+  const mk = (ok, falha) => new Proxy({}, { get: (_, nome) => nome === 'withSuccessHandler' ? (f) => mk(f, falha) : nome === 'withFailureHandler' ? (f) => mk(ok, f) : (a) => window.__chamar(nome, a).then(ok, falha) });
+  window.google = { script: { run: mk(() => {}, () => {}), url: { getLocation: (f) => f({ parameter: {} }) } } };
+});
+await pOk.route('http://ok.test/', (r) => r.fulfill({ contentType: 'text/html', body: html }));
+await pOk.goto('http://ok.test/');
+await pOk.waitForSelector('input[type=email]', { timeout: 20000 });
+await pOk.waitForTimeout(3500);
+ok(await pOk.$('#pmx-diag') === null, 'passado o tempo limite, a tela que abriu normalmente NÃO mostra o quadro vermelho');
+await navOk.close();
+
 const nav3 = await chromium.launch(); const p3 = await nav3.newPage();
 await p3.exposeFunction('__chamar', (nome, arg) => { const f = nome === 'api' ? (a) => ctx.PMX.api(a) : nome === 'lerImagem' ? () => null : (a) => ctx[nome](a); const r = f(arg); return JSON.parse(JSON.stringify(r === undefined ? null : r)); });
 // "api" aqui é a função-ponte de Funcoes.js (entrega a tela quando recebe __painel)

@@ -21,7 +21,7 @@ fs.mkdirSync(gas, { recursive: true });
 
 const s = await construirServidor({ painel, perfil });
 const c = await construirCliente({ painel, perfil });
-const DIAG = `<script>(function(){var erros=[];function mostrar(){var d=document.getElementById("pmx-diag");if(!d){d=document.createElement("pre");d.id="pmx-diag";d.style.cssText="position:fixed;left:8px;right:8px;bottom:8px;max-height:45vh;overflow:auto;margin:0;padding:10px;background:#fff3f3;color:#7a1010;border:1px solid #e0a0a0;border-radius:8px;font:12px/1.4 monospace;white-space:pre-wrap;z-index:2147483647";if(document.body)document.body.appendChild(d);}d.textContent="Erro ao carregar a tela (copie este texto e envie ao suporte):\\n"+erros.join("\\n");}window.pmxErro=function(m){erros.push(String(m));mostrar();};window.addEventListener("error",function(e){erros.push((e.message||"erro")+(e.lineno?" (linha "+e.lineno+", coluna "+e.colno+")":""));mostrar();});window.addEventListener("unhandledrejection",function(e){erros.push("promessa: "+((e.reason&&e.reason.message)||e.reason));mostrar();});setTimeout(function(){var r=document.getElementById("raiz");if(r&&r.getAttribute("data-pronto")!=="1"){erros.push("A tela nao iniciou em 40 segundos.");mostrar();}},40000);})();</script>`;
+const DIAG = `<script>(function(){var erros=[];function mostrar(){var d=document.getElementById("pmx-diag");if(!d){d=document.createElement("pre");d.id="pmx-diag";d.style.cssText="position:fixed;left:8px;right:8px;bottom:8px;max-height:45vh;overflow:auto;margin:0;padding:10px;background:#fff3f3;color:#7a1010;border:1px solid #e0a0a0;border-radius:8px;font:12px/1.4 monospace;white-space:pre-wrap;z-index:2147483647";if(document.body)document.body.appendChild(d);}d.textContent="Erro ao carregar a tela (copie este texto e envie ao suporte):\\n"+erros.join("\\n");}window.pmxErro=function(m){erros.push(String(m));mostrar();};window.addEventListener("error",function(e){erros.push((e.message||"erro")+(e.lineno?" (linha "+e.lineno+", coluna "+e.colno+")":""));mostrar();});window.addEventListener("unhandledrejection",function(e){erros.push("promessa: "+((e.reason&&e.reason.message)||e.reason));mostrar();});setTimeout(function(){if(document.getElementById("pmx-carregando")){erros.push("A tela nao iniciou em "+Math.round((window.__PMX_TEMPO||40000)/1000)+" segundos.");mostrar();}},window.__PMX_TEMPO||40000);})();</script>`;
 /* O código da tela (650 KB) NÃO vai dentro da página HTML: o Apps Script o entregava incompleto.
    A página é só uma casca; este carregador busca o código em pedaços por google.script.run e o executa. */
 const LOADER = `<script>(function(){function falhar(m){if(window.pmxErro)window.pmxErro(m);}
@@ -51,7 +51,7 @@ ${DIAG}
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body style="margin:0;background:#eef1f8">
-<div id="raiz"><div style="font-family:sans-serif;color:#5b6b85;padding:40px">Carregando…</div></div>
+<div id="raiz"><div id="pmx-carregando" style="font-family:sans-serif;color:#5b6b85;padding:40px">Carregando…</div></div>
 ${LOADER}
 </body>
 </html>`;
