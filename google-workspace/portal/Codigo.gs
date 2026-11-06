@@ -2,7 +2,7 @@
  * PORTAL DE LANÇAMENTOS FISCAIS — Apps Script (roda com a conta @premix de quem publica)
  *
  *  1) Formulário (app da Web, incorporado no Google Sites): recebe os dados e os PDFs.
- *  2) PDFs  -> Drive da Premix, pasta Filial / AAAA-MM Mês / Dia, com o nome "Filial SIGLA número"
+ *  2) PDFs  -> Drive da Premix, pasta Filial / Mês / Dia, com o nome "Filial SIGLA número"
  *     (ex.: Patrocínio Paulista NF 000012345). Nada vai para o Supabase.
  *  3) Dados -> uma linha na planilha-base (aba "Lancamentos") e um POST no painel (/api/lancamentos/ingest).
  *  4) Retorno: quando o painel lança, pendencia ou cancela, ELE mesmo grava na linha (Status, Responsável,
@@ -68,9 +68,9 @@ function ehFrete_(tipo) { return String(tipo).indexOf('Frete') === 0; }
 function brDeIso_(iso) { var m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})$/); return m ? m[3] + '/' + m[2] + '/' + m[1] : ''; }
 function isoDeBr_(br) { var m = String(br || '').match(/^(\d{2})\/(\d{2})\/(\d{4})$/); return m ? m[3] + '-' + m[2] + '-' + m[1] : ''; }
 function subpasta_(pai, nome) { var it = pai.getFoldersByName(nome); return it.hasNext() ? it.next() : pai.createFolder(nome); }
-// Filial / 2026-10 Outubro / 06 — cria as pastas que faltarem.
+// Filial / Outubro / 06 — cria as pastas que faltarem.
 function pastaDoDia_(filial, agora) {
-  var mes = Utilities.formatDate(agora, FUSO, 'yyyy-MM') + ' ' + MESES[Number(Utilities.formatDate(agora, FUSO, 'M')) - 1];
+  var mes = MESES[Number(Utilities.formatDate(agora, FUSO, 'M')) - 1];
   var dia = Utilities.formatDate(agora, FUSO, 'dd');
   return subpasta_(subpasta_(subpasta_(DriveApp.getFolderById(prop_('PASTA_RAIZ')), filial), mes), dia);
 }

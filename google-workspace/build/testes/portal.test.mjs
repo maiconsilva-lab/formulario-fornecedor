@@ -35,7 +35,7 @@ ctx.configurar();
 
 const hojeSP = new Date(Date.now() - 3 * 3600e3).toISOString();
 const MESES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-const mesEsperado = hojeSP.slice(0, 7) + ' ' + MESES[Number(hojeSP.slice(5, 7)) - 1];
+const mesEsperado = MESES[Number(hojeSP.slice(5, 7)) - 1];
 const diaEsperado = hojeSP.slice(8, 10);
 const pdf = Buffer.from('%PDF-1.4 conteudo de teste').toString('base64');
 const arquivos = () => Object.values(portal.arquivos);
@@ -67,7 +67,7 @@ const pastaDe = (nome) => { const f = arquivos().find((a) => a.blob.getName() ==
 const pf = pastaDe('Patrocínio Paulista NF 000012345.pdf');
 const raizDocs = portal.globais.DriveApp.getFolderById('raiz-docs');
 const filiais = []; const it = raizDocs.getFolders(); while (it.hasNext()) filiais.push(it.next().getName());
-ok(filiais.includes('Patrocínio Paulista') && filiais.includes('Ribeirão Preto') && !filiais.some((n) => /^\d{4}-\d{2}$/.test(n)), 'a pasta de mais alto nível é a Filial: ' + filiais.slice(0, 4).join(', ') + '...');
+ok(filiais.includes('Patrocínio Paulista') && filiais.includes('Ribeirão Preto') && !filiais.some((n) => /^\d{4}-\d{2}/.test(n)), 'a pasta de mais alto nível é a Filial: ' + filiais.slice(0, 4).join(', ') + '...');
 const fp = raizDocs.getFoldersByName('Patrocínio Paulista').next();
 const meses = []; const im = fp.getFolders(); while (im.hasNext()) meses.push(im.next().getName());
 ok(meses.length === 1 && meses[0] === mesEsperado, 'dentro da filial vem o mês: "' + meses[0] + '"');
